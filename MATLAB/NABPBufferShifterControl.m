@@ -33,7 +33,7 @@ classdef NABPBufferShifterControl < handle
         end
         function buff = fill(obj)
             last_tap = obj.nabp_cfg.pe_set.partitions(end).lower;
-            obj.buff = zeros(last_tap);
+            obj.buff = zeros(1, last_tap);
             for idx = 1:last_tap
                 obj.buff(end - idx + 1) = obj.m_filter_mapper.next();
             end
@@ -42,7 +42,7 @@ classdef NABPBufferShifterControl < handle
         function buff = next(obj)
             if obj.should_shift()
             	next = obj.m_filter_mapper.next();
-            	obj.buff = [next obj.buff(2:end)];
+            	obj.buff = [next obj.buff(1:end-1)];
             end
             buff = obj.buff;
         end
