@@ -10,11 +10,12 @@ function image = nabp(projection, projection_angles)
     mov = moviein(nabp_cfg.p_angle_size);
 
     for p_angle_idx = 1:nabp_cfg.p_angle_size
-        fprintf('Angle: %3.1f\n', p_angle);
 
         % mode control
         p_angle = projection_angles(p_angle_idx);
         mode = NABPModeControl(p_angle);
+
+        fprintf('Angle: %3.1f\n', p_angle);
 
         for line_itr = 1:nabp_cfg.pe_set.partition_size
 
@@ -39,19 +40,19 @@ function image = nabp(projection, projection_angles)
                     if mode.scan_direction == 'f'
                         scan_pos = scan_itr;
                     else
-                        scan_pos = nabp_cfg.i_size - scan_itr;
+                        scan_pos = nabp_cfg.i_size - scan_itr + 1;
                     end
                     if mode.scan_mode == 'x'
                         if pe_line < nabp_cfg.i_size
                             image(scan_pos, end - pe_line) = ...
-                                    image(scan_pos, end - pe_line) + ...
-                                    buffer(pe_tap);
+                                    image(scan_pos, end - pe_line) ...
+                                    + buffer(pe_tap);
                         end
                     elseif mode.scan_mode == 'y'
-                        if pe_tap < nabp_cfg.i_size
-                            image(pe_line, end - scan_pos) = ...
-                                    image(pe_line, end - scan_pos) + ...
-                                    buffer(pe_tap);
+                        if pe_line < nabp_cfg.i_size
+                            image(pe_line, end - scan_pos + 1) = ...
+                                    image(pe_line, end - scan_pos + 1) ...
+                                    + buffer(pe_tap);
                         end
                     end
                 end
