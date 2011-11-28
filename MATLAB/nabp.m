@@ -10,14 +10,13 @@ function image = nabp(projection, projection_angles)
     mov = moviein(nabp_cfg.p_angle_size);
 
     for p_angle_idx = 1:nabp_cfg.p_angle_size
+        fprintf('Angle: %3.1f\n', p_angle);
 
         % mode control
         p_angle = projection_angles(p_angle_idx);
         mode = NABPModeControl(p_angle);
 
         for line_itr = 1:nabp_cfg.pe_set.partition_size
-
-            fprintf('Angle: %f, Line iteration: %d\n', p_angle, line_itr);
 
             % new filter mapper for this iteration
             p_line = projection(:, p_angle_idx);
@@ -58,6 +57,7 @@ function image = nabp(projection, projection_angles)
                 buffer = buffer_control.next();
             end
         end
+        imagesc(image);
         mov(:, p_angle_idx) = getframe;
     end
 

@@ -52,13 +52,13 @@ classdef NABPFilterMapper < handle
             end
 
             % in range
+            if ~numel(obj.m_queue)
+                val = 0;
+                return
+            end
             if floor(m_accu_curr) ~= floor(m_accu_next)
-                if obj.m_queue
-                    val = obj.m_queue(end);
-                    obj.m_queue = obj.m_queue(1:end-1);
-                else
-                    val = 0;
-                end
+                val = obj.m_queue(end);
+                obj.m_queue = obj.m_queue(1:end-1);
             else
                 val = obj.m_queue(end);
             end
