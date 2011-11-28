@@ -35,21 +35,23 @@ function image = nabp(projection, projection_angles)
                 % for each pe, read from buffer taps
                 for pe_itr = 1:nabp_cfg.pe_set.no_of_partitions
                     pe_tap = nabp_cfg.pe_set.partitions(pe_itr).lower;
-                    pe_line = pe_tap + line_itr;
+                    pe_line = pe_tap + line_itr - 1;
                     if mode.scan_direction == 'f'
                         scan_pos = scan_itr;
                     else
                         scan_pos = nabp_cfg.i_size - scan_itr;
                     end
                     if mode.scan_mode == 'x'
-                        if pe_line <= nabp_cfg.i_size
-                            image(scan_pos, pe_line) = ...
-                                image(scan_pos, pe_line) + buffer(pe_tap);
+                        if pe_line < nabp_cfg.i_size
+                            image(scan_pos, end - pe_line) = ...
+                                    image(scan_pos, end - pe_line) + ...
+                                    buffer(pe_tap);
                         end
                     elseif mode.scan_mode == 'y'
-                        if pe_tap <= nabp_cfg.i_size
-                            image(pe_line, scan_pos) = ...
-                                image(pe_line, scan_pos) + buffer(pe_tap);
+                        if pe_tap < nabp_cfg.i_size
+                            image(pe_line, end - scan_pos) = ...
+                                    image(pe_line, end - scan_pos) + ...
+                                    buffer(pe_tap);
                         end
                     end
                 end
