@@ -1,0 +1,10 @@
+# Vim
+*.swp
+
+# Python
+*.pyc
+*.pyo
+
+# MATLAB autosave files
+*.asv
+*.m~
