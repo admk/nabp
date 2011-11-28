@@ -74,13 +74,13 @@ classdef NABPFilterMapper < handle
                 obj.m_factor = -cosd(obj.p_angle);
             elseif obj.mode.sector == 1
                 obj.m_accu = obj.s_eval(start_pos, 0);
-                obj.m_factor = -sind(obj.p_angle);
+                obj.m_factor = sind(obj.p_angle);
             elseif obj.mode.sector == 2
                 obj.m_accu = obj.s_eval(start_pos, obj.nabp_cfg.i_size);
-                obj.m_factor = -sind(obj.p_angle);
+                obj.m_factor = sind(obj.p_angle);
             elseif obj.mode.sector == 3
                 obj.m_accu = obj.s_eval(obj.nabp_cfg.i_size, start_pos);
-                obj.m_factor = cosd(obj.p_angle);
+                obj.m_factor = -cosd(obj.p_angle);
             end
 
             filtered_p_line = nabp_filter(obj.p_line);
@@ -95,7 +95,7 @@ classdef NABPFilterMapper < handle
                     obj.m_queue = filtered_p_line;
                 end
             else
-                if last_tap_idx < obj.nabp_cfg.p_line_size
+                if last_tap_idx > 0
                     % same idea as above
                     obj.m_queue = filtered_p_line(end:-1:last_tap_idx);
                 else
