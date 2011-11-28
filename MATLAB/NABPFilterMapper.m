@@ -83,13 +83,13 @@ classdef NABPFilterMapper < handle
                 obj.m_factor = -cosd(obj.p_angle);
             end
 
-            filtered_p_line = nabp_filter(obj.p_line);
+            filtered_p_line = nabp_filter(obj.nabp_cfg, obj.p_line);
             last_tap_idx = floor(obj.m_accu) + 1;
             if obj.mode.buff_step_direction == 'a'
                 if last_tap_idx < obj.nabp_cfg.p_line_size
                     % in hardware this is achieved by discarding
-                    % (p_line_size - last_tap_idx) values in the
-                    % same no of cycles
+                    % (p_line_size - last_tap_idx) no of values in
+                    % the same no of cycles
                     obj.m_queue = filtered_p_line(1:last_tap_idx);
                 else
                     obj.m_queue = filtered_p_line;
@@ -115,13 +115,23 @@ classdef NABPFilterMapper < handle
     end
 end
 
-function filtered_projection = nabp_filter(projection)
+function filtered_projection = nabp_filter(nabp_cfg, projection)
     % FIR filtering
     % Does not filter in stream but in blocks
     % In efficient hardware implementation it will be replaced by a stream
     % filter.
-    order = 64;
+
+    function filter = ramp_filter_coef(order)
+        filter = linspace(0, 1, order/2+1);
+        filter = [filter filter(end-1:-1:2)];
+        filter = ifftshift(ifft(filter));
+        filter = filter ./ max(filter);
+    end
+
+    order = nabp_cfg.fir_order;
     half_order = order / 2;
+    assert(floor(half_order) == half_order, ...
+            'Filter must be even-ordered.');
     fir_b = ramp_filter_coef(order);
     % filter each angle
     filtered_projection = zeros(size(projection));
@@ -136,9 +146,3 @@ function filtered_projection = nabp_filter(projection)
     end
 end
 
-function filter = ramp_filter_coef(order)
-    filter = linspace(0, 1, order/2+1);
-    filter = [filter filter(end-1:-1:2)];
-    filter = ifftshift(ifft(filter));
-    filter = filter ./ max(filter);
-end

@@ -4,9 +4,9 @@ classdef NABPModeControl < handle
         projection_angle
         % outputs
         sector
-        buff_step_direction
         scan_mode
         scan_direction
+        buff_step_direction
         buff_shift_mode
     end
     methods
@@ -27,24 +27,24 @@ classdef NABPModeControl < handle
             end
 
             if obj.sector == 0
-                obj.buff_step_direction = 'a';
                 obj.scan_mode = 'x';
                 obj.scan_direction = 'f';
+                obj.buff_step_direction = 'a';
                 obj.buff_shift_mode = 'tan';
             elseif obj.sector == 1
-                obj.buff_step_direction = 'd';
                 obj.scan_mode = 'y';
                 obj.scan_direction = 'f';
+                obj.buff_step_direction = 'd';
                 obj.buff_shift_mode = 'cot';
             elseif obj.sector == 2
-                obj.buff_step_direction = 'd';
                 obj.scan_mode = 'y';
                 obj.scan_direction = 'r';
+                obj.buff_step_direction = 'd';
                 obj.buff_shift_mode = 'cot';
             elseif obj.sector == 3
-                obj.buff_step_direction = 'd';
                 obj.scan_mode = 'x';
                 obj.scan_direction = 'r';
+                obj.buff_step_direction = 'd';
                 obj.buff_shift_mode = 'tan';
             end
         end
