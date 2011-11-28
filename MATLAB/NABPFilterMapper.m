@@ -26,8 +26,33 @@ classdef NABPFilterMapper < handle
             obj.reset();
         end
         function val = next(obj)
-            m_accu_next = obj.m_accu + obj.m_factor;
-            if floor(obj.m_accu) ~= floor(m_accu_next)
+            % value update
+            m_accu_curr = obj.m_accu;
+            m_accu_next = m_accu_curr + obj.m_factor;
+            obj.m_accu = m_accu_next;
+
+            % out of range checks
+            p_size = obj.nabp_cfg.p_line_size;
+            if obj.mode.buff_step_direction == 'a'
+                assert(obj.m_factor <= 0, ...
+                    ['m_factor cannot be positive for ' ...
+                     'ascending step direction']);
+                if m_accu_curr + 1 > p_size
+                    val = 0;
+                    return
+                end
+            else
+                assert(obj.m_factor >= 0, ...
+                    ['m_factor cannot be negative for ' ...
+                     'descending step direction']);
+                if m_accu_curr + 1 < 0
+                    val = 0;
+                    return
+                end
+            end
+
+            % in range
+            if floor(m_accu_curr) ~= floor(m_accu_next)
                 if obj.m_queue
                     val = obj.m_queue(end);
                     obj.m_queue = obj.m_queue(1:end-1);
@@ -37,7 +62,6 @@ classdef NABPFilterMapper < handle
             else
                 val = obj.m_queue(end);
             end
-            obj.m_accu = m_accu_next;
         end
         function reset(obj)
             no_of_pes = obj.nabp_cfg.pe_set.no_of_partitions;
@@ -47,34 +71,36 @@ classdef NABPFilterMapper < handle
 
             if obj.mode.sector == 0
             	obj.m_accu = obj.s_eval(0, start_pos);
+                obj.m_factor = -cosd(obj.p_angle);
             elseif obj.mode.sector == 1
                 obj.m_accu = obj.s_eval(start_pos, 0);
+                obj.m_factor = -sind(obj.p_angle);
             elseif obj.mode.sector == 2
                 obj.m_accu = obj.s_eval(start_pos, obj.nabp_cfg.i_size);
+                obj.m_factor = -sind(obj.p_angle);
             elseif obj.mode.sector == 3
                 obj.m_accu = obj.s_eval(obj.nabp_cfg.i_size, start_pos);
+                obj.m_factor = cosd(obj.p_angle);
             end
 
             filtered_p_line = nabp_filter(obj.p_line);
-            buffer_size = floor(obj.m_accu) + 1;
-            queue = zeros(1, buffer_size);
-            for idx = 1:buffer_size
-                if 1 <= idx && idx <= length(queue)
-                    queue(idx) = filtered_p_line(idx);
-                else
-                	queue(idx) = 0;
-                end
-            end
+            last_tap_idx = floor(obj.m_accu) + 1;
             if obj.mode.buff_step_direction == 'a'
-                obj.m_queue = queue;
+                if last_tap_idx < obj.nabp_cfg.p_line_size
+                    % in hardware this is achieved by discarding
+                    % (p_line_size - last_tap_idx) values in the
+                    % same no of cycles
+                    obj.m_queue = filtered_p_line(1:last_tap_idx);
+                else
+                    obj.m_queue = filtered_p_line;
+                end
             else
-                obj.m_queue = queue(end:-1:1);
-            end
-
-            if obj.mode.buff_step_direction == 'x'
-            	obj.m_factor = -cosd(obj.p_angle);
-            else
-            	obj.m_factor = sind(obj.p_angle);
+                if last_tap_idx < obj.nabp_cfg.p_line_size
+                    % same idea as above
+                    obj.m_queue = filtered_p_line(end:-1:last_tap_idx);
+                else
+                    obj.m_queue = filtered_p_line(end:-1:1);
+                end
             end
         end
     end
@@ -106,7 +132,7 @@ function filtered_projection = nabp_filter(projection)
         projection_slice = [projection(:,idx); zeros(half_order,1)];
         filtered_projection_slice = filter(fir_b, 1, projection_slice);
         filtered_projection(:,idx) = filtered_projection_slice(...
-                end-half_order+1, 1);
+                1:(end-half_order), 1);
     end
 end
 
