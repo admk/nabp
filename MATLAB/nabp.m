@@ -6,7 +6,6 @@ function image = nabp(projection, projection_angles)
 
     image = zeros(nabp_cfg.i_size, nabp_cfg.i_size);
 
-    figure;
     colormap('Gray');
     mov = moviein(nabp_cfg.p_angle_size);
 
@@ -18,33 +17,40 @@ function image = nabp(projection, projection_angles)
 
         for line_itr = 1:nabp_cfg.pe_set.partition_size
 
+            fprintf('Angle: %f, Line iteration: %d\n', p_angle, line_itr);
+
             % new filter mapper for this iteration
             p_line = projection(:, p_angle_idx);
-            
+
             % mode control for current angle
             mode = NABPModeControl(p_angle);
- 
+
             % buffer pipeline fill stage
             buffer_control = NABPBufferShifterControl(...
                 nabp_cfg, mode, p_line, p_angle, ...
                 line_itr);
             buffer = buffer_control.fill();
-        
+
             % for each scan iteration
             for scan_itr = 1:nabp_cfg.i_size
                 % for each pe, read from buffer taps
                 for pe_itr = 1:nabp_cfg.pe_set.no_of_partitions
                     pe_tap = nabp_cfg.pe_set.partitions(pe_itr).lower;
                     pe_line = pe_tap + line_itr;
+                    if mode.scan_direction == 'f'
+                        scan_pos = scan_itr;
+                    else
+                        scan_pos = nabp_cfg.i_size - scan_itr;
+                    end
                     if mode.scan_mode == 'x'
-                        if pe_tap <= nabp_cfg.i_size
-                            image(scan_itr, pe_line) = ...
-                                image(scan_itr, pe_line) + buffer(pe_tap);
+                        if pe_line <= nabp_cfg.i_size
+                            image(scan_pos, pe_line) = ...
+                                image(scan_pos, pe_line) + buffer(pe_tap);
                         end
                     elseif mode.scan_mode == 'y'
                         if pe_tap <= nabp_cfg.i_size
-                            image(pe_line, scan_itr) = ...
-                                image(pe_line, scan_itr) + buffer(pe_tap);
+                            image(pe_line, scan_pos) = ...
+                                image(pe_line, scan_pos) + buffer(pe_tap);
                         end
                     end
                 end
