@@ -142,7 +142,7 @@ function filtered_projection = nabp_filter(nabp_cfg, projection)
         projection_slice = [projection(:,idx); zeros(half_order,1)];
         filtered_projection_slice = filter(fir_b, 1, projection_slice);
         filtered_projection(:,idx) = filtered_projection_slice(...
-                1:(end-half_order), 1);
+                (half_order + 1):end, 1);
     end
 end
 
