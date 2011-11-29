@@ -33,6 +33,10 @@ function image = nabp(projection, projection_angles)
 
             % for each scan iteration
             for scan_itr = 1:nabp_cfg.i_size
+                if nabp_cfg.p_domain_pe_interpolate
+                    int_w = buffer_control.interpolate_weight();
+                end
+
                 % for each pe, read from buffer taps
                 for pe_itr = 1:nabp_cfg.pe_set.no_of_partitions
                     pe_tap = nabp_cfg.pe_set.partitions(pe_itr).lower;
@@ -42,27 +46,33 @@ function image = nabp(projection, projection_angles)
                     else
                         scan_pos = nabp_cfg.i_size - scan_itr + 1;
                     end
+                    % interpolation
+                    if (nabp_cfg.p_domain_pe_interpolate && ...
+                            pe_tap < numel(buffer))
+                        upd_val = buffer(pe_tap) * (1 - int_w) + ...
+                                buffer(pe_tap + 1) * int_w;
+                    else
+                        upd_val = buffer(pe_tap);
+                    end
                     if mode.scan_mode == 'x'
                         if pe_line < nabp_cfg.i_size
                             image(scan_pos, end - pe_line) = ...
                                     image(scan_pos, end - pe_line) ...
-                                    + buffer(pe_tap);
+                                    + upd_val;
                         end
                     elseif mode.scan_mode == 'y'
                         if pe_line < nabp_cfg.i_size
                             image(pe_line, end - scan_pos + 1) = ...
                                     image(pe_line, end - scan_pos + 1) ...
-                                    + buffer(pe_tap);
+                                    + upd_val;
                         end
                     end
                 end
-                % shift chain buffer
+                % shift line buffer
                 buffer = buffer_control.next();
             end
         end
         imagesc(image);
-        mov(:, p_angle_idx) = getframe;
+        getframe;
     end
-
-    movie(mov);
 end

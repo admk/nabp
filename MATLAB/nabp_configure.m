@@ -13,6 +13,8 @@ function nabp_cfg = nabp_configure(projection, projection_angles)
     % image size & center
     nabp_cfg.i_size = nabp_cfg.p_line_size;
     nabp_cfg.i_center = (nabp_cfg.i_size + 1) / 2;
+    % interpolation schemes
+    nabp_cfg.p_domain_pe_interpolate = true;
     nabp_cfg.p_domain_stream_interpolate = false;
 
     % data stream pipeline offset value
