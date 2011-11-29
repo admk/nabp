@@ -1,13 +1,11 @@
 function image = nabp(projection, projection_angles)
 
-    no_of_partitions = 24;
-    nabp_cfg = nabp_configure(...
-            projection, projection_angles, no_of_partitions);
-
+    nabp_cfg = nabp_configure(projection, projection_angles);
     image = zeros(nabp_cfg.i_size, nabp_cfg.i_size);
 
     colormap('Gray');
-    mov = moviein(nabp_cfg.p_angle_size);
+    imagesc(image);
+    truesize(imgcf, size(image));
 
     for p_angle_idx = 1:nabp_cfg.p_angle_size
 
@@ -22,10 +20,8 @@ function image = nabp(projection, projection_angles)
             % new filter mapper for this iteration
             p_line = projection(:, p_angle_idx);
 
-            % mode control for current angle
-            mode = NABPModeControl(p_angle);
-
-            % buffer pipeline fill stage
+            % line buffer fill stage
+            % line buffer double buffer swapping not implemented in MATLAB
             buffer_control = NABPBufferShifterControl(...
                 nabp_cfg, mode, p_line, p_angle, ...
                 line_itr);
