@@ -13,6 +13,7 @@ classdef NABPFilterMapper < handle
         m_queue
         m_accu
         m_factor
+        m_val
     end
     methods
         function obj = NABPFilterMapper(...
@@ -56,11 +57,25 @@ classdef NABPFilterMapper < handle
                 val = 0;
                 return
             end
+            m_val_0 = obj.m_val;
             if floor(m_accu_curr) ~= floor(m_accu_next)
-                val = obj.m_queue(end);
+                m_val_1 = obj.m_queue(end);
+                obj.m_val = m_val_1;
                 obj.m_queue = obj.m_queue(1:end-1);
             else
-                val = obj.m_queue(end);
+                m_val_1 = obj.m_queue(end);
+            end
+            if obj.nabp_cfg.p_domain_stream_interpolate
+                w = obj.interpolate_weight();
+                val = m_val_1 * (1 - w) + m_val_0 * w;
+            else
+                val = m_val_1;
+            end
+        end
+        function w = interpolate_weight(obj)
+            w = ceil(obj.m_accu) - obj.m_accu;
+            if obj.mode.buff_step_direction == 'a'
+                w = 1 - w;
             end
         end
         function reset(obj)
@@ -102,6 +117,8 @@ classdef NABPFilterMapper < handle
                     obj.m_queue = filtered_p_line(end:-1:1);
                 end
             end
+
+            obj.m_val = 0;
         end
     end
     methods(Access=private)
@@ -139,10 +156,10 @@ function filtered_projection = nabp_filter(nabp_cfg, projection)
         % pass all data through filter
         % but also append half_order number of zeros
         % to compensate FIR group delay
-        projection_slice = [projection(:,idx); zeros(half_order,1)];
+        projection_slice = [projection(:,idx); ...
+                zeros(half_order + nabp_cfg.pipeline_offset,1)];
         filtered_projection_slice = filter(fir_b, 1, projection_slice);
         filtered_projection(:,idx) = filtered_projection_slice(...
-                (half_order + 1):end, 1);
+                (half_order + nabp_cfg.pipeline_offset + 1):end, 1);
     end
 end
-

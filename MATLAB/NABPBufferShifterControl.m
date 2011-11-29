@@ -27,7 +27,6 @@ classdef NABPBufferShifterControl < handle
             elseif strcmp(mode.buff_shift_mode, 'cot')
                 obj.m_factor = cotd(p_angle);
             end
-
             obj.m_filter_mapper = NABPFilterMapper(...
                     nabp_cfg, mode, p_line, p_angle, line_itr);
         end
@@ -45,6 +44,12 @@ classdef NABPBufferShifterControl < handle
             	obj.buff = [next obj.buff(1:end-1)];
             end
             buff = obj.buff;
+        end
+        function w = interpolate_weight(obj)
+            w = ceil(obj.m_accu) - obj.m_accu;
+            if obj.m_accu < 0
+                w = 1 - w;
+            end
         end
     end
     methods(Access=protected)
