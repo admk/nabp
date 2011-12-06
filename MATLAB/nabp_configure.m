@@ -17,7 +17,7 @@ function nabp_cfg = nabp_configure(projection, projection_angles)
     nabp_cfg.i_center = (nabp_cfg.i_size - 1) / 2;
 
     % number of partitions
-    nabp_cfg.desired_no_of_partitions = 1;
+    nabp_cfg.desired_no_of_partitions = nabp_cfg.i_size;
 
     % filter order
     nabp_cfg.fir_order = 64;
