@@ -1,5 +1,7 @@
-%% Partitioning
 function pe_set = nabp_partition(size, no_of_partitions)
+    % Provides an image partition scheme, for an image size and a proposed
+    % number of partitions, it generates the width of each partition and the
+    % actual number of partitions, as well as the ranges each of them cover.
 
     pe_set.no_of_partitions = no_of_partitions;
     assert(pe_set.no_of_partitions <= size, ...

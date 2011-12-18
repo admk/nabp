@@ -1,4 +1,5 @@
 function image = nabp(projection, projection_angles)
+    % The new architecture simulation in MATLAB
 
     nabp_cfg = nabp_configure(projection, projection_angles);
     image = zeros(nabp_cfg.i_size, nabp_cfg.i_size);

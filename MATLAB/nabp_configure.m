@@ -1,5 +1,6 @@
-%% Configure (compile-time)
 function nabp_cfg = nabp_configure(projection, projection_angles)
+    % Configurations for the algorithm
+
     % projection size
     nabp_cfg.p_line_size = size(projection, 1);
     nabp_cfg.p_angle_size = length(projection_angles);
