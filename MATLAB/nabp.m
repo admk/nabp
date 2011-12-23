@@ -72,6 +72,6 @@ function image = nabp(projection, projection_angles)
         imagesc(image);
         getframe;
     end
-    image = image ./ nabp_cfg.p_angle_size;
+    image = image .* (pi / nabp_cfg.p_angle_size);
     imagesc(image);
 end
