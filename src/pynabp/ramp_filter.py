@@ -1,4 +1,3 @@
-from pylab import *
 import numpy as np
 
 def ramp_filter(order):
