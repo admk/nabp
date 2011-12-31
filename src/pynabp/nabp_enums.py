@@ -13,8 +13,8 @@ class scan_direction:
     backward = '1'
 
 class buff_step_mode:
-    cot = '0'
-    tan = '1'
+    tan = '0'
+    cot = '1'
 
 class buff_step_direction:
     ascending = '0'

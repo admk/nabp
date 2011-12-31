@@ -1,5 +1,6 @@
 import math
 import numpy as np
+import nabp_utils
 from nabp_partition import nabp_partition
 from ramp_filter import ramp_filter
 
@@ -40,10 +41,11 @@ def nabp_config(
             config['image_size'], no_of_partitions)
     config['ramp_filter_coefs'] = ramp_filter(fir_order)
     # architecture specific configs
-    config['kAngleLength'] = math.ceil(math.log(180, 2))
+    config['kAngleLength'] = nabp_utils.bin_width_of_dec(180)
     for angle in range(45, 136, 45):
-        config['kAngle' + angle] = config['kAngleLength'] + '\'d'
-        config['kAngle' + angle] += str(math.ceil(math.log(angle, 2)))
+        key = 'kAngle' + str(angle)
+        config[key] = str(config['kAngleLength']) + '\'b'
+        config[key] += nabp_utils.dec2bin(angle, config['kAngleLength'])
     # optional arguments
     config.update(kwargs)
     return config
