@@ -1,12 +1,13 @@
+derived_src
+
 # Mac
 .DS_Store
 
 # Vim
-*.swp
+*.sw[po]
 
 # Python
-*.pyc
-*.pyo
+*.py[co]
 
 # MATLAB autosave files
 *.asv
