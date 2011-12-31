@@ -12,6 +12,7 @@ def nabp_config(
     if config:
         return config
     config = {}
+    # algorithm specific configs
     config['projection_data'] = projection_data
     if projection_data:
         config['projection_line_size'] = np.shape(projection_data)[1]
@@ -37,6 +38,12 @@ def nabp_config(
         config['projection_domain_stream_pipeline_offset'] -= 1
     config['partition_scheme'] = nabp_partition(
             config['image_size'], no_of_partitions)
-    config.update(kwargs)
     config['ramp_filter_coefs'] = ramp_filter(fir_order)
+    # architecture specific configs
+    config['kAngleLength'] = math.ceil(math.log(180, 2))
+    for angle in range(45, 136, 45):
+        config['kAngle' + angle] = config['kAngleLength'] + '\'d'
+        config['kAngle' + angle] += str(math.ceil(math.log(angle, 2)))
+    # optional arguments
+    config.update(kwargs)
     return config
