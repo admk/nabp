@@ -1,22 +1,18 @@
+{# include('nabp_info.v') #}
 // NABPModeControl
-// ===============
+//     {# name() #}
+//     31 Dec 2011
 // Provides operation modes for the NABP architecture
-//
-// mode_control.v
-// Xitong Gao
-// 31 Dec 2011
-
-
 {#
 from pynabp.nabp_config import nabp_config
 from pynabp.nabp_enums import *
-#}
-
-{% for key, val in nabp_config().iteritems() %}
-    {% if 'kAngle' in key %}
-        `define {# key #} {# val #}
-    {% end %}
+angle_defines = dict(
+        (k, v) for k, v in nabp_config().iteritems() if 'kAngle' in k)
+set_eat_blanklines(True) #}
+{% for key, val in angle_defines.iteritems() %}
+`define {# key #} {# val #}
 {% end %}
+{# set_eat_blanklines(False) #}
 
 module NABPModeControl
 (
