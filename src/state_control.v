@@ -15,86 +15,89 @@ module NABPStateControl
     // global signals
     input wire clk,
     input wire reset_n,
-    // inputs
-    input wire buff_ready;
-    input wire pe_ready;
-    // outputs
-    output wire [`kAngleLength-1:0] buff_angle;
-    output reg buff_sel;
-    output wire fill_kick;
-    output wire shift_kick;
+    // inputs from swap control
+    input wire [`kAngleLength-1:0] sw_angle,
+    input wire sw_swap,
+    // inputs from shifter
+    input wire sh_fill_done,
+    input wire sh_shift_done,
+    // output the angle this state control holds
+    output reg [`kAngleLength-1:0] angle,
+    // output to swap control
+    output wire sw_next_angle,
+    // output to shifter
+    output wire sh_fill_enable,
+    output wire sh_shift_enable,
 );
 
 parameter [{# states.width - 1 #}:0] // synopsys enum code
     {% for idx, key in enumerate(states.enum_keys()) %}
-        {# key #} = {# states.enum_dict()[key] #}
+        {# key #}_s = {# states.enum_dict()[key] #}
         {% if idx < len(states.enum_keys()) - 1 %},{% end %}
     {% end %};
 // synopsys state_vector state
 reg [{# states.width - 1 #}:0] // synopsys enum code
         state, next_state;
 
-reg unsigned [`kAngleLength-1:0] angle;
-assign buff_angle = angle + {# a_len #}'d1;
-
-wire next_iteration;
-assign next_iteration = buff_ready and pe_ready;
-
 always @(posedge clk)
-begin:fsm_transition
+begin:transition
     if (!reset_n)
     begin
         angle <= {# a_len #}'d0;
         state <= {# states.init #};
-        buff_sel <= 0;
     end
     else
     begin
-        if (next_iteration)
+        if (state == {# states.setup #})
         begin
-            angle <= angle + 1;
-            // swap buffer
-            buff_sel <= not buff_sel;
+            angle <= sw_angle;
         end
-        // update state
         state <= next_state;
     end
 end
 
-always @(buff_ready or pe_ready or state)
-begin:fsm_next_state
-    // initial values
-    fill_kick <= 0;
-    shift_kick <= 0;
+// mealy outputs
+assign sw_next_angle   = (state == {# states.init #}) or
+                         (state == {# states.shift_done #});
+assign sh_fill_enable  = (state == {# states.fill #});
+assign sh_shift_enable = (state == {# states.shift #});
+
+// mealy next state
+always @(state)
+begin:mealy_next_state
     next_state <= state;
     // fsm cases
-    case (state) // synopsys parallel_case
-        {# states.init #}:
-            next_state <= {# states.fill #};
-            fill_kick <= 1;
+    case (state) // synopsys parallel_case full_case
+        init_s:
+            next_state <= setup_s;
         end
-        {# states.fill #}:
-            if (next_iteration == 1)
+        setup_s:
+            next_state <= fill_s;
+        end
+        fill_s:
+            if (sh_fill_done)
             begin
-                next_state <= {# states.fill_shift #};
-                fill_kick <= 1;
-                shift_kick <= 1;
+                next_state <= fill_done_s;
             end
         end
-        {# states.fill_shift #}:
-            // stops when finish working
-            if ((next_iteration == 1) and (angle >= {# a_len #}'d179))
+        fill_done_s:
+            if (sw_swap)
             begin
-                next_state <= {# states.stop #};
+                next_state <= shift_s;
             end
-            else
+        end
+        shift_s:
+            if (sh_shift_done)
             begin
-                fill_kick <= 1;
-                shift_kick <= 1;
+                next_state <= shift_done_s;
             end
+        end
+        shift_done_s:
+            next_state <= setup_s;
         end
         default:
-            $display("Invalid state encountered: %d", state);
+            $display(
+                "<NABPStateControl> Invalid state encountered: %d", state);
     endcase
 end
 

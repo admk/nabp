@@ -1,19 +1,11 @@
 import nabp_utils
 
 class states(nabp_utils.enum):
-    """
-    >>> states.width
-    2
-    >>> print states.init
-    2'd0
-    """
-    no = 4
+    no = 6
     width = nabp_utils.bin_width_of_dec(no)
     init = str(width) + '\'d0'
-    fill = str(width) + '\'d1'
-    fill_shift = str(width) + '\'d2'
-    stop = str(width) + '\'d3'
-
-if __name__ == '__main__':
-    import doctest
-    doctest.testmod()
+    setup = str(width) + '\'d1'
+    fill = str(width) + '\'d2'
+    fill_done = str(width) + '\'d3'
+    shift = str(width) + '\'d4'
+    shift_done = str(width) + '\'d5'
