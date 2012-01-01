@@ -19,7 +19,7 @@ module NABPModeControl
     // input from FSM
     input wire unsigned [`kAngleLength-1:0] angle,
     // outputs
-    output wire unsigned [1:0] sector,
+    output wire [1:0] sector,
     output wire scan_mode,
     output wire scan_direction,
     output wire buff_step_mode,
