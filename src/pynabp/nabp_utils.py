@@ -1,5 +1,25 @@
 import math
 
+class enum:
+    @classmethod
+    def enum_dict(cls):
+        d = {}
+        for k, v in cls.__dict__.iteritems():
+            if type(v) is str and not k.startswith('_'):
+                d[k] = v
+        return d
+
+    @classmethod
+    def enum_keys(cls):
+        """
+        >>> enum.enum_keys()
+        []
+        >>> enum.__dict__['x'] = 'x'
+        >>> enum.enum_keys()
+        ['x']
+        """
+        return cls.enum_dict().keys()
+
 def dec2bin(num, width=0):
     """
     >>> dec2bin(0, 8)

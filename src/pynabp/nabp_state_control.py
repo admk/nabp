@@ -1,5 +1,6 @@
 import nabp_utils
-class states:
+
+class states(nabp_utils.enum):
     """
     >>> states.width
     2
