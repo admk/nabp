@@ -4,9 +4,9 @@
 //     31 Dec 2011
 // Controls NABPFilterMapper by providing fm_shift_enable
 {#
-from pynabp.nabp_config import nabp_config
-from pynabp.nabp_enums import shifter_states
-from pynabp.nabp_utils import bin_width_of_dec, dec_repr
+    from pynabp.nabp_config import nabp_config
+    from pynabp.nabp_enums import shifter_states
+    from pynabp.nabp_utils import bin_width_of_dec, dec_repr
 #}
 
 module NABPShifter
@@ -22,24 +22,24 @@ module NABPShifter
 );
 
 {#
-    fill_count_init = nabp_config()['partition_scheme']['partitions'][-1] + 1
-    fill_count_width = bin_width_of_dec(fill_count_init)
-    shift_count_init = nabp_config()['image_size']
-    shift_count_width = bin_width_of_dec(shift_count_init)
+    fill_cnt_init = nabp_config()['partition_scheme']['partitions'][-1] + 1
+    fill_cnt_width = bin_width_of_dec(fill_cnt_init)
+    shift_cnt_init = nabp_config()['image_size']
+    shift_cnt_width = bin_width_of_dec(shift_cnt_init)
 #}
-reg unsigned [{# fill_count_width - 1 #}:0] fill_count;
-reg unsigned [{# shift_count_width - 1 #}:0] shift_count;
+reg unsigned [{# fill_cnt_width - 1 #}:0] fill_cnt;
+reg unsigned [{# shift_cnt_width - 1 #}:0] shift_cnt;
 
 always @(posedge clk)
-begin:counters
-    if (state == fill_s and fill_count != 0)
-        fill_count <= fill_count - 1;
+begin:cnters
+    if (state == fill_s and fill_cnt != 0)
+        fill_cnt <= fill_cnt - 1;
     else
-        fill_count <= {# dec_repr(fill_count_init) #};
-    if (state == shift_s and shift_count != 0)
-        shift_count <= shift_count - 1;
+        fill_cnt <= {# dec_repr(fill_cnt_init) #};
+    if (state == shift_s and shift_cnt != 0)
+        shift_cnt <= shift_cnt - 1;
     else
-        shift_count <= {# dec_repr(shift_count_init) #};
+        shift_cnt <= {# dec_repr(shift_cnt_init) #};
 end
 
 {# include('templates/state_decl(states).v', states=shifter_states) #}
@@ -53,14 +53,14 @@ begin:transition
 end
 
 // mealy outputs
-assign sc_fill_done  = (fill_count == 0) and (state == shift_s);
-assign sc_shift_done = (shift_count == 0);
+assign sc_fill_done  = (fill_cnt == 0) and (state == shift_s);
+assign sc_shift_done = (shift_cnt == 0);
 
 always @(sc_fill_kick or sc_shift_kick or sc_fill_done or sc_shift_done or
          state)
 begin:mealy_next_state
     next_state <= state;
-    case (state)
+    case (state) // synopsys parallel_case full_case
         ready_s:
             if (sc_fill_kick)
                 next_state <= fill_s;
