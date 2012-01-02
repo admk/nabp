@@ -1,4 +1,4 @@
-from nabp_utils import enum, bin_width_of_dec
+from utils import enum, bin_width_of_dec
 
 class sector(enum):
     a = '2\'d0'

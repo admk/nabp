@@ -1,4 +1,4 @@
-from nabp_utils import dec2bin
+from utils import dec2bin
 
 class FixedPoint(object):
     """

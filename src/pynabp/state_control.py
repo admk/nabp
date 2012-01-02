@@ -1,8 +1,8 @@
-import nabp_utils
+import utils
 
-class states(nabp_utils.enum):
+class states(utils.enum):
     no = 6
-    width = nabp_utils.bin_width_of_dec(no)
+    width = utils.bin_width_of_dec(no)
     init = str(width) + '\'d0'
     setup = str(width) + '\'d1'
     fill = str(width) + '\'d2'

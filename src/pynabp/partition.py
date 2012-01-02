@@ -1,12 +1,12 @@
 import math
 
-def nabp_partition(image_size, no_of_partitions):
+def partition(image_size, no_of_partitions):
     """
-    >>> nabp_partition(512, 3)
+    >>> partition(512, 3)
     {'wasted_pixels': 1.0, 'partitions': [0, 171, 342], 'no_of_partitions': 3, 'size': 171.0}
-    >>> nabp_partition(512, 4)
+    >>> partition(512, 4)
     {'wasted_pixels': 0.0, 'partitions': [0, 128, 256, 384], 'no_of_partitions': 4, 'size': 128.0}
-    >>> nabp_partition(512, 5)
+    >>> partition(512, 5)
     {'wasted_pixels': 3.0, 'partitions': [0, 103, 206, 309, 412], 'no_of_partitions': 5, 'size': 103.0}
     """
     partition_scheme = {}
@@ -18,7 +18,7 @@ def nabp_partition(image_size, no_of_partitions):
         idx += 1
     new_no_of_partitions = len(partition_scheme['partitions'])
     if new_no_of_partitions != no_of_partitions:
-        return nabp_partition(image_size, new_no_of_partitions)
+        return partition(image_size, new_no_of_partitions)
     last_tap = (no_of_partitions - 1) * partition_scheme['size']
     # check for consistencies
     if last_tap != partition_scheme['partitions'][-1]:

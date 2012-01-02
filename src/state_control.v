@@ -1,12 +1,12 @@
-{# include('nabp_info.v') #}
+{# include('templates/info.v') #}
 // NABPStateControl
 //     {# name() #}
 //     31 Dec 2011
 // Provides system states for the NABP architecture
 {#
-from pynabp.nabp_enums import state_control_states
-from pynabp.nabp_config import nabp_config
-a_len = nabp_config()['kAngleLength']
+from pynabp.enums import state_control_states
+from pynabp.conf import conf
+a_len = conf()['kAngleLength']
 #}
 `define kAngleLength {# a_len #}
 

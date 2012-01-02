@@ -1,13 +1,13 @@
-{# include('nabp_info.v') #}
+{# include('templates/info.v') #}
 // NABPModeControl
 //     {# name() #}
 //     31 Dec 2011
 // Provides operation modes for the NABP architecture
 {#
-from pynabp.nabp_config import nabp_config
-from pynabp.nabp_enums import *
+from pynabp.conf import conf
+from pynabp.enums import *
 angle_defines = dict(
-        (k, v) for k, v in nabp_config().iteritems() if 'kAngle' in k)
+        (k, v) for k, v in conf().iteritems() if 'kAngle' in k)
 set_eat_blanklines(True) #}
 {% for key, val in angle_defines.iteritems() %}
 `define {# key #} {# val #}

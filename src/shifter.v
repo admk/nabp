@@ -1,15 +1,15 @@
-{# include('nabp_info.v') #}
+{# include('templates/info.v') #}
 // NABPShifter
 //     {# name() #}
 //     31 Dec 2011
 // Controls NABPFilterMapper by providing fm_shift_enable
 {#
-    from pynabp.nabp_config import nabp_config
-    from pynabp.nabp_enums import shifter_states
-    from pynabp.nabp_utils import bin_width_of_dec, dec_repr
+    from pynabp.conf import conf
+    from pynabp.enums import shifter_states
+    from pynabp.utils import bin_width_of_dec, dec_repr
     from pynabp.fixed_point_arith import FixedPoint
 #}
-`define kAngleLength {# nabp_config()['kAngleLength'] #}
+`define kAngleLength {# conf()['kAngleLength'] #}
 
 module NABPShifter
 (
@@ -24,10 +24,10 @@ module NABPShifter
     output reg fm_shift_enable
 );
 {#
-    fill_cnt_init = nabp_config()['partition_scheme']['partitions'][-1] + 1
+    fill_cnt_init = conf()['partition_scheme']['partitions'][-1] + 1
     fill_cnt_width = bin_width_of_dec(fill_cnt_init)
 
-    shift_cnt_init = nabp_config()['image_size']
+    shift_cnt_init = conf()['image_size']
     shift_cnt_width = bin_width_of_dec(shift_cnt_init)
 
     accu_int_width = 1
