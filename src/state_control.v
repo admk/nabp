@@ -4,7 +4,7 @@
 //     31 Dec 2011
 // Provides system states for the NABP architecture
 {#
-from pynabp.nabp_state_control import states
+from pynabp.nabp_enums import state_control_states
 from pynabp.nabp_config import nabp_config
 a_len = nabp_config()['kAngleLength']
 #}
@@ -24,31 +24,25 @@ module NABPStateControl
     // output the angle this state control holds
     output reg [`kAngleLength-1:0] angle,
     // output to swap control
+    output wire sw_swap_ready,
     output wire sw_next_angle,
     // output to shifter
-    output wire sh_fill_enable,
-    output wire sh_shift_enable,
+    output wire sh_fill_kick,
+    output wire sh_shift_kick
 );
 
-parameter [{# states.width - 1 #}:0] // synopsys enum code
-    {% for idx, key in enumerate(states.enum_keys()) %}
-        {# key #}_s = {# states.enum_dict()[key] #}
-        {% if idx < len(states.enum_keys()) - 1 %},{% end %}
-    {% end %};
-// synopsys state_vector state
-reg [{# states.width - 1 #}:0] // synopsys enum code
-        state, next_state;
+{# include('templates/state_decl(states).v', states=state_control_states) #}
 
 always @(posedge clk)
 begin:transition
     if (!reset_n)
     begin
         angle <= {# a_len #}'d0;
-        state <= {# states.init #};
+        state <= init_s;
     end
     else
     begin
-        if (state == {# states.setup #})
+        if (state == setup_s)
         begin
             angle <= sw_angle;
         end
@@ -57,10 +51,13 @@ begin:transition
 end
 
 // mealy outputs
-assign sw_next_angle   = (state == {# states.init #}) or
-                         (state == {# states.shift_done #});
-assign sh_fill_enable  = (state == {# states.fill #});
-assign sh_shift_enable = (state == {# states.shift #});
+assign sw_swap_ready = (state == fill_done_s);
+assign sw_next_angle = (state == init_s) or
+                       (state == shift_done_s);
+assign sh_fill_kick  = (next_state != state) and
+                       (next_state == fill_s);
+assign sh_shift_kick = (next_state != state) and
+                       (next_state == shift_s);
 
 // mealy next state
 always @(state)
