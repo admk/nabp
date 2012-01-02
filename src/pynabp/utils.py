@@ -63,6 +63,12 @@ def dec_repr(num, width=0):
         width = bin_width_of_dec(num)
     return str(width) + '\'d' + str(int(num))
 
+def xfrange(start, stop, step=1):
+    idx = start
+    while idx < stop:
+        yield idx
+        idx += step
+
 if __name__ == '__main__':
     import doctest
     doctest.testmod()
