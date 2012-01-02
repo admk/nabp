@@ -11,7 +11,7 @@ class FixedPoint(object):
         self.integer_width = integer_width
         self.fractional_width = fractional_width
         self.signed = signed
-        if value:
+        if not value is None:
             self.value = value
 
     def width(self):
