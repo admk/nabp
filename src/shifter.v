@@ -29,22 +29,16 @@ module NABPShifter
     shift_cnt_init = conf()['image_size']
     shift_cnt_width = bin_width_of_dec(shift_cnt_init)
 
-    accu_int_width = 1
-    accu_frac_width = 3
-    accu_fixed = FixedPoint(accu_int_width, accu_frac_width, value=0)
+    accu_frac_width = conf()['kAccuPrecision']
+    accu_fixed = FixedPoint(1, accu_frac_width, value=0)
     accu_init_str = accu_fixed.verilog_repr()
     accu_floor_slice = accu_fixed.verilog_floor_slice()
-
-    accu_base_int_width = 1
-    accu_base_frac_width = 3
-    accu_base_fixed = FixedPoint(
-            accu_base_int_width, accu_base_frac_width, value=0)
 #}
 reg unsigned [{# fill_cnt_width - 1 #}:0] fill_cnt;
 reg unsigned [{# shift_cnt_width - 1 #}:0] shift_cnt;
 reg {# accu_fixed.verilog_decl() #} accu;
 reg {# accu_fixed.verilog_decl() #} accu_prev;
-reg {# accu_base_fixed.verilog_decl() #} accu_base;
+reg {# accu_fixed.verilog_decl() #} accu_base;
 
 always @(posedge clk)
 begin:counters
@@ -97,19 +91,15 @@ begin:mealy_next_state
         ready_s:
             if (sc_fill_kick)
                 next_state <= fill_s;
-        end
         fill_s:
             if (sc_fill_done)
                 next_state <= fill_done_s;
-        end
         fill_done_s:
             if (sc_shift_kick)
                 next_state <= shift_s;
-        end
         shift_s:
             if (sc_shift_done)
                 next_state <= ready_s;
-        end
     endcase
 end
 

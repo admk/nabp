@@ -42,9 +42,7 @@ begin:transition
     else
     begin
         if (state == setup_s)
-        begin
             angle <= sw_angle;
-        end
         state <= next_state;
     end
 end
@@ -66,31 +64,19 @@ begin:mealy_next_state
     case (state) // synopsys parallel_case full_case
         init_s:
             next_state <= setup_s;
-        end
         setup_s:
             next_state <= fill_s;
-        end
         fill_s:
             if (sh_fill_done)
-            begin
                 next_state <= fill_done_s;
-            end
-        end
         fill_done_s:
             if (sw_swap)
-            begin
                 next_state <= shift_s;
-            end
-        end
         shift_s:
             if (sh_shift_done)
-            begin
                 next_state <= shift_done_s;
-            end
-        end
         shift_done_s:
             next_state <= setup_s;
-        end
         default:
             $display(
                 "<NABPStateControl> Invalid state encountered: %d", state);

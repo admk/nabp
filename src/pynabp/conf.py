@@ -13,7 +13,7 @@ def conf(
     if _conf:
         return _conf
     _conf = {}
-    # algorithm specific _confs
+    # algorithm specific confs
     _conf['projection_data'] = projection_data
     if projection_data:
         _conf['projection_line_size'] = np.shape(projection_data)[1]
@@ -40,12 +40,13 @@ def conf(
     _conf['partition_scheme'] = partition(
             _conf['image_size'], no_of_partitions)
     _conf['ramp_filter_coefs'] = ramp_filter(fir_order)
-    # architecture specific _confs
+    # architecture specific confs
     _conf['kAngleLength'] = utils.bin_width_of_dec(180)
     for angle in range(45, 136, 45):
         key = 'kAngle' + str(angle)
         _conf[key] = str(_conf['kAngleLength']) + '\'b'
         _conf[key] += utils.dec2bin(angle, _conf['kAngleLength'])
+    _conf['kAccuPrecision'] = 8
     # optional arguments
     _conf.update(kwargs)
     return _conf
