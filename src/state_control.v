@@ -1,6 +1,5 @@
 {# include('templates/info.v') #}
 // NABPStateControl
-//     {# name() #}
 //     31 Dec 2011
 // Provides system states for the NABP architecture
 {#

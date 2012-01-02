@@ -1,7 +1,6 @@
 {# include('templates/info.v') #}
 // NABPShifter
-//     {# name() #}
-//     31 Dec 2011
+//     1 Jan 2012
 // Controls NABPFilterMapper by providing fm_shift_enable
 {#
     from pynabp.conf import conf
