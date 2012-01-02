@@ -13,7 +13,12 @@ def generate_sources(filter_function):
                 continue
             path = os.path.join(root, file_name)
             derived = 'derived_' + path
-            Template(path=path).save(derived)
+            try:
+                Template(path=path).save(derived)
+            except Exception:
+                print 'Cannot generate source for "%s"' % path
+                import traceback
+                traceback.print_exc()
 
 if __name__ == '__main__':
-    generate_sources(lambda f: f.endswith('.v'))
+    generate_sources(lambda f: not f.startswith('_') and f.endswith('.v'))
