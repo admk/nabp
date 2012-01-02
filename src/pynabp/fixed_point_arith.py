@@ -67,6 +67,22 @@ class FixedPoint(object):
         """
         return str(self.width()) + '\'b' + self.bin_repr()
 
+    def verilog_floor_slice(self):
+        """
+        >>> FixedPoint(4, 6, True).verilog_floor_slice()
+        '[10:6]'
+        >>> FixedPoint(1, 3).verilog_floor_slice()
+        '[3]'
+        """
+        from_slice = self.width() - 1
+        to_slice = self.fractional_width
+        if from_slice > to_slice:
+            return '[' + str(from_slice) + ':' + str(to_slice) + ']'
+        elif from_slice == to_slice:
+            return '[' + str(from_slice) + ']'
+        else:
+            raise RuntimeError('Unexpected slicing problem encountered.')
+
     def bin_repr_of_value(self, value):
         """
         >>> FixedPoint(4, 4, True).bin_repr_of_value(-6.1875)

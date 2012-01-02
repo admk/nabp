@@ -30,10 +30,11 @@ module NABPShifter
     shift_cnt_init = nabp_config()['image_size']
     shift_cnt_width = bin_width_of_dec(shift_cnt_init)
 
-    accu_max = nabp_config()['image_size']
-    accu_int_width = bin_width_of_dec(accu_max)
+    accu_int_width = 1
     accu_frac_width = 3
     accu_fixed = FixedPoint(accu_int_width, accu_frac_width, value=0)
+    accu_init_str = accu_fixed.verilog_repr()
+    accu_floor_slice = accu_fixed.verilog_floor_slice()
 
     accu_base_int_width = 1
     accu_base_frac_width = 3
@@ -43,6 +44,7 @@ module NABPShifter
 reg unsigned [{# fill_cnt_width - 1 #}:0] fill_cnt;
 reg unsigned [{# shift_cnt_width - 1 #}:0] shift_cnt;
 reg {# accu_fixed.verilog_decl() #} accu;
+reg {# accu_fixed.verilog_decl() #} accu_prev;
 reg {# accu_base_fixed.verilog_decl() #} accu_base;
 
 always @(posedge clk)
@@ -56,10 +58,20 @@ begin:counters
     else
         shift_cnt <= {# dec_repr(shift_cnt_init) #};
     if (state == shift_s)
+    begin
+        // it is ok to let it overflow
+        // we only need to observe integer boundaries
+        accu_prev <= accu;
         accu <= accu + accu_base;
+        if (accu_prev{# accu_floor_slice #} == accu_prev{# accu_floor_slice #})
+            fm_shift_enable <= 0;
+        else
+            fm_shift_enable <= 1;
+    end
     else
     begin
-        accu <= 0'b{# accu_fixed.bin_repr_of_value(0) #};
+        accu <= {# accu_init_str #};
+        accu_prev <= {# accu_init_str #};
         accu_base <= // TODO lookup table for accu_base
     end
 end
