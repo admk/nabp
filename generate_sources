@@ -11,6 +11,8 @@ def generate_sources(filter_function):
         for file_name in files:
             if not filter_function(file_name):
                 continue
+            if root.startswith('src/template'):
+                continue
             path = os.path.join(root, file_name)
             derived = 'derived_' + path
             try:
