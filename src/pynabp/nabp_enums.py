@@ -31,3 +31,11 @@ class state_control_states(enum):
     fill_done = str(width) + '\'d3'
     shift = str(width) + '\'d4'
     shift_done = str(width) + '\'d5'
+
+class shifter_states(enum):
+    no = 4
+    width = bin_width_of_dec(no)
+    ready = str(width) + '\'d0'
+    fill = str(width) + '\'d1'
+    fill_done = str(width) + '\'d2'
+    shift = str(width) + '\'d3'

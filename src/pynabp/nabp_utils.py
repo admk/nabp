@@ -50,6 +50,11 @@ def dec2bin(num, width=0):
 def bin_width_of_dec(num):
     return int(math.ceil(math.log(num, 2)))
 
+def dec_repr(num, width=0):
+    if not width:
+        width = bin_width_of_dec(num)
+    return str(width) + '\'d' + str(num)
+
 if __name__ == '__main__':
     import doctest
     doctest.testmod()
