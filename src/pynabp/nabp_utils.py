@@ -28,7 +28,15 @@ def dec2bin(num, width=0):
     '00111001'
     >>> dec2bin(3, 10)
     '0000000011'
+    >>> dec2bin(-23, 8)
+    '11101001'
+    >>> dec2bin(23, 8)
+    '00010111'
     """
+    if num < 0:
+        if not width:
+            raise ValueError('Width must be specified for negative numbers')
+        num += 2 ** width
     binary = ''
     while num:
         if num & 1:
