@@ -7,6 +7,7 @@ def generate_sources(filter_function):
     """
     Generate derived sources from template sources
     """
+    log = None
     for root, dirs, files in os.walk('src'):
         for file_name in files:
             if not filter_function(file_name):
@@ -15,12 +16,18 @@ def generate_sources(filter_function):
                 continue
             path = os.path.join(root, file_name)
             derived = 'derived_' + path
+            print 'Generating "%s"' % derived
             try:
                 Template(path=path).save(derived)
             except Exception:
-                print 'Cannot generate source for "%s"' % path
+                print '*** Cannot generate source for "%s"' % path
                 import traceback
-                traceback.print_exc()
+                if not log:
+                    print '*** Log written in generate_source.log'
+                    log = open('generate_sources.log', 'w')
+                log.write(traceback.format_exc())
+    if log:
+        log.close()
 
 if __name__ == '__main__':
     generate_sources(lambda f: not f.startswith('_') and f.endswith('.v'))
