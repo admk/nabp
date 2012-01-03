@@ -23,7 +23,7 @@ def generate_sources(filter_function):
                 print '*** Cannot generate source for "%s"' % path
                 import traceback
                 if not log:
-                    print '*** Log written in generate_source.log'
+                    print '*** Log written in "generate_source.log"'
                     log = open('generate_sources.log', 'w')
                 log.write(traceback.format_exc())
     if log:
