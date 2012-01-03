@@ -24,7 +24,7 @@
 
 module NABPShiferLUT
 (
-    input wire [`kAngleLength-1:0] sh_angle,
+    input wire [`kAngleLength-1:0] angle,
     output reg {# accu_fixed.verilog_decl() #} sh_accu_base
 );
 
@@ -35,7 +35,6 @@ begin
         {% for angle in xfrange(0, 180, conf()['projection_angle_step']) %}
             {# a_len #}'d{# int(angle) #}:
             {# accu_fixed.value = buff_step_val(angle) #}
-            {# print angle, buff_step_val(angle), accu_fixed.value #}
             sh_accu_base <= {# accu_fixed.verilog_repr() #};
         {% end %}
     endcase

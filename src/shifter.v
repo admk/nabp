@@ -10,18 +10,6 @@
 #}
 `define kAngleLength {# conf()['kAngleLength'] #}
 
-module NABPShifter
-(
-    // inputs from state_control
-    input wire [`kAngleLength-1:0] sc_angle,
-    input wire sc_fill_kick,
-    input wire sc_shift_kick,
-    // outputs to state_control
-    output wire sc_fill_done,
-    output wire sc_shift_done,
-    // outputs to filter mapper
-    output reg fm_shift_enable
-);
 {#
     fill_cnt_init = conf()['partition_scheme']['partitions'][-1] + 1
     fill_cnt_width = bin_width_of_dec(fill_cnt_init)
@@ -34,11 +22,24 @@ module NABPShifter
     accu_init_str = accu_fixed.verilog_repr()
     accu_floor_slice = accu_fixed.verilog_floor_slice()
 #}
+module NABPShifter
+(
+    // input from shifter_lut
+    input wire {# accu_fixed.verilog_decl() #} sl_accu_base,
+    // inputs from state_control
+    input wire sc_fill_kick,
+    input wire sc_shift_kick,
+    // outputs to state_control
+    output wire sc_fill_done,
+    output wire sc_shift_done,
+    // outputs to filter mapper
+    output reg fm_shift_enable
+);
+
 reg unsigned [{# fill_cnt_width - 1 #}:0] fill_cnt;
 reg unsigned [{# shift_cnt_width - 1 #}:0] shift_cnt;
 reg {# accu_fixed.verilog_decl() #} accu;
 reg {# accu_fixed.verilog_decl() #} accu_prev;
-reg {# accu_fixed.verilog_decl() #} accu_base;
 
 always @(posedge clk)
 begin:counters
@@ -65,7 +66,6 @@ begin:counters
     begin
         accu <= {# accu_init_str #};
         accu_prev <= {# accu_init_str #};
-        accu_base <= // TODO lookup table for accu_base
     end
 end
 
