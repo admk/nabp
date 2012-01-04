@@ -47,6 +47,8 @@ def xfrange(start, stop, step=1):
     while idx < stop:
         yield idx
         idx += step
+    else:
+        return
 
 class enum(object):
     def __init__(self):

@@ -4,12 +4,14 @@
 // Provides system states for the NABP architecture
 {#
     from pynabp.utils import bin_width_of_dec, dec_repr
+    from pynabp.fixed_point_arith import FixedPoint
     from pynabp.enums import state_control_states
     from pynabp.conf import conf
 
     a_len = conf()['kAngleLength']
     pe_width = conf()['partition_scheme']['size']
     pe_width_len = bin_width_of_dec(pe_width)
+    line_cnt_fact_fixed = FixedPoint(pe_width, conf()['kSEvalPrecision'], True)
 #}
 `define kAngleLength {# a_len #}
 `define kPEWidthLength {# pe_width_len #}
@@ -20,14 +22,19 @@ module NABPStateControl
     input wire clk,
     input wire reset_n,
     // inputs from swap control
-    input wire [`kPEWidthLength-1:0] sw_line_cnt,
+    //   sw_line_cnt_fact is a pre-calculated value
+    // = line_cnt * $\cos\theta$
+    //          when $0\leq\theta{<}45$ or $135\leq\theta{<}180$
+    // = -line_cnt * $\sin\theta$
+    //          when $0\leq\theta{<}135$
+    input wire {# line_cnt_fact_fixed.verilog_decl() #} sw_line_cnt_fact,
     input wire [`kAngleLength-1:0] sw_angle,
     input wire sw_swap,
     // inputs from shifter
     input wire sh_fill_done,
     input wire sh_shift_done,
     // output the iteration data this state control holds
-    output reg [`kPEWidthLength-1:0] mp_line_cnt,
+    output reg {# line_cnt_fact_fixed.verilog_decl() #} mp_line_cnt_fact,
     output reg [`kAngleLength-1:0] mp_angle,
     // output to swap control
     output wire sw_swap_ready,
@@ -50,8 +57,8 @@ begin:transition
     begin
         if (state == setup_s)
         begin
-            angle <= sw_angle;
-            line_cnt <= sw_line_cnt;
+            mp_angle <= sw_angle;
+            mp_line_cnt_fact <= sw_line_cnt_fact;
         end
         state <= next_state;
     end
