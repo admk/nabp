@@ -46,8 +46,9 @@ def conf(
         key = 'kAngle' + str(angle)
         _conf[key] = str(_conf['kAngleLength']) + '\'b'
         _conf[key] += utils.dec2bin(angle, _conf['kAngleLength'])
-    _conf['kAccuPrecision'] = 8
-    _conf['kSEvalPrecision'] = 8
+    _conf['kShiftAccuPrecision'] = 8
+    _conf['kMapAccuPrecision'] = 8
+    _conf['kSEvalPrecision'] = 4
     # optional arguments
     _conf.update(kwargs)
     return _conf

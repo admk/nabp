@@ -10,7 +10,7 @@
     from math import tan, radians
 
     a_len = conf()['kAngleLength']
-    accu_fixed = FixedPoint(1, conf()['kAccuPrecision'])
+    accu_fixed = FixedPoint(1, conf()['kShiftAccuPrecision'])
 
     def buff_step_val(angle):
         if angle < 0 or angle >= 180:

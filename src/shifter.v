@@ -14,7 +14,7 @@
     shift_cnt_init = conf()['image_size']
     shift_cnt_width = bin_width_of_dec(shift_cnt_init)
 
-    accu_frac_width = conf()['kAccuPrecision']
+    accu_frac_width = conf()['kShiftAccuPrecision']
     accu_fixed = FixedPoint(1, accu_frac_width, value=0)
     accu_init_str = accu_fixed.verilog_repr()
     accu_floor_slice = accu_fixed.verilog_floor_slice()

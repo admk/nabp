@@ -42,7 +42,7 @@
     lut_min_val = min(lut_map)
     lut_int_len = bin_width_of_dec(max(lut_max_val, abs(lut_min_val)))
     lut_frac_len = conf()['kSEvalPrecision']
-    lut_fixed = FixedPoint(lut_int_len, 17 - lut_int_len, True)
+    lut_fixed = FixedPoint(lut_int_len, lut_frac_len, True)
 
     a_len = conf()['kAngleLength']
 #}
