@@ -31,10 +31,15 @@ module NABPShifter
     // inputs from state_control
     input wire sc_fill_kick,
     input wire sc_shift_kick,
+    // inputs from mapper
+    input wire mp_ack,
     // outputs to state_control
     output wire sc_fill_done,
     output wire sc_shift_done,
     // outputs to mapper
+    output wire mp_kick,
+    output reg mp_shift_en
+    output wire mp_done,
 );
 
 reg unsigned [{# fill_cnt_width - 1 #}:0] fill_cnt;
@@ -90,6 +95,8 @@ end
 // mealy outputs
 assign sc_fill_done  = (fill_cnt == 0) and (state == shift_s);
 assign sc_shift_done = (shift_cnt == 0);
+assign mp_kick = sc_fill_kick;
+assign mp_done = (state == ready_s);
 
 always @(sc_fill_kick or sc_shift_kick or sc_fill_done or sc_shift_done or
          state)
