@@ -24,6 +24,7 @@
 
 module NABPShiferLUT
 (
+    input wire clk,
     input wire [`kAngleLength-1:0] angle,
     output reg {# accu_fixed.verilog_decl() #} sh_accu_base
 );

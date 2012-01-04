@@ -7,10 +7,7 @@
     from pynabp.enums import shifter_states
     from pynabp.utils import bin_width_of_dec, dec_repr
     from pynabp.fixed_point_arith import FixedPoint
-#}
-`define kAngleLength {# conf()['kAngleLength'] #}
 
-{#
     fill_cnt_init = conf()['partition_scheme']['partitions'][-1] + 1
     fill_cnt_width = bin_width_of_dec(fill_cnt_init)
 
@@ -22,8 +19,13 @@
     accu_init_str = accu_fixed.verilog_repr()
     accu_floor_slice = accu_fixed.verilog_floor_slice()
 #}
+`define kAngleLength {# conf()['kAngleLength'] #}
+
 module NABPShifter
 (
+    // global signals
+    input wire clk,
+    input wire reset_n,
     // input from shifter_lut
     input wire {# accu_fixed.verilog_decl() #} sl_accu_base,
     // inputs from state_control
@@ -32,8 +34,7 @@ module NABPShifter
     // outputs to state_control
     output wire sc_fill_done,
     output wire sc_shift_done,
-    // outputs to filter mapper
-    output reg fm_shift_enable
+    // outputs to mapper
 );
 
 reg unsigned [{# fill_cnt_width - 1 #}:0] fill_cnt;
@@ -43,27 +44,34 @@ reg {# accu_fixed.verilog_decl() #} accu_prev;
 
 always @(posedge clk)
 begin:counters
+    mp_shift_en <= 0;
+
     if (state == fill_s and fill_cnt != 0)
-        fill_cnt <= fill_cnt - 1;
-    else
-        fill_cnt <= {# dec_repr(fill_cnt_init) #};
-    if (state == shift_s and shift_cnt != 0)
-        shift_cnt <= shift_cnt - 1;
-    else
-        shift_cnt <= {# dec_repr(shift_cnt_init) #};
-    if (state == shift_s)
     begin
-        // it is ok to let it overflow
-        // we only need to observe integer boundaries
-        accu_prev <= accu;
-        accu <= accu + accu_base;
-        if (accu_prev{# accu_floor_slice #} == accu_prev{# accu_floor_slice #})
-            fm_shift_enable <= 0;
-        else
-            fm_shift_enable <= 1;
+        if (mp_ack)
+            fill_cnt <= fill_cnt - 1;
+        mp_shift_en <= 1;
     end
     else
+        fill_cnt <= {# dec_repr(fill_cnt_init) #};
+
+    if (state == shift_s and shift_cnt != 0)
+        if (mp_ack)
+        begin
+            shift_cnt <= shift_cnt - 1;
+            // it is ok to let it overflow
+            // we only need to observe integer boundaries
+            accu_prev <= accu;
+            accu <= accu + accu_base;
+            if (accu_prev{# accu_floor_slice #} ==
+                    accu_prev{# accu_floor_slice #})
+                mp_shift_en <= 0;
+            else
+                mp_shift_en <= 1;
+        end
+    else
     begin
+        shift_cnt <= {# dec_repr(shift_cnt_init) #};
         accu <= {# accu_init_str #};
         accu_prev <= {# accu_init_str #};
     end

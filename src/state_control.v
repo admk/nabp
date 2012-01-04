@@ -27,8 +27,8 @@ module NABPStateControl
     input wire sh_fill_done,
     input wire sh_shift_done,
     // output the iteration data this state control holds
-    output reg [`kPEWidthLength-1:0] line_cnt,
-    output reg [`kAngleLength-1:0] angle,
+    output reg [`kPEWidthLength-1:0] mp_line_cnt,
+    output reg [`kAngleLength-1:0] mp_angle,
     // output to swap control
     output wire sw_swap_ready,
     output wire sw_next_itr,
