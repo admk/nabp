@@ -69,7 +69,7 @@ begin:counters
     end
 end
 
-{# include('templates/state_decl(states).v', states=shifter_states) #}
+{# include('templates/state_decl(states).v', states=shifter_states()) #}
 
 always @(posedge clk)
 begin:transition

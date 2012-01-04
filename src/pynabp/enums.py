@@ -1,4 +1,4 @@
-from utils import enum, bin_width_of_dec
+from utils import enum
 
 class sector(enum):
     a = '2\'d0'
@@ -23,19 +23,26 @@ class buff_step_direction(enum):
     descending = '1'
 
 class state_control_states(enum):
-    no = 6
-    width = bin_width_of_dec(no)
-    init = str(width) + '\'d0'
-    setup = str(width) + '\'d1'
-    fill = str(width) + '\'d2'
-    fill_done = str(width) + '\'d3'
-    shift = str(width) + '\'d4'
-    shift_done = str(width) + '\'d5'
+    def __init__(self):
+        self.init = None
+        self.setup = None
+        self.fill = None
+        self.fill_done = None
+        self.shift = None
+        self.shift_done = None
+        super(state_control_states, self).__init__()
 
 class shifter_states(enum):
-    no = 4
-    width = bin_width_of_dec(no)
-    ready = str(width) + '\'d0'
-    fill = str(width) + '\'d1'
-    fill_done = str(width) + '\'d2'
-    shift = str(width) + '\'d3'
+    def __init__(self):
+        self.ready = None
+        self.fill = None
+        self.fill_done = None
+        self.shift = None
+        super(shifter_states, self).__init__()
+
+class mapper_states(enum):
+    def __init__(self):
+        self.ready = None
+        self.setup = None
+        self.mapping = None
+        super(mapper_states, self).__init__()

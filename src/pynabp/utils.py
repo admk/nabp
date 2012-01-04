@@ -1,25 +1,5 @@
 import math
 
-class enum:
-    @classmethod
-    def enum_dict(cls):
-        d = {}
-        for k, v in cls.__dict__.iteritems():
-            if type(v) is str and not k.startswith('_'):
-                d[k] = v
-        return d
-
-    @classmethod
-    def enum_keys(cls):
-        """
-        >>> enum.enum_keys()
-        []
-        >>> enum.__dict__['x'] = 'x'
-        >>> enum.enum_keys()
-        ['x']
-        """
-        return cls.enum_dict().keys()
-
 def dec2bin(num, width=0):
     """
     >>> dec2bin(0, 8)
@@ -49,8 +29,7 @@ def dec2bin(num, width=0):
         if no_zeros < 0:
             raise OverflowError('A binary of width %d cannot fit %d' %
                     (width, num))
-        for _ in xrange(no_zeros):
-            binary += '0'
+        binary += '0' * no_zeros
     if not binary:
         binary = '0'
     return binary[::-1]
@@ -69,6 +48,27 @@ def xfrange(start, stop, step=1):
         yield idx
         idx += step
 
-if __name__ == '__main__':
-    import doctest
-    doctest.testmod()
+class enum(object):
+    def __init__(self):
+        self.generate_states()
+
+    def generate_states(self):
+        keys = self.enum_keys()
+        no = len(keys)
+        width = bin_width_of_dec(no)
+        for idx, key in enumerate(keys):
+            self.__dict__[key] = '%d\'b%s' % (width, dec2bin(idx, width))
+        self.no = no
+        self.width = width
+        return self
+
+    def enum_dict(self):
+        d = {}
+        for k, v in self.__dict__.iteritems():
+            if (type(v) is str or v is None) and \
+                    not k.startswith('_'):
+                d[k] = v
+        return d
+
+    def enum_keys(self):
+        return self.enum_dict().keys()

@@ -37,7 +37,7 @@ module NABPStateControl
     output wire sh_shift_kick
 );
 
-{# include('templates/state_decl(states).v', states=state_control_states) #}
+{# include('templates/state_decl(states).v', states=state_control_states()) #}
 
 always @(posedge clk)
 begin:transition
