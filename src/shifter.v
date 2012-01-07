@@ -49,7 +49,7 @@ always @(posedge clk)
 begin:counters
     mp_shift_en <= 0;
 
-    if (state == fill_s and fill_cnt != 0)
+    if (state == fill_s and fill_cnt != {# fill_cnt_width #}'d0)
     begin
         if (mp_ack)
             fill_cnt <= fill_cnt - 1;
@@ -58,7 +58,7 @@ begin:counters
     else
         fill_cnt <= {# dec_repr(fill_cnt_init) #};
 
-    if (state == shift_s and shift_cnt != 0)
+    if (state == shift_s and shift_cnt != {# shift_cnt_width #}'d0)
         if (mp_ack)
         begin
             shift_cnt <= shift_cnt - 1;
