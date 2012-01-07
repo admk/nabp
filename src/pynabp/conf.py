@@ -3,6 +3,7 @@ import numpy as np
 import utils
 from partition import partition
 from ramp_filter import ramp_filter
+from fixed_point_arith import FixedPoint
 
 global _conf
 _conf = None
@@ -12,7 +13,7 @@ def conf(
     global _conf
     if _conf:
         return _conf
-    _conf = {}
+    _conf = dict(kwargs)
     # algorithm specific confs
     _conf['projection_data'] = projection_data
     if projection_data:
@@ -46,9 +47,71 @@ def conf(
         key = 'kAngle' + str(angle)
         _conf[key] = str(_conf['kAngleLength']) + '\'b'
         _conf[key] += utils.dec2bin(angle, _conf['kAngleLength'])
-    _conf['kShiftAccuPrecision'] = 8
-    _conf['kMapAccuPrecision'] = 8
     _conf['kSEvalPrecision'] = 4
-    # optional arguments
+    _conf = map_lut_conf(_conf)
+    _conf = shift_lut_conf(_conf)
+    # re-update optional arguments
     _conf.update(kwargs)
     return _conf
+
+def shift_lut_conf(config):
+    config['kShiftAccuPrecision'] = 8
+    fp = FixedPoint(
+            1, config['kShiftAccuPrecision'], value=0)
+    @fp.verilog_repr_decorator
+    def lookup(angle):
+        if angle < 0 or angle >= 180:
+            raise ValueError('Angle must be within range 0-180')
+        if (0 <= angle and angle < 45) or (135 <= angle and angle < 180):
+            return abs(math.tan(math.radians(angle)))
+        else:
+            return abs(1 / math.tan(math.radians(angle)))
+    config['tShiftAccuBase'] = fp
+    config['lutShiftAccuBaseFunc'] = lookup
+    return config
+
+def map_lut_conf(config):
+    config['kMapAccuPrecision'] = 8
+    # setup mapper accu_init
+    last_pe = config['partition_scheme']['partitions'][-1]
+    i_size = config['image_size']
+    def accu_init_lookup(angle):
+        sin_val = math.sin(math.radians(angle))
+        cos_val = math.cos(math.radians(angle))
+        if (0 <= angle and angle < 45):
+            val = last_pe * cos_val
+        elif (45 <= angle and angle < 90):
+            val = - last_pe * sin_val
+        elif (90 <= angle and angle < 135):
+            val = - last_pe * sin_val + i_size * cos_val
+        elif (135 <= angle and angle < 180):
+            val = last_pe * cos_val - i_size * sin_val
+        else:
+            raise RuntimeError('Invalid angle encountered')
+        val += config['image_center'] * sin_val
+        val -= config['image_center'] * cos_val
+        val += config['projection_line_center']
+        return val
+    config['lutMapAccuInit'] = map(
+            accu_init_lookup,
+            utils.xfrange(0, 180, conf()['projection_angle_step']))
+    accu_init_int_len = utils.bin_width_of_dec(max(
+            max(config['lutMapAccuInit']),
+            abs(min(config['lutMapAccuInit']))))
+    config['tMapAccuInit'] = FixedPoint(
+            accu_init_int_len, conf()['kSEvalPrecision'], True)
+    # setup mapper accu_base
+    def accu_base_lookup(angle):
+        if ((0 <= angle and angle < 45) or
+            (135 <= angle and angle < 180)):
+            return -math.cos(math.radians(angle))
+        elif (45 <= angle and angle < 135):
+            return math.sin(math.radians(angle))
+        else:
+            raise RuntimeError('Invalid angle encountered')
+    config['tMapAccuBase'] = FixedPoint(
+            1, config['kMapAccuPrecision'], True)
+    config['lutMapAccuBase'] = map(
+            accu_base_lookup,
+            utils.xfrange(0, 180, config['projection_angle_step']))
+    return config

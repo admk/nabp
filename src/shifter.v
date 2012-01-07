@@ -14,8 +14,7 @@
     shift_cnt_init = conf()['image_size']
     shift_cnt_width = bin_width_of_dec(shift_cnt_init)
 
-    accu_frac_width = conf()['kShiftAccuPrecision']
-    accu_fixed = FixedPoint(1, accu_frac_width, value=0)
+    accu_fixed = conf()['tShiftAccuBase']
     accu_init_str = accu_fixed.verilog_repr()
     accu_floor_slice = accu_fixed.verilog_floor_slice()
 #}
@@ -26,11 +25,10 @@ module NABPShifter
     // global signals
     input wire clk,
     input wire reset_n,
-    // input from shifter_lut
-    input wire {# accu_fixed.verilog_decl() #} sl_accu_base,
     // inputs from state_control
     input wire sc_fill_kick,
     input wire sc_shift_kick,
+    input wire {# accu_fixed.verilog_decl() #} sc_accu_base,
     // inputs from mapper
     input wire mp_ack,
     // outputs to state_control

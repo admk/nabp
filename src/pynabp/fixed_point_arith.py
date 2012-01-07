@@ -58,14 +58,27 @@ class FixedPoint(object):
         signed = 'signed' if self.signed else 'unsigned'
         return signed + ' [' + str(self.width() - 1) + ':0]'
 
-    def verilog_repr(self):
+    def verilog_repr_decorator(self, func):
+        def dec_func(*args):
+            return self.verilog_repr(func(*args))
+        return dec_func
+
+    def verilog_repr(self, value=None):
         """
         >>> FixedPoint(4, 4, True, value='110011101').verilog_repr()
         "9'b110011101"
         >>> FixedPoint(4, 4, True, value=-6.37).verilog_repr()
         "9'b110011011"
         """
-        return str(self.width()) + '\'b' + self.bin_repr()
+        repr_str = str(self.width()) + '\'b'
+        if not value is None:
+            return repr_str + self.bin_repr_of_value(value)
+        return repr_str + self.bin_repr()
+
+    def type_repr(self):
+        signed_str = 'S' if self.signed else 'U'
+        return signed_str + '(' + str(self.integer_width) + ').(' + \
+                str(self.fractional_width) + ')'
 
     def verilog_floor_slice(self):
         """

@@ -10,6 +10,8 @@
     from pynabp.fixed_point_arith import FixedPoint
 
     s_val_len = bin_width_of_dec(conf()['projection_line_size'])
+    mp_accu_base_fixed = conf()['tMapAccuBase']
+    mp_accu_init_fixed = conf()['tMapAccuInit']
 #}
 `define kSLength {# s_val_len #}
 `define kAngleLength {# conf()['kAngleLength'] #}
@@ -21,7 +23,8 @@ module NABPMapper
     input wire reset_n,
     // inputs from state_control
     input wire unsigned [`kPEWidthLength-1:0] sc_line_cnt,
-    input wire unsigned [`kAngleLength-1:0] sc_angle,
+    input wire {# mp_accu_init_fixed.verilog_decl() #} mp_accu_init,
+    input wire {# mp_accu_base_fixed.verilog_decl() #} mp_accu_base,
     // inputs from shifter
     input wire sh_en,
     input wire sh_shift_enable,

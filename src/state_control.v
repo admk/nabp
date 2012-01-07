@@ -8,6 +8,9 @@
     from pynabp.enums import state_control_states
     from pynabp.conf import conf
 
+    sh_accu_fixed = conf()['tShiftAccuBase']
+    mp_accu_fixed = conf()['tMapAccuBase']
+
     a_len = conf()['kAngleLength']
     pe_width = conf()['partition_scheme']['size']
     pe_width_len = bin_width_of_dec(pe_width)
