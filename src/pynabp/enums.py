@@ -24,8 +24,7 @@ class buff_step_direction(enum):
 
 class state_control_states(enum):
     def __init__(self):
-        self.init = None
-        self.setup = None
+        self.ready = None
         self.fill = None
         self.fill_done = None
         self.shift = None
@@ -43,6 +42,5 @@ class shifter_states(enum):
 class mapper_states(enum):
     def __init__(self):
         self.ready = None
-        self.setup = None
         self.mapping = None
         super(mapper_states, self).__init__()

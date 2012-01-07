@@ -31,8 +31,11 @@ module NABPStateControl
     // = -line_cnt * $\sin\theta$
     //          when $0\leq\theta{<}135$
     input wire {# line_cnt_fact_fixed.verilog_decl() #} sw_line_cnt_fact,
+    input wire {# sh_accu_fixed.verilog_decl() #} sw_sh_accu_base,
+    input wire {# mp_accu_fixed.verilog_decl() #} sw_mp_accu_base,
     input wire [`kAngleLength-1:0] sw_angle,
     input wire sw_swap,
+    input wire sw_next_itr_ack,
     // inputs from shifter
     input wire sh_fill_done,
     input wire sh_shift_done,
@@ -45,6 +48,9 @@ module NABPStateControl
     // output to shifter
     output wire sh_fill_kick,
     output wire sh_shift_kick
+    output reg {# sh_accu_fixed.verilog_decl() #} sh_accu_base,
+    // output to mapper
+    output reg {# mp_accu_fixed.verilog_decl() #} mp_accu_base,
 );
 
 {# include('templates/state_decl(states).v', states=state_control_states()) #}
@@ -54,14 +60,16 @@ begin:transition
     if (!reset_n)
     begin
         angle <= {# a_len #}'d0;
-        state <= init_s;
+        state <= ready_s;
     end
     else
     begin
-        if (state == setup_s)
+        if (state == ready_s)
         begin
             mp_angle <= sw_angle;
             mp_line_cnt_fact <= sw_line_cnt_fact;
+            mp_accu_base <= sw_mp_accu_base;
+            sh_accu_base <= sw_sh_accu_base;
         end
         state <= next_state;
     end
@@ -69,12 +77,9 @@ end
 
 // mealy outputs
 assign sw_swap_ready = (state == fill_done_s);
-assign sw_next_itr   = (state == init_s) or
-                       (state == shift_done_s);
-assign sh_fill_kick  = (next_state != state) and
-                       (next_state == fill_s);
-assign sh_shift_kick = (next_state != state) and
-                       (next_state == shift_s);
+assign sw_next_itr   = (state == ready_s);
+assign sh_fill_kick  = (next_state != state) and (next_state == fill_s);
+assign sh_shift_kick = (next_state != state) and (next_state == shift_s);
 
 // mealy next state
 always @(state)
@@ -82,10 +87,9 @@ begin:mealy_next_state
     next_state <= state;
     // fsm cases
     case (state) // synopsys parallel_case full_case
-        init_s:
-            next_state <= setup_s;
-        setup_s:
-            next_state <= fill_s;
+        ready_s:
+            if (sw_next_itr_ack)
+                next_state <= fill_s;
         fill_s:
             if (sh_fill_done)
                 next_state <= fill_done_s;

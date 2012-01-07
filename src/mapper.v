@@ -26,7 +26,7 @@ module NABPMapper
     input wire {# mp_accu_init_fixed.verilog_decl() #} mp_accu_init,
     input wire {# mp_accu_base_fixed.verilog_decl() #} mp_accu_base,
     // inputs from shifter
-    input wire sh_en,
+    input wire sh_kick,
     input wire sh_shift_enable,
     input wire sh_done,
     // outputs to shifter
@@ -54,9 +54,7 @@ begin:mealy_next_state
     case (state) // synopsys parallel_case full_case
         ready_s:
             if (sh_kick)
-                next_state <= setup_a_s;
-        setup_s:
-            next_state <= mapping_s;
+                next_state <= mapping_s;
         mapping_s:
             if (sh_done)
                 next_state <= ready_s;
