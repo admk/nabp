@@ -3,13 +3,8 @@
 //     31 Dec 2011
 // Provides system states for the NABP architecture
 {#
-    from pynabp.utils import bin_width_of_dec, dec_repr
-    from pynabp.fixed_point_arith import FixedPoint
     from pynabp.enums import state_control_states
     from pynabp.conf import conf
-
-    sh_accu_fixed = conf()['tShiftAccuBase']
-    mp_accu_fixed = conf()['tMapAccuBase']
 
     a_len = conf()['kAngleLength']
 #}
@@ -21,15 +16,10 @@ module NABPStateControl
     input wire clk,
     input wire reset_n,
     // inputs from swap control
-    //   sw_line_cnt_fact is a pre-calculated value
-    // = line_cnt * $\cos\theta$
-    //          when $0\leq\theta{<}45$ or $135\leq\theta{<}180$
-    // = -line_cnt * $\sin\theta$
-    //          when $0\leq\theta{<}135$
-    input wire {# conf()['tLineCntFact'].verilog_decl() #} sw_line_cnt_fact,
-    input wire {# sh_accu_fixed.verilog_decl() #} sw_sh_accu_base,
-    input wire {# mp_accu_fixed.verilog_decl() #} sw_mp_accu_base,
     input wire [`kAngleLength-1:0] sw_angle,
+    input wire {# conf()['tShiftAccuBase'].verilog_decl() #} sw_sh_accu_base,
+    input wire {# conf()['tMapAccuInit'].verilog_decl() #} sw_mp_accu_init,
+    input wire {# conf()['tMapAccuBase'].verilog_decl() #} sw_mp_accu_base,
     input wire sw_swap,
     input wire sw_next_itr_ack,
     // inputs from shifter
@@ -63,7 +53,7 @@ begin:transition
         if (state == ready_s)
         begin
             angle <= sw_angle;
-            mp_line_cnt_fact <= sw_line_cnt_fact;
+            mp_accu_init <= sw_mp_accu_init;
             mp_accu_base <= sw_mp_accu_base;
             sh_accu_base <= sw_sh_accu_base;
         end
