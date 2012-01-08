@@ -10,24 +10,20 @@ def partition(image_size, no_of_partitions):
     {'wasted_pixels': 3.0, 'partitions': [0, 103, 206, 309, 412], 'no_of_partitions': 5, 'size': 103.0}
     """
     partition_scheme = {}
+    partition_scheme['no_of_partitions'] = no_of_partitions
     partition_scheme['size'] = math.ceil(image_size / float(no_of_partitions))
     partition_scheme['partitions'] = []
     for idx in xrange(no_of_partitions):
         offset = int(idx * partition_scheme['size'])
         partition_scheme['partitions'].append(offset)
-        idx += 1
-    new_no_of_partitions = len(partition_scheme['partitions'])
-    if new_no_of_partitions != no_of_partitions:
-        return partition(image_size, new_no_of_partitions)
-    last_tap = (no_of_partitions - 1) * partition_scheme['size']
     # check for consistencies
+    last_tap = (no_of_partitions - 1) * partition_scheme['size']
     if last_tap != partition_scheme['partitions'][-1]:
         raise Exception('Last tap and partitions disagree')
     partition_scheme['wasted_pixels'] = last_tap + partition_scheme['size'] - \
             image_size
     if partition_scheme['wasted_pixels'] < 0:
         raise Exception('Partitions does not cover the entire image size')
-    partition_scheme['no_of_partitions'] = no_of_partitions
     return partition_scheme
 
 if __name__ == '__main__':
