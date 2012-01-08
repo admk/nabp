@@ -42,6 +42,15 @@ def dec_repr(num, width=0):
         width = bin_width_of_dec(num)
     return str(width) + '\'d' + str(int(num))
 
+def bin_width_of_dec_vals(vals):
+    min_val, max_val = min(vals), max(vals)
+    width = bin_width_of_dec(max(max_val, abs(min_val)))
+    if min_val < 0:
+        signed = True
+    else:
+        signed = False
+    return width, signed
+
 def xfrange(start, stop, step=1):
     idx = start
     while idx < stop:

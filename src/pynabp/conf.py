@@ -1,6 +1,7 @@
 import math
 import numpy as np
 import utils
+from itertools import chain
 from partition import partition
 from ramp_filter import ramp_filter
 from fixed_point_arith import FixedPoint
@@ -47,7 +48,6 @@ def conf(
         key = 'kAngle' + str(angle)
         _conf[key] = str(_conf['kAngleLength']) + '\'b'
         _conf[key] += utils.dec2bin(angle, _conf['kAngleLength'])
-    _conf['kSEvalPrecision'] = 4
     _conf = map_lut_conf(_conf)
     _conf = shift_lut_conf(_conf)
     # re-update optional arguments
@@ -71,11 +71,16 @@ def shift_lut_conf(config):
     return config
 
 def map_lut_conf(config):
+    # accumulated line_cnt_fact from state control
+    config['kSEvalPrecision'] = 4
+    pe_width_len = utils.bin_width_of_dec(conf()['partition_scheme']['size'])
+    config['tLineCntFact'] = FixedPoint(
+            pe_width_len, conf()['kSEvalPrecision'], True)
+    # setup mapper accu_part
     config['kMapAccuPrecision'] = 8
-    # setup mapper accu_init
     last_pe = config['partition_scheme']['partitions'][-1]
     i_size = config['image_size']
-    def accu_init_lookup(angle):
+    def accu_part_lookup(angle):
         sin_val = math.sin(math.radians(angle))
         cos_val = math.cos(math.radians(angle))
         if (0 <= angle and angle < 45):
@@ -92,14 +97,12 @@ def map_lut_conf(config):
         val -= config['image_center'] * cos_val
         val += config['projection_line_center']
         return val
-    config['lutMapAccuInit'] = map(
-            accu_init_lookup,
+    config['lutMapAccuPart'] = map(accu_part_lookup,
             utils.xfrange(0, 180, conf()['projection_angle_step']))
-    accu_init_int_len = utils.bin_width_of_dec(max(
-            max(config['lutMapAccuInit']),
-            abs(min(config['lutMapAccuInit']))))
-    config['tMapAccuInit'] = FixedPoint(
-            accu_init_int_len, conf()['kSEvalPrecision'], True)
+    accu_part_int_len, accu_part_signed = utils.bin_width_of_dec_vals(
+            config['lutMapAccuPart'])
+    config['tMapAccuPart'] = FixedPoint(
+            accu_part_int_len, conf()['kSEvalPrecision'], accu_part_signed)
     # setup mapper accu_base
     def accu_base_lookup(angle):
         if ((0 <= angle and angle < 45) or
@@ -111,7 +114,33 @@ def map_lut_conf(config):
             raise RuntimeError('Invalid angle encountered')
     config['tMapAccuBase'] = FixedPoint(
             1, config['kMapAccuPrecision'], True)
-    config['lutMapAccuBase'] = map(
-            accu_base_lookup,
+    config['lutMapAccuBase'] = map(accu_base_lookup,
             utils.xfrange(0, 180, config['projection_angle_step']))
+    # range required for accu_init
+    def accu_init_vals(angle):
+        part_val = accu_part_lookup(angle)
+        line_val = -config['partition_scheme']['size'] * \
+                accu_base_lookup(angle)
+        return (part_val, part_val + line_val)
+    def accu_init_range():
+        accu_init_range_list = map(accu_init_vals,
+                utils.xfrange(0, 180, config['projection_angle_step']))
+        accu_init_range_list = list(chain.from_iterable(accu_init_range_list))
+        return utils.bin_width_of_dec_vals(accu_init_range_list)
+    accu_init_len, accu_init_signed = accu_init_range()
+    config['tMapAccuInit'] = FixedPoint(
+            accu_init_len, config['kMapAccuPrecision'], accu_init_signed)
+    # range for accumulated value
+    def accu_vals(angle):
+        scan_val = config['image_size'] * accu_base_lookup(angle)
+        val_0, val_1 = accu_init_vals(angle)
+        return (val_0, val_1, val_0 + scan_val, val_1 + scan_val)
+    def accu_range():
+        accu_range_list = map(accu_vals,
+                utils.xfrange(0, 180, config['projection_angle_step']))
+        accu_range_list = list(chain.from_iterable(accu_range_list))
+        return utils.bin_width_of_dec_vals(accu_range_list)
+    accu_len, accu_signed = accu_range()
+    config['tMapAccu'] = FixedPoint(
+            accu_len, config['kMapAccuPrecision'], accu_init_signed)
     return config
