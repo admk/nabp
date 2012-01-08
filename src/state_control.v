@@ -35,21 +35,21 @@ module NABPStateControl
     // inputs from shifter
     input wire sh_fill_done,
     input wire sh_shift_done,
-    // output the iteration data this state control holds
-    output reg [`kAngleLength-1:0] mp_angle,
     // output to swap control
     output wire sw_swap_ready,
     output wire sw_next_itr,
     // output to shifter
     output wire sh_fill_kick,
-    output wire sh_shift_kick
+    output wire sh_shift_kick,
     output reg {# sh_accu_fixed.verilog_decl() #} sh_accu_base,
     // output to mapper
     output wire {# conf()['tMapAccuInit'].verilog_decl() #} mp_accu_init,
-    output wire {# conf()['tMapAccuBase'].verilog_decl() #} mp_accu_base,
+    output wire {# conf()['tMapAccuBase'].verilog_decl() #} mp_accu_base
 );
 
 {# include('templates/state_decl(states).v', states=state_control_states()) #}
+
+reg unsigned [`kAngleLength-1:0] angle;
 
 always @(posedge clk)
 begin:transition
@@ -62,7 +62,7 @@ begin:transition
     begin
         if (state == ready_s)
         begin
-            mp_angle <= sw_angle;
+            angle <= sw_angle;
             mp_line_cnt_fact <= sw_line_cnt_fact;
             mp_accu_base <= sw_mp_accu_base;
             sh_accu_base <= sw_sh_accu_base;
