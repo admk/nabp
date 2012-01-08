@@ -12,12 +12,8 @@
     mp_accu_fixed = conf()['tMapAccuBase']
 
     a_len = conf()['kAngleLength']
-    pe_width = conf()['partition_scheme']['size']
-    pe_width_len = bin_width_of_dec(pe_width)
-    line_cnt_fact_fixed = FixedPoint(pe_width, conf()['kSEvalPrecision'], True)
 #}
 `define kAngleLength {# a_len #}
-`define kPEWidthLength {# pe_width_len #}
 
 module NABPStateControl
 (
@@ -30,7 +26,7 @@ module NABPStateControl
     //          when $0\leq\theta{<}45$ or $135\leq\theta{<}180$
     // = -line_cnt * $\sin\theta$
     //          when $0\leq\theta{<}135$
-    input wire {# line_cnt_fact_fixed.verilog_decl() #} sw_line_cnt_fact,
+    input wire {# conf()['tLineCntFact'].verilog_decl() #} sw_line_cnt_fact,
     input wire {# sh_accu_fixed.verilog_decl() #} sw_sh_accu_base,
     input wire {# mp_accu_fixed.verilog_decl() #} sw_mp_accu_base,
     input wire [`kAngleLength-1:0] sw_angle,
@@ -40,7 +36,6 @@ module NABPStateControl
     input wire sh_fill_done,
     input wire sh_shift_done,
     // output the iteration data this state control holds
-    output reg {# line_cnt_fact_fixed.verilog_decl() #} mp_line_cnt_fact,
     output reg [`kAngleLength-1:0] mp_angle,
     // output to swap control
     output wire sw_swap_ready,
@@ -50,7 +45,8 @@ module NABPStateControl
     output wire sh_shift_kick
     output reg {# sh_accu_fixed.verilog_decl() #} sh_accu_base,
     // output to mapper
-    output reg {# mp_accu_fixed.verilog_decl() #} mp_accu_base,
+    output wire {# conf()['tMapAccuInit'].verilog_decl() #} mp_accu_init,
+    output wire {# conf()['tMapAccuBase'].verilog_decl() #} mp_accu_base,
 );
 
 {# include('templates/state_decl(states).v', states=state_control_states()) #}

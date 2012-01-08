@@ -6,12 +6,13 @@
 {# 
     from pynabp.conf import conf
     from pynabp.enums import mapper_states
-    from pynabp.utils import bin_width_of_dec
+    from pynabp.utils import bin_width_of_dec, dec_repr
     from pynabp.fixed_point_arith import FixedPoint
 
-    s_val_len = bin_width_of_dec(conf()['projection_line_size'])
-    mp_accu_base_fixed = conf()['tMapAccuBase']
-    mp_accu_init_fixed = conf()['tMapAccuInit']
+    p_line_size = conf()['projection_line_size']
+    s_val_len = bin_width_of_dec(p_line_size)
+    accu_fixed = conf()['tMapAccu']
+    accu_max = accu_fixed.verilog_repr(p_line_size)
 #}
 `define kSLength {# s_val_len #}
 `define kAngleLength {# conf()['kAngleLength'] #}
@@ -22,9 +23,8 @@ module NABPMapper
     input wire clk,
     input wire reset_n,
     // inputs from state_control
-    input wire unsigned [`kPEWidthLength-1:0] sc_line_cnt,
-    input wire {# mp_accu_init_fixed.verilog_decl() #} mp_accu_init,
-    input wire {# mp_accu_base_fixed.verilog_decl() #} mp_accu_base,
+    input wire {# conf()['tMapAccuInit'].verilog_decl() #} mp_accu_init,
+    input wire {# conf()['tMapAccuBase'].verilog_decl() #} mp_accu_base,
     // inputs from shifter
     input wire sh_kick,
     input wire sh_shift_enable,
@@ -32,7 +32,7 @@ module NABPMapper
     // outputs to shifter
     output wire sh_ack,
     // outputs to RAM
-    output reg [`kSLength-1:0] rm_s_val
+    output reg signed [`kSLength-1:0] rm_s_val
 );
 
 {# include('templates/state_decl(states).v', states=mapper_states()) #}
