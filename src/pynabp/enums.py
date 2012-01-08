@@ -28,7 +28,6 @@ class state_control_states(enum):
         self.fill = None
         self.fill_done = None
         self.shift = None
-        self.shift_done = None
         super(state_control_states, self).__init__()
 
 class shifter_states(enum):

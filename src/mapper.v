@@ -29,15 +29,16 @@ module NABPMapper
     input wire sh_kick,
     input wire sh_shift_enable,
     input wire sh_done,
-    // outputs to shifter
-    output wire sh_ack,
     // outputs to RAM
-    output reg signed [`kSLength-1:0] rm_s_val
+    output wire signed [`kSLength-1:0] rm_s_val
 );
 
 {# include('templates/state_decl(states).v', states=mapper_states()) #}
 
 reg {# accu_fixed.verilog_decl() #} accu;
+assign rm_s_val = (accu < 0 or accu >= {# accu_max #}) ?
+                  {# dec_repr(0, s_val_len) #} :
+                  accu {# accu_fixed.verilog_floor_shift() #};
 
 always @(posedge clk)
 begin:counter
@@ -46,11 +47,8 @@ begin:counter
             accu <= accu + mp_accu_base;
     else
         accu <= mp_accu_init;
-    if (accu < 0 or accu >= {# accu_max #})
-        rm_s_val <= {# dec_repr(0, s_val_len) #};
-    else
-        rm_s_val <= accu {# accu_fixed.verilog_floor_shift() #};
 end
+
 always @(posedge clk)
 begin:transition
     if (!reset_n)

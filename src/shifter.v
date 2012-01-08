@@ -8,10 +8,10 @@
     from pynabp.utils import bin_width_of_dec, dec_repr
     from pynabp.fixed_point_arith import FixedPoint
 
-    fill_cnt_init = conf()['partition_scheme']['partitions'][-1] + 1
+    fill_cnt_init = conf()['partition_scheme']['partitions'][-1]
     fill_cnt_width = bin_width_of_dec(fill_cnt_init)
 
-    shift_cnt_init = conf()['image_size']
+    shift_cnt_init = conf()['image_size'] - 1
     shift_cnt_width = bin_width_of_dec(shift_cnt_init)
 
     accu_fixed = conf()['tShiftAccuBase']
@@ -29,8 +29,6 @@ module NABPShifter
     input wire sc_fill_kick,
     input wire sc_shift_kick,
     input wire {# accu_fixed.verilog_decl() #} sc_accu_base,
-    // inputs from mapper
-    input wire mp_ack,
     // outputs to state_control
     output wire sc_fill_done,
     output wire sc_shift_done,
@@ -91,10 +89,10 @@ begin:transition
 end
 
 // mealy outputs
-assign sc_fill_done  = (fill_cnt == 0) and (state == shift_s);
-assign sc_shift_done = (shift_cnt == 0);
+assign sc_fill_done  = (fill_cnt == 0) and (state == fill_s);
+assign sc_shift_done = (shift_cnt == 0) and (state == shift_s);
 assign mp_kick = sc_fill_kick;
-assign mp_done = (state == ready_s);
+assign mp_done = sc_shift_done;
 
 always @(sc_fill_kick or sc_shift_kick or sc_fill_done or sc_shift_done or
          state)

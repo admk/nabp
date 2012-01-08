@@ -31,10 +31,10 @@ module NABPStateControl
     // output to shifter
     output wire sh_fill_kick,
     output wire sh_shift_kick,
-    output reg {# sh_accu_fixed.verilog_decl() #} sh_accu_base,
+    output reg {# conf()['tShiftAccuBase'].verilog_decl() #} sh_accu_base,
     // output to mapper
-    output wire {# conf()['tMapAccuInit'].verilog_decl() #} mp_accu_init,
-    output wire {# conf()['tMapAccuBase'].verilog_decl() #} mp_accu_base
+    output reg {# conf()['tMapAccuInit'].verilog_decl() #} mp_accu_init,
+    output reg {# conf()['tMapAccuBase'].verilog_decl() #} mp_accu_base
 );
 
 {# include('templates/state_decl(states).v', states=state_control_states()) #}
@@ -84,9 +84,7 @@ begin:mealy_next_state
                 next_state <= shift_s;
         shift_s:
             if (sh_shift_done)
-                next_state <= shift_done_s;
-        shift_done_s:
-            next_state <= setup_s;
+                next_state <= ready_s;
         default:
             $display(
                 "<NABPStateControl> Invalid state encountered: %d", state);
