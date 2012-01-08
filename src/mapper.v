@@ -37,6 +37,20 @@ module NABPMapper
 
 {# include('templates/state_decl(states).v', states=mapper_states()) #}
 
+reg {# accu_fixed.verilog_decl() #} accu;
+
+always @(posedge clk)
+begin:counter
+    if (state == mapping_s)
+        if (sh_shift_enable)
+            accu <= accu + mp_accu_base;
+    else
+        accu <= mp_accu_init;
+    if (accu < 0 or accu >= {# accu_max #})
+        rm_s_val <= {# dec_repr(0, s_val_len) #};
+    else
+        rm_s_val <= accu {# accu_fixed.verilog_floor_shift() #};
+end
 always @(posedge clk)
 begin:transition
     if (!reset_n)
