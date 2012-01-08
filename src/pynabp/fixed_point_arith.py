@@ -11,8 +11,7 @@ class FixedPoint(object):
         self.integer_width = integer_width
         self.fractional_width = fractional_width
         self.signed = signed
-        if not value is None:
-            self.value = value
+        self.value = value if not value is None else 0
 
     def width(self):
         sign_bit = 1 if self.signed else 0
@@ -96,6 +95,9 @@ class FixedPoint(object):
         else:
             raise RuntimeError('Unexpected slicing problem encountered.')
 
+    def verilog_floor_shift(self):
+        return '>>> ' + str(self.fractional_width)
+
     def bin_repr_of_value(self, value):
         """
         >>> FixedPoint(4, 4, True).bin_repr_of_value(-6.1875)
@@ -150,7 +152,14 @@ class FixedPoint(object):
         self._value = value
 
     def __str__(self):
-        return self.verilog_repr()
+        """
+        >>> FixedPoint(4, 4, True, value=-6.37)
+        FixedPoint: S(4).(4) = -6.3125
+        """
+        return 'FixedPoint: ' + self.type_repr() + ' = ' + str(self.value)
+
+    def __repr__(self):
+        return self.__str__()
 
 if __name__ == '__main__':
     import doctest
