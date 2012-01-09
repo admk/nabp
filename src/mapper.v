@@ -3,7 +3,7 @@
 //     3 Jan 2012
 // Provides addresses of the mapped projection line for line buffer
 
-{# 
+{#
     from pynabp.conf import conf
     from pynabp.enums import mapper_states
     from pynabp.utils import bin_width_of_dec, dec_repr
@@ -27,23 +27,32 @@ module NABPMapper
     input wire {# conf()['tMapAccuBase'].verilog_decl() #} mp_accu_base,
     // inputs from shifter
     input wire sh_kick,
-    input wire sh_shift_enable,
+    input wire sh_shift_en,
     input wire sh_done,
     // outputs to RAM
-    output wire signed [`kSLength-1:0] rm_s_val
+    output wire signed [`kSLength-1:0] rm_s_val,
+    output reg rm_en
 );
 
 {# include('templates/state_decl(states).v', states=mapper_states()) #}
 
 reg {# accu_fixed.verilog_decl() #} accu;
-assign rm_s_val = (accu < 0 or accu >= {# accu_max #}) ?
-                  {# dec_repr(0, s_val_len) #} :
-                  accu {# accu_fixed.verilog_floor_shift() #};
+
+always @(accu or state)
+begin:rm_s_val_update
+    rm_en <= sh_shift_en;
+    rm_s_val <= 0;
+    if ((state != mapping_s) or
+        (accu < 0 or accu >= {# accu_max #}))
+        rm_s_val <= {# dec_repr(0, s_val_len) #};
+    else
+        rm_s_val <= accu {# accu_fixed.verilog_floor_shift() #};
+end
 
 always @(posedge clk)
 begin:counter
     if (state == mapping_s)
-        if (sh_shift_enable)
+        if (sh_shift_en)
             accu <= accu + mp_accu_base;
     else
         accu <= mp_accu_init;
