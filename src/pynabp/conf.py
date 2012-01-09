@@ -24,7 +24,7 @@ def conf(
         # FIXME projection_line_size
         # odd size for integer-valued center,
         # or use (x).(1) fixed precision
-        _conf['projection_line_size'] = 367
+        _conf['projection_line_size'] = 363
         _conf['projection_angles_size'] = 180
     _conf['projection_angle_step'] = 180 / _conf['projection_angles_size']
     _conf['projection_line_center'] = (_conf['projection_line_size'] - 1) / 2
@@ -43,6 +43,7 @@ def conf(
             _conf['image_size'], no_of_partitions)
     _conf['ramp_filter_coefs'] = ramp_filter(fir_order)
     # architecture specific confs
+    _conf['kDataLength'] = 8
     _conf['kAngleLength'] = utils.bin_width_of_dec(180)
     for angle in range(45, 136, 45):
         key = 'kAngle' + str(angle)

@@ -1,7 +1,8 @@
 {# include('templates/info.v') #}
 // NABPStateControl
 //     31 Dec 2011
-// Provides system states for the NABP architecture
+// Hold system states for the NABP architecture for the swappable modules
+// Coordinate the shifter and mapper modules
 {#
     from pynabp.enums import state_control_states
     from pynabp.conf import conf
