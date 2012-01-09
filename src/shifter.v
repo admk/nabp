@@ -49,27 +49,25 @@ begin:counters
 
     if (state == fill_s and fill_cnt != {# fill_cnt_width #}'d0)
     begin
-        if (mp_ack)
-            fill_cnt <= fill_cnt - 1;
+        fill_cnt <= fill_cnt - 1;
         mp_shift_en <= 1;
     end
     else
         fill_cnt <= {# dec_repr(fill_cnt_init) #};
 
     if (state == shift_s and shift_cnt != {# shift_cnt_width #}'d0)
-        if (mp_ack)
-        begin
-            shift_cnt <= shift_cnt - 1;
-            // it is ok to let it overflow
-            // we only need to observe integer boundaries
-            accu_prev <= accu;
-            accu <= accu + accu_base;
-            if (accu_prev{# accu_floor_slice #} ==
-                    accu_prev{# accu_floor_slice #})
-                mp_shift_en <= 0;
-            else
-                mp_shift_en <= 1;
-        end
+    begin
+        shift_cnt <= shift_cnt - 1;
+        // it is ok to let it overflow
+        // we only need to observe integer boundaries
+        accu_prev <= accu;
+        accu <= accu + accu_base;
+        if (accu_prev{# accu_floor_slice #} ==
+                accu_prev{# accu_floor_slice #})
+            mp_shift_en <= 0;
+        else
+            mp_shift_en <= 1;
+    end
     else
     begin
         shift_cnt <= {# dec_repr(shift_cnt_init) #};
@@ -112,17 +110,6 @@ begin:mealy_next_state
             if (sc_shift_done)
                 next_state <= ready_s;
     endcase
-end
-
-always @(state)
-begin:fm_shift_enable
-    fm_shift_enable <= 0;
-    if (state == fill_s)
-        fm_shift_enable <= 1;
-    if (state == shift_s)
-    begin
-        // TODO shift enable signal on shift mode
-    end
 end
 
 endmodule
