@@ -38,7 +38,7 @@ module NABPMapper
 
 reg {# accu_fixed.verilog_decl() #} accu;
 
-always @(accu or state)
+always @(accu or state or sh_shift_en)
 begin:rm_s_val_update
     rm_en <= sh_shift_en;
     rm_s_val <= 0;

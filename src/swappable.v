@@ -6,10 +6,11 @@
 {#
     from pynabp.enums import state_control_states
     from pynabp.conf import conf
+    from pynabp.utils import bin_width_of_dec
 
     p_line_size = conf()['projection_line_size']
     s_val_len = bin_width_of_dec(p_line_size)
-    data_len = conf()['projection_data_length']
+    data_len = conf()['kDataLength']
     a_len = conf()['kAngleLength']
 #}
 `define kSLength {# s_val_len #}
