@@ -1,7 +1,36 @@
 {# include('templates/info.v') #}
 // NABPProcessingElement
 //     10 Jan 2011
-// The processing element
+// Processing element
+// ~~~~~~~~~~~~~~~~~~
+//
+// The processing element is operating in a mode that only the same number of
+// caches are necessary.  The image is divided in 5x5 blocks. The access
+// pattern (digits are caches and letters are PEs) for an image with
+// 5 partitions is
+//
+//      E-> 5 1 2 3 4
+//      D-> 4 5 1 2 3
+//      C-> 3 4 5 1 2
+//      B-> 2 3 4 5 1
+//      A-> 1 2 3 4 5
+//          ^ ^ ^ ^ ^
+//          A B C D E
+//
+// In either scan mode (x or y), each PE accesses the caches in the same
+// pattern at each iteration, and only one will be accessed by one PE at
+// a time.
+// The addresses for the caches are not packed (to avoid the use of
+// multipliers). And they have the following scheme -
+//
+//      { cc_sel, y, x }
+//
+// The signal cc_sel is of length
+//
+//      ceil(log2(no_of_partitions))
+//
+// This is because a cache stores no_of_partitions blocks of the image. (For
+// example cache no. 5 stores the diagonal blocks of the image.)
 
 {#
     from pynabp.conf import conf
