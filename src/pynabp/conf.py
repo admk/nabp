@@ -44,6 +44,7 @@ def conf(
     _conf['ramp_filter_coefs'] = ramp_filter(fir_order)
     # architecture specific confs
     _conf['kDataLength'] = 8
+    _conf['kFilteredDataLength'] = 9
     _conf['kAngleLength'] = utils.bin_width_of_dec(180)
     for angle in range(45, 136, 45):
         key = 'kAngle' + str(angle)
