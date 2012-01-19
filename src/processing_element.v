@@ -130,4 +130,23 @@ begin:cc_write
     cc_write_val <= cc_read_val + lb_val;
 end
 
+{% if conf()['debug'] %}
+
+integer file, err;
+reg [20*8:1] file_name;
+
+initial
+begin
+    $sprintf(file_name, "pe_update_%d", id);
+    file = $fopen(file_name, "w");
+    always @(posedge clk)
+        if (cc_write_en)
+        begin
+            $fwrite(file, "%g, %d, %d\n", $time, cc_write_val, cc_write_addr);
+            err = $fflush(file);
+        end
+end
+
+{% end %}
+
 endmodule

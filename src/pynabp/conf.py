@@ -15,9 +15,11 @@ def conf(
     if _conf:
         return _conf
     _conf = dict(kwargs)
+    # general confs
+    _conf['debug'] = True
     # algorithm specific confs
-    _conf['projection_data'] = projection_data
     if projection_data:
+        _conf['projection_data'] = projection_data
         _conf['projection_line_size'] = np.shape(projection_data)[1]
         _conf['projection_angles_size'] = np.shape(projection_data)[0]
     else:
