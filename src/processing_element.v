@@ -42,8 +42,13 @@
     partition_size_len = bin_width_of_dec(partition_size)
     no_partitions = conf()['partition_scheme']['no_of_partitions']
     no_partitions_len = bin_width_of_dec(no_partitions)
-    image_size = conf()['image_size']
     addr_len = partition_size_len * 2 + no_partitions_len
+    image_size_len = bin_width_of_dec(conf()['image_size'])
+
+    def to_v(val):
+        return dec_repr(val, partition_size_len)
+    def to_sel(val):
+        return dec_repr(val, no_partitions_len)
 #}
 
 `define kNoPartitions {# no_partitions #}
@@ -66,7 +71,7 @@ module NABPProcessingElement
     // inputs from cache control
     input wire signed [`kFilteredDataLength-1:0] cc_read_val,
     // outputs to cache control
-    output unsigned [`kNoPartitonsLength-1:0] cc_sel,
+    output reg unsigned [`kNoPartitonsLength-1:0] cc_sel,
     output wire [`kAddressLength-1:0] cc_read_addr,
     output reg cc_write_en,
     output reg [`kAddressLength-1:0] cc_write_addr,
@@ -77,48 +82,39 @@ parameter [`kNoPartitonsLength-1:0] id = {# dec_repr(0, no_partitions_len) #};
 
 reg unsigned [`kPartitionSizeLength-1:0] line_itr;
 reg unsigned [`kPartitionSizeLength-1:0] scan_itr;
-reg unsigned [`kNoPartitonsLength:0] scan_sec;
+reg unsigned [`kNoPartitonsLength-1:0] scan_sec;
 wire [`kNoPartitonsLength-1:0] cc_sec_sel;
-{# cc_sel_max = dec_repr(no_partitions, no_partitions_len + 1) #}
-assign cc_sel = (scan_sec < {# cc_sel_max #}) ?  scan_sec :
-                (scan_sec - {# cc_sel_max #});
-assign cc_sec_sel = (sw_scan_mode == {# scan_mode.y #}) ? id : scan_sec;
+assign cc_sec_sel = (sw_scan_mode == {# scan_mode.y #}) ? pe_id : scan_sec;
 assign cc_read_addr = (sw_scan_mode == {# scan_mode.x #} ? 
                       {cc_sec_sel, line_itr, scan_itr} :
                       {cc_sec_sel, scan_itr, line_itr};
 
-{#
-    def to_v(val):
-        return dec_repr(val, partition_size_len)
-#}
 always @(posedge clk)
 begin:counter
     if (!reset_n)
     begin
         line_itr <= {# to_v(0) #};
         scan_itr <= {# to_v(0) #};
-        scan_sec <= {0, id};
-    end else
+        scan_sec <= {# to_sel(0) #};
+        cc_sel <= pe_id;
+    end
+    else if (sw_kick)
     begin
-        if (sw_kick)
+        line_itr <= line_itr + {# to_v(1) #};
+        scan_itr <= {# to_v(0) #};
+        scan_sec <= {# to_sel(0) #};
+        cc_sel <= pe_id;
+    end
+    else if (sw_en)
+    begin
+        if (scan_itr == {# to_v(partition_size) #})
         begin
-            line_itr <= line_itr + {# to_v(1) #};
             scan_itr <= {# to_v(0) #};
-            scan_sec <= {0, id};
-        end
-        else if (sw_en)
-        begin
-            line_itr <= line_itr;
-            if (scan_itr == {# to_v(partition_size) #})
-            begin
-                scan_itr <= {# to_v(0) #};
-                scan_sec <= scan_sec +
-                        {# dec_repr(0, no_partitions_len + 1) #};
-            end
+            scan_sec <= scan_sec + {# to_sel(1) #};
+            if (cc_sel == {# to_sel(no_partitions - 1) #})
+                cc_sel <= {# to_sel(0) #};
             else
-                scan_itr <= scan_itr + {# to_v(1) #};
-                scan_sec <= scan_sec;
-            end
+                cc_sel <= cc_sel + {# to_sel(1) #};
         end
     end
 end
