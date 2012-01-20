@@ -56,6 +56,7 @@
 `define kFilteredDataLength {# data_len #}
 `define kPartitionSizeLength {# partition_size_len #}
 `define kAddressLength {# addr_len #}
+`define kImageSizeLength {# image_size_len #}
 
 module NABPProcessingElement
 (
@@ -78,7 +79,8 @@ module NABPProcessingElement
     output reg signed [`kFilteredDataLength-1:0] cc_write_val
 );
 
-parameter [`kNoPartitonsLength-1:0] id = {# dec_repr(0, no_partitions_len) #};
+parameter [`kNoPartitonsLength-1:0] pe_id = 'bz;
+parameter [`kImageSizeLength-1:0] pe_tap = 'bz;
 
 reg unsigned [`kPartitionSizeLength-1:0] line_itr;
 reg unsigned [`kPartitionSizeLength-1:0] scan_itr;
@@ -127,22 +129,33 @@ begin:cc_write
 end
 
 {% if conf()['debug'] %}
-
 integer file, err;
 reg [20*8:1] file_name;
-
+reg unsigned [`kImageSizeLength-1:0] im_x, im_y, scan_pos, line_pos;
 initial
 begin
-    $sprintf(file_name, "pe_update_%d", id);
+    $sprintf(file_name, "pe_update_%d.csv", pe_id);
     file = $fopen(file_name, "w");
+    $fwrite(file, "Time, X, Y, Value");
     always @(posedge clk)
         if (cc_write_en)
         begin
-            $fwrite(file, "%g, %d, %d\n", $time, cc_write_val, cc_write_addr);
+            scan_pos = {# dec_repr(partition_size, image_size_len) #} *
+                    scan_sec + scan_itr;
+            line_pos = pe_tap + line_itr;
+            if (sw_scan_mode == {# scan_mode.x #})
+            begin
+                im_x = scan_pos;
+                im_y = line_pos;
+            end else
+            begin
+                im_x = line_pos;
+                im_y = scan_pos;
+            end
+            $fwrite(file, "%g, %d, %d, %d\n", $time, im_x, im_y, cc_write_val);
             err = $fflush(file);
         end
 end
-
 {% end %}
 
 endmodule
