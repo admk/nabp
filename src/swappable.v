@@ -1,6 +1,6 @@
 {# include('templates/info.v') #}
 // NABPSwappable
-//     9 Jan 2011
+//     9 Jan 2012
 // The top level entity for modules that are to be swapped together
 
 {#
@@ -10,11 +10,11 @@
 
     p_line_size = conf()['projection_line_size']
     s_val_len = bin_width_of_dec(p_line_size)
-    data_len = conf()['kDataLength']
+    data_len = conf()['kFilteredDataLength']
     a_len = conf()['kAngleLength']
 #}
 `define kSLength {# s_val_len #}
-`define kDataLength {# data_len #}
+`define kFilteredDataLength {# data_len #}
 `define kAngleLength {# a_len #}
 
 module NABPSwappable
@@ -30,13 +30,13 @@ module NABPSwappable
     input wire sw_swap,
     input wire sw_next_itr_ack,
     // input from RAM
-    input wire signed [`kDataLength-1:0] rm_val,
+    input wire signed [`kFilteredDataLength-1:0] rm_val,
     // outputs to swap control
     output wire sw_swap_ready,
     output wire sw_next_itr,
+    output wire sw_pe_en,
     // output to RAM
     output wire signed [`kSLength-1:0] rm_s_val,
-    output wire rm_en
 );
 
 wire sc_sh_fill_kick;
@@ -59,6 +59,7 @@ NABPStateControl state_control
     .sw_mp_accu_base(sw_mp_accu_base),
     .sw_swap(sw_swap),
     .sw_next_itr_ack(sw_next_itr_ack),
+    .sw_pe_en(sw_pe_en),
     // inputs from shifter
     .sh_fill_done(sh_sc_fill_done),
     .sh_shift_done(sh_sc_shift_done),
@@ -93,7 +94,7 @@ NABPShifter shifter
     // outputs to mapper
     .mp_kick(sh_mp_kick),
     .mp_shift_en(sh_mp_shift_en),
-    .mp_done(sh_mp_done),
+    .mp_done(sh_mp_done)
 );
 
 NABPMapper mapper
@@ -109,8 +110,7 @@ NABPMapper mapper
     .sh_shift_en(sh_mp_shift_en),
     .sh_done(sh_mp_done),
     // outputs to RAM
-    .rm_s_val(rm_s_val),
-    .rm_en(rm_en)
+    .rm_s_val(rm_s_val)
 );
 
 // TODO line buffer
