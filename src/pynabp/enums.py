@@ -43,3 +43,11 @@ class mapper_states(enum):
         self.ready = None
         self.mapping = None
         super(mapper_states, self).__init__()
+
+class swap_control_states(enum):
+    def __init__(self):
+        self.ready = None
+        self.preprocess = None
+        self.fill = None
+        self.fill_and_shift = None
+        self.shift = None
