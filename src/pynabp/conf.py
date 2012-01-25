@@ -45,6 +45,7 @@ def conf(
             _conf['image_size'], no_of_partitions)
     _conf['ramp_filter_coefs'] = ramp_filter(fir_order)
     # architecture specific confs
+    _conf['device'] = 'Cyclone II'
     _conf['kDataLength'] = 8
     _conf['kFilteredDataLength'] = 9
     _conf['kAngleLength'] = utils.bin_width_of_dec(180)

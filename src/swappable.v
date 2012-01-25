@@ -113,6 +113,21 @@ NABPMapper mapper
     .rm_s_val(rm_s_val)
 );
 
-// TODO line buffer
+altshift_taps
+#(
+    intended_device_family = {# conf()['device'] #},
+    number_of_taps = {# conf()['partition_scheme']['no_of_partitions'] - 1 #},
+    power_up_state = "CLEARED",
+    taps_distance = {# conf()['partition_scheme']['size'] #},
+    width = `kFilteredDataLength,
+    lpm_type = "altshift_taps",
+    lpm_hint = "unused"
+) line_buff (
+    .aclr(sw_next_itr),
+    .clken(sh_mp_shift_en),
+    .clock(clk),
+    .shiftin(rm_val),
+    .taps() // [width*number_of_taps-1:0]
+);
 
 endmodule
