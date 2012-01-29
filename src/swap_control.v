@@ -15,28 +15,6 @@ module NABPSwapControl
     input wire clk,
     input wire reset_n,
     input wire na_kick,
-    // inputs from swappables
-    input wire sc0_swap_ready,
-    input wire sc0_next_itr,
-    input wire sc0_pe_en,
-    input wire sc1_swap_ready,
-    input wire sc1_next_itr,
-    input wire sc1_pe_en,
-    // outputs to swappables
-    //   sc_sel - selects swappable
-    output reg sc_sel,
-    // sw0
-    output wire {# conf()['tShiftAccuBase'].verilog_decl() #} sc0_sh_accu_base,
-    output wire {# conf()['tMapAccuInit'].verilog_decl() #} sc0_mp_accu_init,
-    output wire {# conf()['tMapAccuBase'].verilog_decl() #} sc0_mp_accu_base,
-    output wire sc0_swap,
-    output wire sc0_next_itr_ack,
-    // sw1
-    output wire {# conf()['tShiftAccuBase'].verilog_decl() #} sc1_sh_accu_base,
-    output wire {# conf()['tMapAccuInit'].verilog_decl() #} sc1_mp_accu_init,
-    output wire {# conf()['tMapAccuBase'].verilog_decl() #} sc1_mp_accu_base,
-    output wire sc1_swap,
-    output wire sc1_next_itr_ack,
     // output to processing elements
     output wire pe_kick,
     output wire pe_en,
@@ -45,6 +23,22 @@ module NABPSwapControl
 
 {# include('templates/state_decl(states).v', states=swap_control_states()) #}
 
+// inputs from swappables
+wire sw0_swap_ready, sw1_swap_ready;
+wire sw0_next_itr, sw1_next_itr;
+wire sw0_pe_en, sw1_pe_en; // TODO pe_en
+// outputs to swappables
+//   sw_sel - selects swappable
+reg sw_sel;
+// TODO lut vals
+wire {# conf()['tShiftAccuBase'].verilog_decl() #}
+        sw0_sh_accu_base, sw1_sh_accu_base;
+wire {# conf()['tMapAccuInit'].verilog_decl() #}
+        sw0_mp_accu_init, sw1_mp_accu_init;
+wire {# conf()['tMapAccuBase'].verilog_decl() #}
+        sw0_mp_accu_base, sw1_mp_accu_base;
+wire sw0_swap, sw1_swap;
+wire sw0_next_itr_ack, sw1_next_itr_ack;
 
 // mealy outputs
 wire swa_swap_ready;
@@ -104,5 +98,30 @@ begin:mealy_next_state
                 "<NABPSwapControl> Invalid state encountered: %d", state);
     endcase
 end
+
+{% for i in [0, 1] %}
+NABPSwappable sw{#i#}
+(
+    // global signals
+    .clk(clk),
+    .reset_n(reset_n),
+    // inputs from swap control
+    .sw_sh_accu_base(sw{#i#}_sh_accu_base),
+    .sw_mp_accu_init(sw{#i#}_mp_accu_init),
+    .sw_mp_accu_base(sw{#i#}_mp_accu_base),
+    .sw_swap(sw{#i#}_swap),
+    .sw_next_itr_ack(sw{#i#}_next_itr_ack),
+    // TODO inputs from Filtered RAM
+    .fr_val(),
+    // outputs to swap control
+    .sw_swap_ready(sw{#i#}_swap_ready),
+    .sw_next_itr(sw{#i#}_next_itr),
+    .sw_pe_en(sw{#i#}_pe_en),
+    // outputs to Filtered RAM
+    .fr_s_val(),
+    // TODO outputs to PEs
+    .pe_taps(),
+);
+{% end %}
 
 endmodule
