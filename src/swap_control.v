@@ -2,6 +2,7 @@
 // NABPSwapControl
 //     24 Jan 2012
 // Provides control for the swappables
+// Handles swapping between the swappable instances
 {#
     from pynabp.conf import conf
     from pynabp.enums import swap_control_states
@@ -44,40 +45,35 @@ module NABPSwapControl
 
 {# include('templates/state_decl(states).v', states=swap_control_states()) #}
 
-// TODO RAM Proprocessing
-// TODO Angle iterations
-// signals: preprocess_done, next_angle
-
-wire sca_swap_ready;
-wire scb_next_itr;
-assign sca_swap_ready = sc_sel ? sc1_swap_ready : sc0_swap_ready;
-assign scb_next_itr = sc_sel ? sc0_next_itr : sc1_next_itr;
-
-wire swap;
-assign swap = (state == fill_s and sca_swap_ready) or
-              (state == fill_and_shift_s and sca_swap_ready and scb_next_itr);
 
 // mealy outputs
-wire sca_next_itr_ack, scb_next_itr_ack;
-assign sca_next_itr_ack = (state == preprocess_s and preprocess_done);
-assign scb_next_itr_ack = (!next_angle and swap);
-assign sc0_next_itr_ack = sc_sel ? scb_next_itr_ack : sca_next_itr_ack;
-assign sc1_next_itr_ack = sc_sel ? sca_next_itr_ack : scb_next_itr_ack;
-assign sc0_swap = sc_sel ? 0 : swap;
-assign sc1_swap = sc_sel ? swap : 0;
+wire swa_swap_ready;
+wire swb_next_itr;
+wire swa_next_itr_ack, swb_next_itr_ack;
+wire swap;
+assign swa_swap_ready = sw_sel ? sw1_swap_ready : sw0_swap_ready;
+assign swb_next_itr = sw_sel ? sw0_next_itr : sw1_next_itr;
+assign swap = (state == fill_s and swa_swap_ready) or
+              (state == fill_and_shift_s and swa_swap_ready and swb_next_itr);
+assign swa_next_itr_ack = (state == ready_s and hs_next_angle_ack);
+assign swb_next_itr_ack = (!hs_has_next_angle and swap);
+assign sw0_next_itr_ack = sw_sel ? swb_next_itr_ack : swa_next_itr_ack;
+assign sw1_next_itr_ack = sw_sel ? swa_next_itr_ack : swb_next_itr_ack;
+assign sw0_swap = sw_sel ? 0 : swap;
+assign sw1_swap = sw_sel ? swap : 0;
 
 always @(posedge clk)
 begin:transition
     if (!reset_n)
     begin
         state <= ready_s;
-        sc_sel <= 0;
+        sw_sel <= 0;
     end
     else
     begin
         state <= next_state;
         if (swap)
-            sc_sel <= !sc_sel;
+            sw_sel <= !sw_sel;
     end
 end
 
@@ -101,7 +97,7 @@ begin:mealy_next_state
             if (swap and next_angle)
                 next_state <= shift_s;
         shift_s:
-            if (scb_next_itr)
+            if (swb_next_itr)
                 next_state <= preprocess_s;
         default:
             $display(
