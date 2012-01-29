@@ -14,7 +14,12 @@ module NABPSwapControl
     // global signals
     input wire clk,
     input wire reset_n,
-    input wire na_kick,
+    // inputs from host
+    input wire hs_angle,
+    input wire hs_next_angle_ack,
+    input wire hs_has_next_angle,
+    // outputs to host
+    output wire hs_next_angle,
     // output to processing elements
     output wire pe_kick,
     output wire pe_en,
@@ -76,19 +81,16 @@ begin:mealy_next_state
     next_state <= state;
     case (state) // synopsys parallel_case full_case
         ready_s:
-            if (na_kick)
-                next_state <= preprocess_s;
-        preprocess_s:
-            if (preprocess_done)
+            if (hs_next_angle_ack)
                 next_state <= fill_s;
         fill_s:
             if (swap)
-                if (next_angle)
+                if (hs_has_next_angle)
                     next_state <= shift_s;
                 else
                     next_state <= fill_and_shift_s;
         fill_and_shift_s:
-            if (swap and next_angle)
+            if (swap and hs_has_next_angle)
                 next_state <= shift_s;
         shift_s:
             if (swb_next_itr)
