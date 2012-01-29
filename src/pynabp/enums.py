@@ -50,3 +50,4 @@ class swap_control_states(enum):
         self.fill = None
         self.fill_and_shift = None
         self.shift = None
+        super(swap_control_states, self).__init__()
