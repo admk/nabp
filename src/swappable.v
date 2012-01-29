@@ -11,11 +11,11 @@
     p_line_size = conf()['projection_line_size']
     s_val_len = bin_width_of_dec(p_line_size)
     data_len = conf()['kFilteredDataLength']
-    a_len = conf()['kAngleLength']
+    no_pes = conf()['partition_scheme']['no_of_partitions']
 #}
 `define kSLength {# s_val_len #}
 `define kFilteredDataLength {# data_len #}
-`define kAngleLength {# a_len #}
+`define kNoOfPartitions {# no_pes #}
 
 module NABPSwappable
 (
@@ -23,20 +23,21 @@ module NABPSwappable
     input wire clk,
     input wire reset_n,
     // inputs from swap control
-    input wire [`kAngleLength-1:0] sw_angle,
     input wire {# conf()['tShiftAccuBase'].verilog_decl() #} sw_sh_accu_base,
     input wire {# conf()['tMapAccuInit'].verilog_decl() #} sw_mp_accu_init,
     input wire {# conf()['tMapAccuBase'].verilog_decl() #} sw_mp_accu_base,
     input wire sw_swap,
     input wire sw_next_itr_ack,
-    // input from RAM
-    input wire signed [`kFilteredDataLength-1:0] rm_val,
+    // input from Filtered RAM
+    input wire signed [`kFilteredDataLength-1:0] fr_val,
     // outputs to swap control
     output wire sw_swap_ready,
     output wire sw_next_itr,
     output wire sw_pe_en,
     // output to RAM
-    output wire signed [`kSLength-1:0] rm_s_val,
+    output wire signed [`kSLength-1:0] fr_s_val,
+    // output to PEs
+    output wire [`kFilteredDataLength*`kNoOfPartitions-1:0] pe_taps
 );
 
 wire sc_sh_fill_kick;
@@ -53,7 +54,6 @@ NABPStateControl state_control
     .clk(clk),
     .reset_n(reset_n),
     // inputs from swap control
-    .sw_angle(sw_angle),
     .sw_sh_accu_base(sw_sh_accu_base),
     .sw_mp_accu_init(sw_mp_accu_init),
     .sw_mp_accu_base(sw_mp_accu_base),
@@ -110,13 +110,18 @@ NABPMapper mapper
     .sh_shift_en(sh_mp_shift_en),
     .sh_done(sh_mp_done),
     // outputs to RAM
-    .rm_s_val(rm_s_val)
+    .fr_s_val(fr_s_val)
 );
+
+reg signed [`kFilteredDataLength-1:0] pe_tap0;
+wire [(`kNoOfPartitions-1)*`kFilteredDataLength] pe_shift_taps;
+
+assign pe_taps = {pe_shift_taps, pe_tap0};
 
 altshift_taps
 #(
     intended_device_family = {# conf()['device'] #},
-    number_of_taps = {# conf()['partition_scheme']['no_of_partitions'] - 1 #},
+    number_of_taps = `kNoOfPartitions - 1,
     power_up_state = "CLEARED",
     taps_distance = {# conf()['partition_scheme']['size'] #},
     width = `kFilteredDataLength,
@@ -126,8 +131,8 @@ altshift_taps
     .aclr(sw_next_itr),
     .clken(sh_mp_shift_en),
     .clock(clk),
-    .shiftin(rm_val),
-    .taps() // [width*number_of_taps-1:0]
+    .shiftin(fr_val),
+    .taps(pe_shift_taps)
 );
 
 endmodule
