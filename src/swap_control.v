@@ -15,7 +15,7 @@ module NABPSwapControl
     input wire clk,
     input wire reset_n,
     // inputs from host
-    input wire hs_angle,
+    input wire unsigned [`kAngleLength-1:0] hs_angle,
     input wire hs_next_angle_ack,
     input wire hs_has_next_angle,
     // outputs to host
