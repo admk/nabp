@@ -126,4 +126,24 @@ NABPSwappable sw{#i#}
 );
 {% end %}
 
+NABPMapperLUT mapper_lut
+(
+    // inputs
+    .clk(clk),
+    .mp_line_cnt(),
+    .mp_angle(),
+    // outputs
+    .mp_accu_const_part(),
+    .mp_accu_base()
+);
+
+NABPShifterLUT shifter_lut
+(
+    // inputs
+    .clk(clk),
+    .sh_angle(),
+    // output
+    .sh_accu_base()
+);
+
 endmodule
