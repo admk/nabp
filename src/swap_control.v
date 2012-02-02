@@ -6,12 +6,21 @@
 {#
     from pynabp.conf import conf
     from pynabp.enums import swap_control_states, scan_mode
+    from pynabp.utils import bin_width_of_dec, dec_repr
+
+    partition_size = conf()['partition_scheme']['size']
+    partition_size_len = bin_width_of_dec(partition_size)
 
     angle_defines = dict(
             (k, v) for k, v in conf().iteritems() if 'kAngle' in k)
+
+    def to_v(val):
+        return dec_repr(val, partition_size_len)
 #}
 {% for key, val in angle_defines.iteritems() %}
 `define {# key #} {# val #} {% end %}
+
+`define kPartitionSizeLength {# partition_size_len #}
 
 module NABPSwapControl
 (
@@ -32,6 +41,9 @@ module NABPSwapControl
 
 {# include('templates/state_decl(states).v', states=swap_control_states()) #}
 
+// line iteration
+reg unsigned [`kPartitionSizeLength-1:0] line_itr;
+
 // inputs from swappables
 wire sw0_swap, sw1_swap;
 wire sw0_next_itr, sw1_next_itr;
@@ -47,6 +59,7 @@ wire swa_swap;
 wire swb_next_itr;
 wire swa_next_itr_ack, swb_next_itr_ack;
 wire swap_ack;
+wire has_next_itr;
 assign swa_swap = sw_sel ? sw1_swap : sw0_swap;
 assign swb_next_itr = sw_sel ? sw0_next_itr : sw1_next_itr;
 assign swap_ack = (state == fill_s or state == fill_and_shift_s) and
@@ -58,7 +71,16 @@ assign sw1_next_itr_ack = sw_sel ? swa_next_itr_ack : swb_next_itr_ack;
 assign sw0_swap_ack = sw_sel ? 0 : swap_ack;
 assign sw1_swap_ack = sw_sel ? swap_ack : 0;
 assign hs_next_angle = (next_state == ready_s);
+assign has_next_itr = (line_itr == {# to_v(partition_size_len - 1) #});
 
+always @(posedge clk)
+begin:line_itr_update
+    if (state == ready_s)
+        line_itr <= {# to_v(0) #};
+    else
+        if (swap_ack)
+            line_itr <= line_itr + {# to_v(0) #};
+end
 always @(posedge clk)
 begin:transition
     if (!reset_n)
@@ -156,6 +178,7 @@ NABPSwappable sw{#i#}
 {% end %}
 
 // look-up tables
+// TODO & FIXME mapper look-up value accumulation
 NABPMapperLUT mapper_lut
 (
     // inputs
