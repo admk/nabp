@@ -8,6 +8,8 @@
     from pynabp.enums import swap_control_states, scan_mode
     from pynabp.utils import bin_width_of_dec, dec_repr
 
+    s_val_len = bin_width_of_dec(p_line_size)
+    data_len = conf()['kFilteredDataLength']
     partition_size = conf()['partition_scheme']['size']
     partition_size_len = bin_width_of_dec(partition_size)
 
@@ -20,6 +22,8 @@
 {% for key, val in angle_defines.iteritems() %}
 `define {# key #} {# val #} {% end %}
 
+`define kSLength {# s_val_len #}
+`define kFilteredDataLength {# data_len #}
 `define kPartitionSizeLength {# partition_size_len #}
 
 module NABPSwapControl
@@ -30,6 +34,8 @@ module NABPSwapControl
     // inputs from host
     input wire unsigned [`kAngleLength-1:0] hs_angle,
     input wire hs_next_angle_ack,
+    // input from Filtered RAM
+    input wire signed [`kFilteredDataLength-1:0] fr_val,
     // outputs to host
     output wire hs_next_angle,
     // output to processing elements
@@ -37,6 +43,8 @@ module NABPSwapControl
     output wire pe_kick,
     output wire pe_en,
     output wire pe_scan_mode
+    // output to RAM
+    output wire signed [`kSLength-1:0] fr_s_val,
 );
 
 {# include('templates/state_decl(states).v', states=swap_control_states()) #}
@@ -164,14 +172,14 @@ NABPSwappable sw{#i#}
     .sw_mp_accu_base(sw{#i#}_mp_accu_base),
     .sw_swap_ack(sw{#i#}_swap_ack),
     .sw_next_itr_ack(sw{#i#}_next_itr_ack),
-    // TODO inputs from Filtered RAM
-    .fr_val(),
+    // inputs from Filtered RAM
+    .fr_val(fr_val),
     // outputs to swap control
     .sw_swap(sw{#i#}_swap),
     .sw_next_itr(sw{#i#}_next_itr),
     .sw_pe_en(sw{#i#}_pe_en),
     // outputs to Filtered RAM
-    .fr_s_val(),
+    .fr_s_val(fr_s_val),
     // TODO outputs to PEs
     .pe_taps(),
 );
