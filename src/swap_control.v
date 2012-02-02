@@ -31,7 +31,7 @@ module NABPSwapControl
 // inputs from swappables
 wire sw0_swap, sw1_swap;
 wire sw0_next_itr, sw1_next_itr;
-wire sw0_pe_en, sw1_pe_en; // TODO pe_en
+wire sw0_pe_en, sw1_pe_en;
 // outputs to swappables
 //   sw_sel - selects swappable
 reg sw_sel;
@@ -94,11 +94,26 @@ begin:mealy_next_state
                 next_state <= shift_s;
         shift_s:
             if (swb_next_itr)
-                next_state <= preprocess_s;
+                next_state <= ready_s;
         default:
             $display(
                 "<NABPSwapControl> Invalid state encountered: %d", state);
     endcase
+end
+
+// pe control outputs
+reg scan_mode;
+assign pe_en = sw_sel ? sw1_pe_en : sw0_pe_en;
+assign pe_reset = swa_next_itr_ack;
+assign pe_kick = swap_ack;
+assign pe_scan_mode = scan_mode;
+always @(posedge clk)
+begin:pe_setup
+    if (state == setup_s)
+        if (hs_angle < `kAngle45 or hs_angle >= `kAngle135)
+            scan_mode <= {# scan_mode.x #};
+        else
+            scan_mode <= {# scan_mode.y #};
 end
 
 {% for i in [0, 1] %}
