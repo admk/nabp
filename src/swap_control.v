@@ -35,7 +35,8 @@ module NABPSwapControl
     input wire unsigned [`kAngleLength-1:0] hs_angle,
     input wire hs_next_angle_ack,
     // input from Filtered RAM
-    input wire signed [`kFilteredDataLength-1:0] fr_val,
+    input wire signed [`kFilteredDataLength-1:0] fr0_val,
+    input wire signed [`kFilteredDataLength-1:0] fr1_val,
     // outputs to host
     output wire hs_next_angle,
     // output to processing elements
@@ -44,7 +45,8 @@ module NABPSwapControl
     output wire pe_en,
     output wire pe_scan_mode
     // output to RAM
-    output wire signed [`kSLength-1:0] fr_s_val,
+    output wire signed [`kSLength-1:0] fr0_s_val,
+    output wire signed [`kSLength-1:0] fr1_s_val,
 );
 
 {# include('templates/state_decl(states).v', states=swap_control_states()) #}
@@ -173,13 +175,13 @@ NABPSwappable sw{#i#}
     .sw_swap_ack(sw{#i#}_swap_ack),
     .sw_next_itr_ack(sw{#i#}_next_itr_ack),
     // inputs from Filtered RAM
-    .fr_val(fr_val),
+    .fr_val(fr{#i#}_val),
     // outputs to swap control
     .sw_swap(sw{#i#}_swap),
     .sw_next_itr(sw{#i#}_next_itr),
     .sw_pe_en(sw{#i#}_pe_en),
     // outputs to Filtered RAM
-    .fr_s_val(fr_s_val),
+    .fr_s_val(fr{#i#}_s_val),
     // TODO outputs to PEs
     .pe_taps(),
 );
