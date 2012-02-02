@@ -109,7 +109,7 @@ begin:counter
     end
     else if (sw_en)
     begin
-        if (scan_itr == {# to_v(partition_size) #})
+        if (scan_itr == {# to_v(partition_size - 1) #})
         begin
             scan_itr <= {# to_v(0) #};
             scan_sec <= scan_sec + {# to_sel(1) #};
