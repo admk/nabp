@@ -62,8 +62,8 @@ module NABPProcessingElement
 (
     // global signals
     input wire clk,
-    input wire reset_n,
     // inputs from swap control
+    input wire sw_reset,
     input wire sw_kick,
     input wire sw_en,
     input wire sw_scan_mode,
@@ -93,7 +93,7 @@ assign cc_read_addr = (sw_scan_mode == {# scan_mode.x #} ?
 
 always @(posedge clk)
 begin:counter
-    if (!reset_n)
+    if (sw_reset)
     begin
         line_itr <= {# to_v(0) #};
         scan_itr <= {# to_v(0) #};

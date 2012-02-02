@@ -17,10 +17,10 @@ module NABPSwapControl
     // inputs from host
     input wire unsigned [`kAngleLength-1:0] hs_angle,
     input wire hs_next_angle_ack,
-    input wire hs_has_next_angle,
     // outputs to host
     output wire hs_next_angle,
     // output to processing elements
+    output wire pe_reset,
     output wire pe_kick,
     output wire pe_en,
     output wire pe_scan_mode
@@ -29,7 +29,7 @@ module NABPSwapControl
 {# include('templates/state_decl(states).v', states=swap_control_states()) #}
 
 // inputs from swappables
-wire sw0_swap_ready, sw1_swap_ready;
+wire sw0_swap, sw1_swap;
 wire sw0_next_itr, sw1_next_itr;
 wire sw0_pe_en, sw1_pe_en; // TODO pe_en
 // outputs to swappables
@@ -42,24 +42,24 @@ wire {# conf()['tMapAccuInit'].verilog_decl() #}
         sw0_mp_accu_init, sw1_mp_accu_init;
 wire {# conf()['tMapAccuBase'].verilog_decl() #}
         sw0_mp_accu_base, sw1_mp_accu_base;
-wire sw0_swap, sw1_swap;
+wire sw0_swap_ack, sw1_swap_ack;
 wire sw0_next_itr_ack, sw1_next_itr_ack;
 
 // mealy outputs
-wire swa_swap_ready;
+wire swa_swap;
 wire swb_next_itr;
 wire swa_next_itr_ack, swb_next_itr_ack;
-wire swap;
-assign swa_swap_ready = sw_sel ? sw1_swap_ready : sw0_swap_ready;
+wire swap_ack;
+assign swa_swap = sw_sel ? sw1_swap : sw0_swap;
 assign swb_next_itr = sw_sel ? sw0_next_itr : sw1_next_itr;
-assign swap = (state == fill_s and swa_swap_ready) or
-              (state == fill_and_shift_s and swa_swap_ready and swb_next_itr);
-assign swa_next_itr_ack = (state == ready_s and hs_next_angle_ack);
-assign swb_next_itr_ack = (!hs_has_next_angle and swap);
+assign swap_ack = (state == fill_s and swa_swap) or
+                  (state == fill_and_shift_s and swa_swap and swb_next_itr);
+assign swa_next_itr_ack = (state == setup_s and hs_next_angle_ack);
+assign swb_next_itr_ack = (!has_next_itr and swap_ack);
 assign sw0_next_itr_ack = sw_sel ? swb_next_itr_ack : swa_next_itr_ack;
 assign sw1_next_itr_ack = sw_sel ? swa_next_itr_ack : swb_next_itr_ack;
-assign sw0_swap = sw_sel ? 0 : swap;
-assign sw1_swap = sw_sel ? swap : 0;
+assign sw0_swap_ack = sw_sel ? 0 : swap_ack;
+assign sw1_swap_ack = sw_sel ? swap_ack : 0;
 
 always @(posedge clk)
 begin:transition
@@ -71,7 +71,7 @@ begin:transition
     else
     begin
         state <= next_state;
-        if (swap)
+        if (swap_ack)
             sw_sel <= !sw_sel;
     end
 end
@@ -84,13 +84,13 @@ begin:mealy_next_state
             if (hs_next_angle_ack)
                 next_state <= fill_s;
         fill_s:
-            if (swap)
-                if (hs_has_next_angle)
+            if (swap_ack)
+                if (has_next_itr)
                     next_state <= shift_s;
                 else
                     next_state <= fill_and_shift_s;
         fill_and_shift_s:
-            if (swap and hs_has_next_angle)
+            if (swap_ack and has_next_itr)
                 next_state <= shift_s;
         shift_s:
             if (swb_next_itr)
@@ -111,12 +111,12 @@ NABPSwappable sw{#i#}
     .sw_sh_accu_base(sw{#i#}_sh_accu_base),
     .sw_mp_accu_init(sw{#i#}_mp_accu_init),
     .sw_mp_accu_base(sw{#i#}_mp_accu_base),
-    .sw_swap(sw{#i#}_swap),
+    .sw_swap_ack(sw{#i#}_swap_ack),
     .sw_next_itr_ack(sw{#i#}_next_itr_ack),
     // TODO inputs from Filtered RAM
     .fr_val(),
     // outputs to swap control
-    .sw_swap_ready(sw{#i#}_swap_ready),
+    .sw_swap(sw{#i#}_swap),
     .sw_next_itr(sw{#i#}_next_itr),
     .sw_pe_en(sw{#i#}_pe_en),
     // outputs to Filtered RAM
