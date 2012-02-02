@@ -11,8 +11,7 @@
             (k, v) for k, v in conf().iteritems() if 'kAngle' in k)
 #}
 {% for key, val in angle_defines.iteritems() %}
-`define {# key #} {# val #}
-{% end %}
+`define {# key #} {# val #} {% end %}
 
 module NABPSwapControl
 (
@@ -50,16 +49,15 @@ wire swa_next_itr_ack, swb_next_itr_ack;
 wire swap_ack;
 assign swa_swap = sw_sel ? sw1_swap : sw0_swap;
 assign swb_next_itr = sw_sel ? sw0_next_itr : sw1_next_itr;
-assign swap_ack = (state == fill_s and swa_swap) or
-                  (state == fill_and_shift_s and swa_swap and swb_next_itr);
+assign swap_ack = (state == fill_s or state == fill_and_shift_s) and
+                  (swa_swap and swb_next_itr);
 assign swa_next_itr_ack = (state == setup_s and hs_next_angle_ack);
 assign swb_next_itr_ack = (!has_next_itr and swap_ack);
 assign sw0_next_itr_ack = sw_sel ? swb_next_itr_ack : swa_next_itr_ack;
 assign sw1_next_itr_ack = sw_sel ? swa_next_itr_ack : swb_next_itr_ack;
 assign sw0_swap_ack = sw_sel ? 0 : swap_ack;
 assign sw1_swap_ack = sw_sel ? swap_ack : 0;
-assign hs_next_angle = (next_state == setup_s);
-// TODO has_next_itr
+assign hs_next_angle = (next_state == ready_s);
 
 always @(posedge clk)
 begin:transition
@@ -81,9 +79,10 @@ begin:mealy_next_state
     next_state <= state;
     case (state) // synopsys parallel_case full_case
         ready_s:
-            next_state <= setup_s;
-        setup_s:
             if (hs_next_angle_ack)
+                next_state <= setup_s;
+        setup_s:
+            if (swa_next_itr)
                 next_state <= fill_s;
         fill_s:
             if (swap_ack)
@@ -124,13 +123,14 @@ wire {# conf()['tMapAccuInit'].verilog_decl() #} mp_accu_init;
 wire {# conf()['tMapAccuBase'].verilog_decl() #} mp_accu_base;
 
 {% for i in [0, 1] %}
+// swappable {#i#}
 wire {# conf()['tShiftAccuBase'].verilog_decl() #} sw{#i#}_sh_accu_base;
 wire {# conf()['tMapAccuInit'].verilog_decl() #} sw{#i#}_mp_accu_init;
 wire {# conf()['tMapAccuBase'].verilog_decl() #} sw{#i#}_mp_accu_base;
 assign sw{#i#}_sh_accu_base = sh_accu_base;
 assign sw{#i#}_mp_accu_init = mp_accu_init;
 assign sw{#i#}_mp_accu_base = mp_accu_base;
-
+// module instantiation
 NABPSwappable sw{#i#}
 (
     // global signals
@@ -155,6 +155,7 @@ NABPSwappable sw{#i#}
 );
 {% end %}
 
+// look-up tables
 NABPMapperLUT mapper_lut
 (
     // inputs
@@ -165,7 +166,6 @@ NABPMapperLUT mapper_lut
     .mp_accu_const_part(mp_accu_init),
     .mp_accu_base(mp_accu_base)
 );
-
 NABPShifterLUT shifter_lut
 (
     // inputs
