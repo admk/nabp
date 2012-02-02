@@ -47,6 +47,7 @@ class mapper_states(enum):
 class swap_control_states(enum):
     def __init__(self):
         self.ready = None
+        self.setup = None
         self.fill = None
         self.fill_and_shift = None
         self.shift = None

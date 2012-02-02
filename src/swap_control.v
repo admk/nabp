@@ -5,9 +5,14 @@
 // Handles swapping between the swappable instances
 {#
     from pynabp.conf import conf
-    from pynabp.enums import swap_control_states
+    from pynabp.enums import swap_control_states, scan_mode
+
+    angle_defines = dict(
+            (k, v) for k, v in conf().iteritems() if 'kAngle' in k)
 #}
-`define kAngleLength {# conf()['kAngleLength'] #}
+{% for key, val in angle_defines.iteritems() %}
+`define {# key #} {# val #}
+{% end %}
 
 module NABPSwapControl
 (
@@ -35,13 +40,6 @@ wire sw0_pe_en, sw1_pe_en;
 // outputs to swappables
 //   sw_sel - selects swappable
 reg sw_sel;
-// TODO lut vals
-wire {# conf()['tShiftAccuBase'].verilog_decl() #}
-        sw0_sh_accu_base, sw1_sh_accu_base;
-wire {# conf()['tMapAccuInit'].verilog_decl() #}
-        sw0_mp_accu_init, sw1_mp_accu_init;
-wire {# conf()['tMapAccuBase'].verilog_decl() #}
-        sw0_mp_accu_base, sw1_mp_accu_base;
 wire sw0_swap_ack, sw1_swap_ack;
 wire sw0_next_itr_ack, sw1_next_itr_ack;
 
@@ -60,12 +58,14 @@ assign sw0_next_itr_ack = sw_sel ? swb_next_itr_ack : swa_next_itr_ack;
 assign sw1_next_itr_ack = sw_sel ? swa_next_itr_ack : swb_next_itr_ack;
 assign sw0_swap_ack = sw_sel ? 0 : swap_ack;
 assign sw1_swap_ack = sw_sel ? swap_ack : 0;
+assign hs_next_angle = (next_state == setup_s);
+// TODO has_next_itr
 
 always @(posedge clk)
 begin:transition
     if (!reset_n)
     begin
-        state <= ready_s;
+        state <= setup_s;
         sw_sel <= 0;
     end
     else
@@ -81,6 +81,8 @@ begin:mealy_next_state
     next_state <= state;
     case (state) // synopsys parallel_case full_case
         ready_s:
+            next_state <= setup_s;
+        setup_s:
             if (hs_next_angle_ack)
                 next_state <= fill_s;
         fill_s:
@@ -116,7 +118,19 @@ begin:pe_setup
             scan_mode <= {# scan_mode.y #};
 end
 
+// lut vals
+wire {# conf()['tShiftAccuBase'].verilog_decl() #} sh_accu_base;
+wire {# conf()['tMapAccuInit'].verilog_decl() #} mp_accu_init;
+wire {# conf()['tMapAccuBase'].verilog_decl() #} mp_accu_base;
+
 {% for i in [0, 1] %}
+wire {# conf()['tShiftAccuBase'].verilog_decl() #} sw{#i#}_sh_accu_base;
+wire {# conf()['tMapAccuInit'].verilog_decl() #} sw{#i#}_mp_accu_init;
+wire {# conf()['tMapAccuBase'].verilog_decl() #} sw{#i#}_mp_accu_base;
+assign sw{#i#}_sh_accu_base = sh_accu_base;
+assign sw{#i#}_mp_accu_init = mp_accu_init;
+assign sw{#i#}_mp_accu_base = mp_accu_base;
+
 NABPSwappable sw{#i#}
 (
     // global signals
@@ -146,19 +160,19 @@ NABPMapperLUT mapper_lut
     // inputs
     .clk(clk),
     .mp_line_cnt(),
-    .mp_angle(),
+    .mp_angle(hs_angle),
     // outputs
-    .mp_accu_const_part(),
-    .mp_accu_base()
+    .mp_accu_const_part(mp_accu_init),
+    .mp_accu_base(mp_accu_base)
 );
 
 NABPShifterLUT shifter_lut
 (
     // inputs
     .clk(clk),
-    .sh_angle(),
+    .sh_angle(hs_angle),
     // output
-    .sh_accu_base()
+    .sh_accu_base(sh_accu_base)
 );
 
 endmodule
