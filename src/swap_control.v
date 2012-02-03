@@ -81,7 +81,7 @@ assign sw1_next_itr_ack = sw_sel ? swa_next_itr_ack : swb_next_itr_ack;
 assign sw0_swap_ack = sw_sel ? 0 : swap_ack;
 assign sw1_swap_ack = sw_sel ? swap_ack : 0;
 assign hs_next_angle = (next_state == ready_s);
-assign has_next_itr = (line_itr == {# to_v(partition_size_len - 1) #});
+assign has_next_itr = (line_itr != {# to_v(partition_size_len - 1) #});
 
 always @(posedge clk)
 begin:line_itr_update
