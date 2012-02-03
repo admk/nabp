@@ -89,7 +89,7 @@ begin:line_itr_update
         line_itr <= {# to_v(0) #};
     else
         if (swap_ack)
-            line_itr <= line_itr + {# to_v(0) #};
+            line_itr <= line_itr + {# to_v(1) #};
 end
 always @(posedge clk)
 begin:transition
