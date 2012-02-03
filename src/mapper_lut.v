@@ -20,7 +20,6 @@ module NABPMapperLUT
     // global signals
     input wire clk,
     // inputs from mapper
-    input wire unsigned [`kPEWidthLength-1:0] mp_line_cnt,
     input wire unsigned [`kAngleLength-1:0] mp_angle,
     // outputs to mapper
     output reg {# accu_part_fixed.verilog_decl() #} mp_accu_const_part,

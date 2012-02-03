@@ -193,7 +193,6 @@ NABPMapperLUT mapper_lut
 (
     // inputs
     .clk(clk),
-    .mp_line_cnt(),
     .mp_angle(hs_angle),
     // outputs
     .mp_accu_const_part(mp_accu_init),
