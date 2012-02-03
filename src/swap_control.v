@@ -75,7 +75,7 @@ assign swb_next_itr = sw_sel ? sw0_next_itr : sw1_next_itr;
 assign swap_ack = (state == fill_s or state == fill_and_shift_s) and
                   (swa_swap and swb_next_itr);
 assign swa_next_itr_ack = (state == setup_s and hs_next_angle_ack);
-assign swb_next_itr_ack = (!has_next_itr and swap_ack);
+assign swb_next_itr_ack = (has_next_itr and swap_ack);
 assign sw0_next_itr_ack = sw_sel ? swb_next_itr_ack : swa_next_itr_ack;
 assign sw1_next_itr_ack = sw_sel ? swa_next_itr_ack : swb_next_itr_ack;
 assign sw0_swap_ack = sw_sel ? 0 : swap_ack;
@@ -118,12 +118,12 @@ begin:mealy_next_state
                 next_state <= fill_s;
         fill_s:
             if (swap_ack)
-                if (has_next_itr)
+                if (!has_next_itr)
                     next_state <= shift_s;
                 else
                     next_state <= fill_and_shift_s;
         fill_and_shift_s:
-            if (swap_ack and has_next_itr)
+            if (swap_ack and !has_next_itr)
                 next_state <= shift_s;
         shift_s:
             if (swb_next_itr)
