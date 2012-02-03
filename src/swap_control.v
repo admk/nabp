@@ -12,6 +12,7 @@
     data_len = conf()['kFilteredDataLength']
     partition_size = conf()['partition_scheme']['size']
     partition_size_len = bin_width_of_dec(partition_size)
+    no_pes = conf()['partition_scheme']['no_of_partitions']
 
     angle_defines = dict(
             (k, v) for k, v in conf().iteritems() if 'kAngle' in k)
@@ -25,6 +26,7 @@
 `define kSLength {# s_val_len #}
 `define kFilteredDataLength {# data_len #}
 `define kPartitionSizeLength {# partition_size_len #}
+`define kNoOfPartitions {# no_pes #}
 
 module NABPSwapControl
 (
@@ -44,9 +46,10 @@ module NABPSwapControl
     output wire pe_kick,
     output wire pe_en,
     output wire pe_scan_mode
+    output wire [`kFilteredDataLength*`kNoOfPartitions-1:0] pe_taps,
     // output to RAM
     output wire signed [`kSLength-1:0] fr0_s_val,
-    output wire signed [`kSLength-1:0] fr1_s_val,
+    output wire signed [`kSLength-1:0] fr1_s_val
 );
 
 {# include('templates/state_decl(states).v', states=swap_control_states()) #}
@@ -159,6 +162,7 @@ wire {# conf()['tMapAccuBase'].verilog_decl() #} mp_accu_base;
 wire {# conf()['tShiftAccuBase'].verilog_decl() #} sw{#i#}_sh_accu_base;
 wire {# conf()['tMapAccuInit'].verilog_decl() #} sw{#i#}_mp_accu_init;
 wire {# conf()['tMapAccuBase'].verilog_decl() #} sw{#i#}_mp_accu_base;
+wire [`kFilteredDataLength*`kNoOfPartitions-1:0] sw{#i#}_pe_taps;
 assign sw{#i#}_sh_accu_base = sh_accu_base;
 assign sw{#i#}_mp_accu_init = mp_accu_init;
 assign sw{#i#}_mp_accu_base = mp_accu_base;
@@ -182,10 +186,12 @@ NABPSwappable sw{#i#}
     .sw_pe_en(sw{#i#}_pe_en),
     // outputs to Filtered RAM
     .fr_s_val(fr{#i#}_s_val),
-    // TODO outputs to PEs
-    .pe_taps(),
+    // outputs to PEs
+    .pe_taps(sw{#i#}_pe_taps),
 );
 {% end %}
+
+assign pe_taps = sw_sel ? sw1_pe_taps : sw0_pe_taps; // TODO verify swap
 
 // look-up tables
 // TODO & FIXME mapper look-up value accumulation
