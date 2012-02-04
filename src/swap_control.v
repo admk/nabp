@@ -3,6 +3,29 @@
 //     24 Jan 2012
 // Provides control for the swappables
 // Handles swapping between the swappable instances
+// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//
+// Swappable Mux & Demux Scheme
+// ------------------------------
+// inputs                                      outputs
+//         /|          _____          |\
+// 0 --/--| |-/-[a]-/-| FSM |-/-[a]-/-| |--/-- 0
+// 1 --/--| |-/-[b]-/-|_____|-/-[b]-/-| |--/-- 1
+//         \|                         |/
+//         |                           |
+// sw_sel -*---------------------------*
+//
+// Value Tabel
+// -----------
+//  _______________________
+// | sw_sel  | 0    | 1    |
+// |_________|______|______|
+// | inputs  | 0->a | 0->b |
+// |         | 1->b | 1->a |
+// |_________|______|______|
+// | outputs | a->0 | a->1 |
+// |         | b->1 | b->0 |
+// |_________|______|______|
 {#
     from pynabp.conf import conf
     from pynabp.enums import swap_control_states, scan_mode
@@ -191,7 +214,7 @@ NABPSwappable sw{#i#}
 );
 {% end %}
 
-assign pe_taps = sw_sel ? sw1_pe_taps : sw0_pe_taps; // TODO verify swap
+assign pe_taps = sw_sel ? sw0_pe_taps : sw1_pe_taps;
 
 // look-up tables
 // TODO & FIXME mapper look-up value accumulation
