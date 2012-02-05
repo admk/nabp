@@ -1,5 +1,5 @@
 {# include('templates/info.v') #}
-// NABPSwapControl
+// NABPProcessingSwapControl
 //     24 Jan 2012
 // Provides control for the swappables
 // Handles swapping between the swappable instances
@@ -51,7 +51,7 @@
 `define kPartitionSizeLength {# partition_size_len #}
 `define kNoOfPartitions {# no_pes #}
 
-module NABPSwapControl
+module NABPProcessingSwapControl
 (
     // global signals
     input wire clk,
@@ -148,7 +148,8 @@ begin:mealy_next_state
                 next_state <= ready_s;
         default:
             $display(
-                "<NABPSwapControl> Invalid state encountered: %d", state);
+                "<NABPProcessingSwapControl> Invalid state encountered: %d",
+                state);
     endcase
 end
 
