@@ -31,7 +31,7 @@
     from pynabp.enums import swap_control_states, scan_mode
     from pynabp.utils import bin_width_of_dec, dec_repr
 
-    s_val_len = bin_width_of_dec(p_line_size)
+    s_val_len = bin_width_of_dec(conf()['projection_line_size'])
     data_len = conf()['kFilteredDataLength']
     partition_size = conf()['partition_scheme']['size']
     partition_size_len = bin_width_of_dec(partition_size)
@@ -216,7 +216,7 @@ NABPSwappable sw{#i#}
     // outputs to Filtered RAM
     .fr_s_val(fr{#i#}_s_val),
     // outputs to PEs
-    .pe_taps(sw{#i#}_pe_taps),
+    .pe_taps(sw{#i#}_pe_taps)
 );
 {% end %}
 
