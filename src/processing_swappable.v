@@ -1,7 +1,8 @@
 {# include('templates/info.v') #}
-// NABPSwappable
+// NABPProcessingSwappable
 //     9 Jan 2012
-// The top level entity for modules that are to be swapped together
+// The top level entity for data processing modules that are to be swapped
+// together
 
 {#
     from pynabp.enums import state_control_states
@@ -17,7 +18,7 @@
 `define kFilteredDataLength {# data_len #}
 `define kNoOfPartitions {# no_pes #}
 
-module NABPSwappable
+module NABPProcessingSwappable
 (
     // global signals
     input wire clk,

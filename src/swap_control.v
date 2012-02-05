@@ -196,7 +196,7 @@ assign sw{#i#}_sh_accu_base = sh_accu_base;
 assign sw{#i#}_mp_accu_init = mp_accu_init;
 assign sw{#i#}_mp_accu_base = mp_accu_base;
 // module instantiation
-NABPSwappable sw{#i#}
+NABPProcessingSwappable sw{#i#}
 (
     // global signals
     .clk(clk),
