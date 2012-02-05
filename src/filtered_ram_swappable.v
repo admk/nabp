@@ -5,7 +5,7 @@
 
 {#
     from pynabp.conf import conf
-    from pynabp.utils import bin_width_of_dec, dec_repr
+    from pynabp.utils import bin_width_of_dec
 
     p_line_size = conf()['projection_line_size']
     s_val_len = bin_width_of_dec(p_line_size)

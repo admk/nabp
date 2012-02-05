@@ -1,8 +1,8 @@
 {# include('templates/info.v') #}
 // NABPShifterLUT
 //     1 Jan 2012
-// Provides NABPShifter the look-up values of
-// $\tan\theta$ and $\cot\theta$
+// Provides NABPShifter the look-up values of $\tan\theta$ and $\cot\theta$
+// TODO reduce look-up table size by using symmetry
 {#
     from pynabp.utils import xfrange, dec_repr
     from pynabp.conf import conf

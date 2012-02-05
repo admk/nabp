@@ -3,6 +3,7 @@
 //     3 Jan 2012
 // Provides addresses of the mapped projection line for line buffer
 // Outputs available in 2 cycles
+// TODO reduce look-up table size by using symmetry
 
 {# 
     from pynabp.conf import conf
