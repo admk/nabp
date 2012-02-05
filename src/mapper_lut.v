@@ -22,7 +22,7 @@ module NABPMapperLUT
     // inputs from mapper
     input wire unsigned [`kAngleLength-1:0] mp_angle,
     // outputs to mapper
-    output reg {# accu_part_fixed.verilog_decl() #} mp_accu_const_part,
+    output reg {# accu_part_fixed.verilog_decl() #} mp_accu_part,
     output reg {# accu_base_fixed.verilog_decl() #} mp_accu_base
 );
 
@@ -38,8 +38,7 @@ begin
                 accu_base_val = conf()['lutMapAccuBase'][idx]
             #}
             // {# accu_part_val #}
-            mp_accu_const_part <= {#
-                    accu_part_fixed.verilog_repr(accu_part_val) #};
+            mp_accu_part <= {# accu_part_fixed.verilog_repr(accu_part_val) #};
             // {# accu_base_val #}
             mp_accu_base <= {# accu_base_fixed.verilog_repr(accu_base_val) #};
         {% end %}

@@ -68,7 +68,7 @@ module NABPSwapControl
     output wire pe_reset,
     output wire pe_kick,
     output wire pe_en,
-    output wire pe_scan_mode
+    output wire pe_scan_mode,
     output wire [`kFilteredDataLength*`kNoOfPartitions-1:0] pe_taps,
     // output to RAM
     output wire signed [`kSLength-1:0] fr0_s_val,
@@ -109,14 +109,6 @@ assign sw1_swap_ack = sw_sel ? swap_ack : 0;
 assign hs_next_angle = (next_state == ready_s);
 assign has_next_itr = (line_itr != {# to_v(partition_size_len - 1) #});
 
-always @(posedge clk)
-begin:line_itr_update
-    if (state == ready_s)
-        line_itr <= {# to_v(0) #};
-    else
-        if (swap_ack)
-            line_itr <= line_itr + {# to_v(1) #};
-end
 always @(posedge clk)
 begin:transition
     if (!reset_n)
@@ -177,8 +169,22 @@ end
 
 // lut vals
 wire {# conf()['tShiftAccuBase'].verilog_decl() #} sh_accu_base;
-wire {# conf()['tMapAccuInit'].verilog_decl() #} mp_accu_init;
+reg {# conf()['tMapAccuInit'].verilog_decl() #} mp_accu_init;
 wire {# conf()['tMapAccuBase'].verilog_decl() #} mp_accu_base;
+wire {# conf()['tMapAccuPart'].verilog_decl() #} mp_accu_part;
+
+always @(posedge clk)
+begin:line_itr_update
+    if (state == ready_s)
+        line_itr <= {# to_v(0) #};
+    else if (state == setup_s)
+        mp_accu_init <= mp_accu_part;
+    else if (swap_ack)
+    begin
+        line_itr <= line_itr + {# to_v(1) #};
+        mp_accu_init <= mp_accu_init - mp_accu_base;
+    end
+end
 
 {% for i in [0, 1] %}
 // swappable {#i#}
@@ -214,17 +220,14 @@ NABPSwappable sw{#i#}
 );
 {% end %}
 
-assign pe_taps = sw_sel ? sw0_pe_taps : sw1_pe_taps;
-
 // look-up tables
-// TODO & FIXME mapper look-up value accumulation
 NABPMapperLUT mapper_lut
 (
     // inputs
     .clk(clk),
     .mp_angle(hs_angle),
     // outputs
-    .mp_accu_const_part(mp_accu_init),
+    .mp_accu_part(mp_accu_part),
     .mp_accu_base(mp_accu_base)
 );
 NABPShifterLUT shifter_lut
@@ -235,5 +238,8 @@ NABPShifterLUT shifter_lut
     // output
     .sh_accu_base(sh_accu_base)
 );
+
+// PE taps values
+assign pe_taps = sw_sel ? sw0_pe_taps : sw1_pe_taps;
 
 endmodule
