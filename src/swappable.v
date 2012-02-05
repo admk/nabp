@@ -26,12 +26,12 @@ module NABPSwappable
     input wire {# conf()['tShiftAccuBase'].verilog_decl() #} sw_sh_accu_base,
     input wire {# conf()['tMapAccuInit'].verilog_decl() #} sw_mp_accu_init,
     input wire {# conf()['tMapAccuBase'].verilog_decl() #} sw_mp_accu_base,
-    input wire sw_swap,
+    input wire sw_swap_ack,
     input wire sw_next_itr_ack,
     // input from Filtered RAM
     input wire signed [`kFilteredDataLength-1:0] fr_val,
     // outputs to swap control
-    output wire sw_swap_ready,
+    output wire sw_swap,
     output wire sw_next_itr,
     output wire sw_pe_en,
     // output to RAM
@@ -57,14 +57,14 @@ NABPStateControl state_control
     .sw_sh_accu_base(sw_sh_accu_base),
     .sw_mp_accu_init(sw_mp_accu_init),
     .sw_mp_accu_base(sw_mp_accu_base),
-    .sw_swap(sw_swap),
+    .sw_swap_ack(sw_swap_ack),
     .sw_next_itr_ack(sw_next_itr_ack),
     .sw_pe_en(sw_pe_en),
     // inputs from shifter
     .sh_fill_done(sh_sc_fill_done),
     .sh_shift_done(sh_sc_shift_done),
     // outputs to swap control
-    .sw_swap_ready(sw_swap_ready),
+    .sw_swap(sw_swap),
     .sw_next_itr(sw_next_itr),
     // outputs to shifter
     .sh_fill_kick(sc_sh_fill_kick),
