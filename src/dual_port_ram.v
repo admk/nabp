@@ -1,5 +1,5 @@
 {# include('templates/info.v') #}
-// NABPFilteredRAMSwappable
+// NABPDualPortRAM
 //     5 Feb 2012
 // The RAM that stores the filtered projection data
 
@@ -17,7 +17,7 @@
 `define kDataLength {# data_len #}
 `define kProjectionLineSize {# p_line_size #}
 
-module NABPFilteredRAMSwappable
+module NABPDualPortRAM
 (
     // global signals
     input wire clk,
