@@ -21,11 +21,12 @@ module NABPFilteredRAMSwappable
 (
     // global signals
     input wire clk,
-    // inputs
     {% for i in port_list %}
+    // inputs for port {#i#}
     input wire we_{#i#},
     input wire [`kSLength-1:0] addr_{#i#},
     input wire [`kDataLength-1:0] data_in_{#i#},
+    // outputs for port {#i#}
     output wire [`kDataLength-1:0] data_out_{#i#}
     {% if i != port_list[-1] %},{% end %}
     {% end %}
