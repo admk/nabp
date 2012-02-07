@@ -83,7 +83,7 @@ assign delay_done = (read_itr == {#
         to_s(conf()['filter']['order'] / 2 - 1) #};
 
 // mealy next state
-always @(state)
+always @(state or hs_fill_kick or delay_done or hs_fill_done)
 begin:mealy_next_state
     case (state) // synopsys parallel_case full_case
         ready_s:
