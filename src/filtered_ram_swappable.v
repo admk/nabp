@@ -76,15 +76,16 @@ end
 // mealy outputs
 wire write_enable;
 wire delay_done;
-assign hs_fill_done = (write_itr == {# to_s(p_line_size - 1) #});
+assign hs_fill_done = (next_state == ready_s);
 assign hs_s_val = read_itr;
 assign write_enable = (state == fill_s);
 assign delay_done = (read_itr == {#
         to_s(conf()['filter']['order'] / 2 - 1) #};
 
 // mealy next state
-always @(state or hs_fill_kick or delay_done or hs_fill_done)
+always @(state or hs_fill_kick or delay_done or write_itr)
 begin:mealy_next_state
+    next_state <= state;
     case (state) // synopsys parallel_case full_case
         ready_s:
             if (hs_fill_kick)
@@ -93,7 +94,7 @@ begin:mealy_next_state
             if (delay_done)
                 next_state <= fill_s;
         fill_s:
-            if (hs_fill_done)
+            if (write_itr == {# to_s(p_line_size - 1) #})
                 next_state <= ready_s;
 end
 
