@@ -52,3 +52,10 @@ class swap_control_states(enum):
         self.fill_and_shift = None
         self.shift = None
         super(swap_control_states, self).__init__()
+
+class filtered_ram_control_states(enum):
+    def __init__(self):
+        self.ready = None
+        self.delay = None
+        self.fill = None
+        super(filtered_ram_control_states, self).__init__()
