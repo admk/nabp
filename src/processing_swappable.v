@@ -129,6 +129,7 @@ altshift_taps
     lpm_type = "altshift_taps",
     lpm_hint = "unused"
 ) line_buff (
+    // FIXME aclr too early?
     .aclr(sw_next_itr),
     .clken(sh_mp_shift_en),
     .clock(clk),

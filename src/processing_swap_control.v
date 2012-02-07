@@ -18,14 +18,11 @@
 // Value Tabel
 // -----------
 //  _______________________
-// | sw_sel  | 0    | 1    |
-// |_________|______|______|
+// | ̲s̲w̲_̲s̲e̲l̲ ̲ ̲|̲ ̲0̲ ̲ ̲ ̲ ̲|̲ ̲1̲ ̲ ̲ ̲ ̲|
 // | inputs  | 0->a | 0->b |
-// |         | 1->b | 1->a |
-// |_________|______|______|
+// | ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲|̲ ̲1̲-̲>̲b̲ ̲|̲ ̲1̲-̲>̲a̲ ̲|
 // | outputs | a->0 | a->1 |
-// |         | b->1 | b->0 |
-// |_________|______|______|
+// | ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲|̲ ̲b̲-̲>̲1̲ ̲|̲ ̲b̲-̲>̲0̲ ̲|
 {#
     from pynabp.conf import conf
     from pynabp.enums import swap_control_states, scan_mode
@@ -56,14 +53,11 @@ module NABPProcessingSwapControl
     // global signals
     input wire clk,
     input wire reset_n,
-    // inputs from host
-    input wire unsigned [`kAngleLength-1:0] hs_angle,
-    input wire hs_next_angle_ack,
-    // input from Filtered RAM
+    // inputs from filtered RAM swap control
+    input wire unsigned [`kAngleLength-1:0] fr_angle,
+    input wire fr_next_angle_ack,
     input wire signed [`kFilteredDataLength-1:0] fr0_val,
     input wire signed [`kFilteredDataLength-1:0] fr1_val,
-    // outputs to host
-    output wire hs_next_angle,
     // output to processing elements
     output wire pe_reset,
     output wire pe_kick,
@@ -71,6 +65,7 @@ module NABPProcessingSwapControl
     output wire pe_scan_mode,
     output wire [`kFilteredDataLength*`kNoOfPartitions-1:0] pe_taps,
     // output to RAM
+    output wire fr_next_angle,
     output wire signed [`kSLength-1:0] fr0_s_val,
     output wire signed [`kSLength-1:0] fr1_s_val
 );
