@@ -97,6 +97,9 @@ begin:mealy_next_state
                 next_state <= ready_s;
 end
 
+wire [`kSLength-1:0] pr0_s_val_m;
+assign pr0_s_val_m = (state == ready_s) ? pr0_s_val : write_itr;
+
 NABPDualPortRAM dual_port_ram
 (
     .clk(clk),
