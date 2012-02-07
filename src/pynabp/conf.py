@@ -43,7 +43,10 @@ def conf(
         _conf['projection_domain_stream_pipeline_offset'] -= 1
     _conf['partition_scheme'] = partition(
             _conf['image_size'], no_of_partitions)
-    _conf['ramp_filter_coefs'] = ramp_filter(fir_order)
+    _conf['filter'] = {
+                'order': fir_order,
+                'coefs': ramp_filter(fir_order),
+            }
     # architecture specific confs
     _conf['device'] = 'Cyclone II'
     _conf['kDataLength'] = 8
