@@ -1,5 +1,5 @@
 {# include('templates/info.v') #}
-// NABPFilteredRAMControl
+// NABPFilteredRAMSwappable
 //     6 Feb 2012
 // Controls the filling of filtered RAM
 
@@ -21,7 +21,7 @@
 `define kDataLength {# data_len #}
 `define kFilteredDataLength {# filtered_data_len #}
 
-module NABPFilteredRAMControl
+module NABPFilteredRAMSwappable
 (
     // global signals
     input wire clk,
