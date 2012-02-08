@@ -1,5 +1,6 @@
 # Project folders & files
 derived_src
+build
 .ropeproject
 .sconsign.dblite
 

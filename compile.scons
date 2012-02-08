@@ -1,6 +1,7 @@
 # compile
 verilog_builder = Builder(
-        action='iverilog -o $TARGET $SOURCE', suffix='.vvp', src_suffix='.vx')
+        action='iverilog -o $TARGET $SOURCE',
+        suffix='.vvp', src_suffix='.vx')
 
 env = Environment()
 env.Append(
@@ -22,6 +23,7 @@ sources = Split("""
     state_control.vx
     """)
 
-env.Verilog(sources)
+for src in sources:
+    env.Verilog(src)
 
 # vim:ft=python:
