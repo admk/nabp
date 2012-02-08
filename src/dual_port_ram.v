@@ -9,12 +9,11 @@
 
     p_line_size = conf()['projection_line_size']
     s_val_len = bin_width_of_dec(p_line_size)
-    data_len = conf()['kDataLength']
+    data_len = conf()['kFilteredDataLength']
 
     port_list = range(2)
 #}
 `define kSLength {# s_val_len #}
-`define kDataLength {# data_len #}
 `define kProjectionLineSize {# p_line_size #}
 
 module NABPDualPortRAM
@@ -25,14 +24,16 @@ module NABPDualPortRAM
     // inputs for port {#i#}
     input wire we_{#i#},
     input wire [`kSLength-1:0] addr_{#i#},
-    input wire [`kDataLength-1:0] data_in_{#i#},
+    input wire [pDataLength-1:0] data_in_{#i#},
     // outputs for port {#i#}
-    output wire [`kDataLength-1:0] data_out_{#i#}
+    output reg [pDataLength-1:0] data_out_{#i#}
     {% if i != port_list[-1] %},{% end %}
     {% end %}
 );
 
-reg [`kDataLength-1] ram[`kProjectionLineSize-1:0];
+parameter pDataLength = {# data_len #};
+
+reg [pDataLength-1:0] ram[`kProjectionLineSize-1:0];
 
 {% for i in port_list %}
 always @(posedge clk)

@@ -36,7 +36,7 @@ module NABPFilteredRAMSwapControl
     input wire clk,
     input wire reset_n,
     // inputs from host
-    input wire unsigned [`kAngleLength-1:0] hs_angle,
+    input wire [`kAngleLength-1:0] hs_angle,
     input wire hs_has_next_angle,
     input wire hs_next_angle_ack,
     // input from filter
@@ -44,12 +44,12 @@ module NABPFilteredRAMSwapControl
     // inputs from processing swappables
     input wire signed [`kSLength-1:0] pr0_s_val,
     input wire signed [`kSLength-1:0] pr1_s_val,
-    input wire ps_next_angle,
+    input wire pr_next_angle,
     // outputs to host RAM
     output wire [`kSLength-1:0] hs_s_val,
     output wire hs_next_angle,
     // outputs to processing swappables
-    output wire unsigned [`kAngleLength-1:0] pr_angle,
+    output wire [`kAngleLength-1:0] pr_angle,
     output wire pr_next_angle_ack,
     output wire signed [`kFilteredDataLength-1:0] pr0_val,
     output wire signed [`kFilteredDataLength-1:0] pr1_val
@@ -79,9 +79,14 @@ wire signed [`kSLength-1:0] sw{#i#}_hs_s_val;
 wire signed [`kFilteredDataLength-1:0] sw{#i#}_pr0_val, sw{#i#}_pr1_val;
 {% end %}
 
+wire fill_done, fill_kick, swap;
 assign fill_done = sw_sel ? sw0_fill_done : sw1_fill_done;
 assign sw0_fill_kick = sw_sel ? 0 : fill_kick;
 assign sw1_fill_kick = sw_sel ? fill_kick : 0;
+
+// mealy outputs
+assign swap = (hs_next_angle_ack && pr_next_angle && fill_done);
+assign fill_kick = swap;
 
 // mealy state transition
 always @(posedge clk)
@@ -90,18 +95,17 @@ begin:transition
     begin
         state <= ready_s;
         sw_sel <= 0;
+    end
     else
+    begin
         state <= next_state;
         if (swap)
             sw_sel <= !sw_sel;
+    end
 end
 
-// mealy outputs
-assign swap = (hs_next_angle_ack and pr_next_angle and fill_done);
-assign fill_kick = swap;
-
 // mealy next state
-always @(state or )
+always @(*)
 begin:mealy_next_state
     next_state <= state;
     case (state) // synopsys parallel_case full_case
@@ -121,8 +125,9 @@ begin:mealy_next_state
                 else 
                     next_state <= work_s;
         work_s:
-            if (fill_done and pr_next_angle)
+            if (fill_done && pr_next_angle)
                 next_state <= ready_s;
+    endcase
 end
 
 {% for i in swap_list %}
