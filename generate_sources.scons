@@ -7,7 +7,10 @@ def generate_derived_sources(target, source, env):
 env = Environment()
 source_generator = Builder(
         action=generate_derived_sources, suffix='.vx', src_suffix='.v')
-env.Append(BUILDERS = {'Generate' : source_generator})
+env.Append(
+        BUILDERS = {
+            'Generate': source_generator,
+        })
 
 sources = Split("""
     dual_port_ram.v
