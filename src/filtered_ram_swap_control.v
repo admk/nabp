@@ -17,6 +17,7 @@
 {#
     from pynabp.conf import conf
     from pynabp.utils import bin_width_of_dec
+    from pynabp.enums import filtered_ram_swap_control_states
     data_len = conf()['kDataLength']
     filtered_data_len = conf()['kFilteredDataLength']
     a_len = conf()['kAngleLength']

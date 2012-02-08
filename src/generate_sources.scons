@@ -1,4 +1,3 @@
-import os
 from akpytemp import Template
 
 def generate_derived_sources(target, source, env):
