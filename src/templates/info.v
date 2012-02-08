@@ -1,3 +1,4 @@
+// vim:ft=verilog:fileencoding=utf-8
 // Source: {# parent.name() #}
 // Folder: {# parent.dir() #}
 // Author: Xitong Gao

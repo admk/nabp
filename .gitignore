@@ -1,7 +1,7 @@
 # Project folders & files
 derived_src
-generate_sources.log
 .ropeproject
+.sconsign.dblite
 
 # Mac
 .DS_Store
