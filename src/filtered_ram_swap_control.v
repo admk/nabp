@@ -12,6 +12,9 @@
 //                      |_____|
 // The delay between the correspondence between address and data is handled by
 // NABPFilteredRAMSwappable.
+// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//               <<has>>                     <<has>>
+// Dual Port RAM ------> FilteredRAMSwappable -----> FilteredRAMSwapControl
 // FIR is not in NABPFilteredRAMSwapControl to make early testing easier. 
 // Possible TODO: refactor FIR to be a part of NABPFilteredRAMSwapControl.
 {#
@@ -40,7 +43,7 @@ module NABPFilteredRAMSwapControl
     input wire hs_has_next_angle,
     input wire hs_next_angle_ack,
     // input from filter
-    input wire [`kDataLength-1:0] hs_val,
+    input wire [`kFilteredDataLength-1:0] hs_val,
     // inputs from processing swappables
     input wire signed [`kSLength-1:0] pr0_s_val,
     input wire signed [`kSLength-1:0] pr1_s_val,
@@ -49,7 +52,7 @@ module NABPFilteredRAMSwapControl
     output wire [`kSLength-1:0] hs_s_val,
     output wire hs_next_angle,
     // outputs to processing swappables
-    output wire [`kAngleLength-1:0] pr_angle,
+    output reg [`kAngleLength-1:0] pr_angle,
     output wire pr_next_angle_ack,
     output wire signed [`kFilteredDataLength-1:0] pr0_val,
     output wire signed [`kFilteredDataLength-1:0] pr1_val
@@ -84,9 +87,15 @@ assign fill_done = sw_sel ? sw0_fill_done : sw1_fill_done;
 assign sw0_fill_kick = sw_sel ? 0 : fill_kick;
 assign sw1_fill_kick = sw_sel ? fill_kick : 0;
 
+// angle update
+always @(posedge clk)
+    if (swap)
+        pr_angle <= hs_angle;
+
 // mealy outputs
 assign swap = (hs_next_angle_ack && pr_next_angle && fill_done);
 assign fill_kick = swap;
+assign pr_next_angle_ack = swap;
 
 // mealy state transition
 always @(posedge clk)

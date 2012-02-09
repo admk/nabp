@@ -36,8 +36,8 @@ module NABPFilteredRAMSwappable
     output wire hs_fill_done,
     output wire [`kSLength-1:0] hs_s_val,
     // outputs to processing swappables
-    input wire signed [`kFilteredDataLength-1:0] pr0_val,
-    input wire signed [`kFilteredDataLength-1:0] pr1_val
+    output wire signed [`kFilteredDataLength-1:0] pr0_val,
+    output wire signed [`kFilteredDataLength-1:0] pr1_val
 );
 
 {#
@@ -54,7 +54,7 @@ begin:transition
         state <= next_state;
 end
 
-reg unsigned [`kSLength-1:0] write_itr, read_itr;
+reg [`kSLength-1:0] write_itr, read_itr;
 
 always @(posedge clk)
 begin:itr_update
@@ -80,7 +80,7 @@ assign hs_fill_done = (next_state == ready_s);
 assign hs_s_val = read_itr;
 assign write_enable = (state == fill_s);
 assign delay_done = (read_itr == {#
-        to_s(conf()['filter']['order'] / 2 - 1) #};
+        to_s(conf()['filter']['order'] / 2 - 1) #});
 
 // mealy next state
 always @(state or hs_fill_kick or delay_done or write_itr)
@@ -96,6 +96,7 @@ begin:mealy_next_state
         fill_s:
             if (write_itr == {# to_s(p_line_size - 1) #})
                 next_state <= ready_s;
+    endcase
 end
 
 wire [`kSLength-1:0] pr0_s_val_m;
