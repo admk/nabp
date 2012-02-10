@@ -9,20 +9,30 @@ env.Append(
             'Verilog': verilog_builder,
         })
 
-sources = Split("""
-    dual_port_ram.vx
-    filtered_ram_swappable.vx
-    filtered_ram_swap_control.vx
-    processing_element.vx
-    processing_swappable.vx
-    processing_swap_control.vx
-    mapper.vx
-    mapper_lut.vx
-    shifter.vx
-    shifter_lut.vx
-    state_control.vx
-    """)
+sources = {
+        'all': Split("""
+            dual_port_ram.vx
+            filtered_ram_swappable.vx
+            filtered_ram_swap_control.vx
+            processing_element.vx
+            processing_swappable.vx
+            processing_swap_control.vx
+            mapper.vx
+            mapper_lut.vx
+            shifter.vx
+            shifter_lut.vx
+            state_control.vx
+            """),
+        'fr_test': Split("""
+            dual_port_ram.vx
+            filtered_ram_swappable.vx
+            filtered_ram_swap_control.vx
+            filtered_ram_test.vx
+            """)
+    }
 
-env.Verilog('nabp', sources)
+compile_all = env.Verilog(target='nabp', source=sources['all'])
+filtered_ram_test = env.Verilog(target='fr_test', source=sources['fr_test'])
+env.Alias('fr_test', filtered_ram_test)
 
 # vim:ft=python:

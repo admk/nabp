@@ -48,6 +48,7 @@ def conf(
                 'coefs': ramp_filter(fir_order),
             }
     # architecture specific confs
+    _conf['clock_period'] = 100
     _conf['device'] = 'Cyclone II'
     _conf['kDataLength'] = 8
     _conf['kFilteredDataLength'] = 9
