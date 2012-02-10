@@ -86,6 +86,7 @@ wire fill_done, fill_kick, swap;
 assign fill_done = sw_sel ? sw0_fill_done : sw1_fill_done;
 assign sw0_fill_kick = sw_sel ? 0 : fill_kick;
 assign sw1_fill_kick = sw_sel ? fill_kick : 0;
+assign hs_s_val = sw_sel ? sw0_hs_s_val : sw1_hs_s_val;
 
 // angle update
 always @(posedge clk)
@@ -94,6 +95,7 @@ always @(posedge clk)
 
 // mealy outputs
 assign swap = (hs_next_angle_ack && pr_next_angle && fill_done);
+assign hs_next_angle = (state == ready_s || swap);
 assign fill_kick = swap;
 assign pr_next_angle_ack = swap;
 
@@ -144,7 +146,6 @@ end
 assign sw{#i#}_pr0_s_val = pr0_s_val;
 assign sw{#i#}_pr1_s_val = pr1_s_val;
 assign sw{#i#}_hs_val = hs_val;
-assign sw{#i#}_hs_s_val = hs_s_val;
 
 // swappable {#i#} instantiation
 NABPFilteredRAMSwappable sw{#i#}

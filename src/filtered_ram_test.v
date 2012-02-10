@@ -100,16 +100,19 @@ always
 begin:pr_verification
     pr_next_angle = 1;
     @(pr_next_angle_ack);
-    @(posedge clk);
-    pr_next_angle = 0;
-    s_itr = 0;
-    while (s_itr < {# to_s(conf()['projection_line_size']) #})
+    if (pr_next_angle_ack)
     begin
         @(posedge clk);
-        pr_val_ori = data_test_vals(pr_s_val, pr_angle);
-        $display("Angle %d, S iteration: %d", pr_angle, pr_s_val);
-        $display("Expected: %d, Found: %d", pr_val_ori, pr_val);
-        s_itr = s_itr + 1;
+        pr_next_angle = 0;
+        s_itr = 0;
+        while (s_itr < {# to_s(conf()['projection_line_size']) #})
+        begin
+            @(posedge clk);
+            pr_val_ori = data_test_vals(pr_s_val, pr_angle);
+            $display("Angle %d, S iteration: %d", pr_angle, pr_s_val);
+            $display("Expected: %d, Found: %d", pr_val_ori, pr_val);
+            s_itr = s_itr + 1;
+        end
     end
 end
 

@@ -106,7 +106,7 @@ NABPDualPortRAM dual_port_ram
 (
     .clk(clk),
     .we_0(write_enable),
-    .we_1(0),
+    .we_1(1'b0),
     .addr_0(write_itr),
     .addr_1(pr1_s_val),
     .data_in_0(hs_val),
