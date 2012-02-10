@@ -18,20 +18,25 @@
 
 module NABPDualPortRAM
 (
-    // global signals
-    input wire clk,
+    clk,
     {% for i in port_list %}
-    // inputs for port {#i#}
-    input wire we_{#i#},
-    input wire [`kSLength-1:0] addr_{#i#},
-    input wire [pDataLength-1:0] data_in_{#i#},
-    // outputs for port {#i#}
-    output reg [pDataLength-1:0] data_out_{#i#}
-    {% if i != port_list[-1] %},{% end %}
+    we_{#i#}, addr_{#i#},
+    data_in_{#i#}, data_out_{#i#}{% if i != port_list[-1] %},{% end %}
     {% end %}
 );
 
 parameter pDataLength = {# data_len #};
+
+// global signals
+input wire clk;
+{% for i in port_list %}
+// inputs for port {#i#}
+input wire we_{#i#};
+input wire [`kSLength-1:0] addr_{#i#};
+input wire [pDataLength-1:0] data_in_{#i#};
+// outputs for port {#i#}
+output reg [pDataLength-1:0] data_out_{#i#};
+{% end %}
 
 reg [pDataLength-1:0] ram[`kProjectionLineSize-1:0];
 
