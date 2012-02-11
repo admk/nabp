@@ -29,22 +29,20 @@ module NABPFilteredRAMTest();
 
 // outputs to UUT
 reg [`kAngleLength-1:0] hs_angle;
-reg hs_has_next_angle;
+wire hs_has_next_angle;
 // inputs from UUT
 wire hs_next_angle, hs_next_angle_ack;
-assign hs_next_angle_ack = hs_next_angle;
+assign hs_next_angle_ack = hs_has_next_angle && hs_next_angle;
+assign hs_has_next_angle = (hs_angle < {# to_a(80) #});
 initial
 begin:hs_angle_iterate
-    @(posedge reset_n);
     hs_angle = {# to_a(0) #};
-    hs_has_next_angle = 1;
-    while (hs_angle <= {# to_a(80) #})
+    @(posedge reset_n);
+    while (hs_has_next_angle)
     begin
         @(negedge hs_next_angle_ack);
         hs_angle = hs_angle + {# to_a(20) #};
     end
-    hs_has_next_angle = 0;
-    $finish;
 end
 
 function signed [`kFilteredDataLength-1:0] data_test_vals;
@@ -72,28 +70,42 @@ shift_register sr_filter_model
 
 // processing model, verifies output
 reg pr_next_angle;
+reg pr_finish_next_round;
 wire pr_next_angle_ack;
 wire [`kAngleLength-1:0] pr_angle;
 reg [`kFilteredDataLength-1:0] pr_val_ori;
 reg [`kSLength-1:0] pr_s_val;
 wire [`kFilteredDataLength-1:0] pr_val;
-always
+initial
 begin:pr_verification
-    pr_next_angle = 1;
-    @(pr_next_angle_ack);
-    if (pr_next_angle_ack)
+    pr_finish_next_round = 0;
+    forever
     begin
-        @(posedge clk);
-        pr_next_angle = 0;
-        pr_s_val = 0;
-        while (pr_s_val < {# to_s(conf()['projection_line_size']) #})
+        pr_next_angle = 1;
+        @(pr_next_angle_ack);
+        if (pr_next_angle_ack)
         begin
             @(posedge clk);
-            pr_val_ori = data_test_vals(pr_s_val, pr_angle);
-            $display("Angle %d, S iteration: %d", pr_angle, pr_s_val);
-            $display("Expected: %d, Found: %d", pr_val_ori, pr_val);
-            pr_s_val = pr_s_val + 1;
+            pr_next_angle = 0;
+            pr_s_val = 0;
+            while (pr_s_val < {# to_s(conf()['projection_line_size']) #})
+            begin
+                @(posedge clk);
+                pr_val_ori = data_test_vals(pr_s_val, pr_angle);
+                #1; // to make sure pr_s_val is updated
+                if (pr_val != pr_val_ori)
+                    $display(
+                            "Error: S Val: %d, Expected: %d, Found: %d",
+                            pr_s_val, pr_val_ori, pr_val);
+                pr_s_val = pr_s_val + 1;
+            end
+            $display("Test RAM for Angle %d...Done", pr_angle);
+            pr_s_val = `kSLength'bx;
         end
+        if (pr_finish_next_round)
+        	$finish;
+        if (!hs_has_next_angle)
+            pr_finish_next_round = 1;
     end
 end
 

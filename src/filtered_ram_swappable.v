@@ -65,10 +65,10 @@ begin:itr_update
     end
     else if (state == delay_s)
         read_itr <= read_itr + {# to_s(1) #};
-    else if (state == fill_s)
+    else if (state == fill_s && next_state != ready_s)
     begin
         write_itr <= write_itr + {# to_s(1) #};
-        if (read_itr != {# to_s(p_line_size) #})
+        if (read_itr != {# to_s(p_line_size - 1) #})
             read_itr <= read_itr + {# to_s(1) #};
     end
 end
