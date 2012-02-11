@@ -1,0 +1,5 @@
+#!/bin/sh
+scons
+scons fr_test
+cd build/
+vsim work.NABPFilteredRAMTest -do ../test/NABPFilteredRAMTest.tcl
