@@ -30,8 +30,8 @@ module NABPFilteredRAMSwappable
     input wire hs_fill_kick,
     input wire [`kFilteredDataLength-1:0] hs_val,
     // inputs from processing swappables
-    input wire signed [`kSLength-1:0] pr0_s_val,
-    input wire signed [`kSLength-1:0] pr1_s_val,
+    input wire [`kSLength-1:0] pr0_s_val,
+    input wire [`kSLength-1:0] pr1_s_val,
     // output to host
     output wire hs_fill_done,
     output wire [`kSLength-1:0] hs_s_val,
@@ -107,7 +107,7 @@ NABPDualPortRAM dual_port_ram
     .clk(clk),
     .we_0(write_enable),
     .we_1(1'b0),
-    .addr_0(write_itr),
+    .addr_0(pr0_s_val_m),
     .addr_1(pr1_s_val),
     .data_in_0(hs_val),
     .data_in_1({# to_v(0) #}),

@@ -38,21 +38,21 @@ begin:hs_angle_iterate
     @(posedge reset_n);
     hs_angle = {# to_a(0) #};
     hs_has_next_angle = 1;
-    while (hs_angle < {# to_a(180) #})
+    while (hs_angle <= {# to_a(80) #})
     begin
-        @(posedge hs_next_angle_ack);
+        @(negedge hs_next_angle_ack);
         hs_angle = hs_angle + {# to_a(20) #};
     end
     hs_has_next_angle = 0;
     $finish;
 end
 
-function [`kDataLength-1:0] data_test_vals;
+function signed [`kFilteredDataLength-1:0] data_test_vals;
     input [`kSLength-1:0] s;
     input [`kAngleLength-1:0] a;
     begin
         // a simple function to generate a hash value
-        data_test_vals = s * a + {# to_v(87) #};
+        data_test_vals = s + a;
     end
 endfunction
 
@@ -88,11 +88,9 @@ end
 reg pr_next_angle;
 wire pr_next_angle_ack;
 wire [`kAngleLength-1:0] pr_angle;
-reg [`kSLength-1:0] s_itr;
 reg [`kFilteredDataLength-1:0] pr_val_ori;
-wire [`kSLength-1:0] pr_s_val;
+reg [`kSLength-1:0] pr_s_val;
 wire [`kFilteredDataLength-1:0] pr_val;
-assign pr_s_val = s_itr;
 always
 begin:pr_verification
     pr_next_angle = 1;
@@ -101,14 +99,14 @@ begin:pr_verification
     begin
         @(posedge clk);
         pr_next_angle = 0;
-        s_itr = 0;
-        while (s_itr < {# to_s(conf()['projection_line_size']) #})
+        pr_s_val = 0;
+        while (pr_s_val < {# to_s(conf()['projection_line_size']) #})
         begin
             @(posedge clk);
             pr_val_ori = data_test_vals(pr_s_val, pr_angle);
             $display("Angle %d, S iteration: %d", pr_angle, pr_s_val);
             $display("Expected: %d, Found: %d", pr_val_ori, pr_val);
-            s_itr = s_itr + 1;
+            pr_s_val = pr_s_val + 1;
         end
     end
 end

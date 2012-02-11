@@ -74,11 +74,11 @@ reg sw_sel;
 // signal wirings for swappable {#i#}
 // inputs
 wire sw{#i#}_fill_kick;
-wire signed [`kSLength-1:0] sw{#i#}_pr0_s_val, sw{#i#}_pr1_s_val;
+wire [`kSLength-1:0] sw{#i#}_pr0_s_val, sw{#i#}_pr1_s_val;
 wire signed [`kFilteredDataLength-1:0] sw{#i#}_hs_val;
 // outputs
 wire sw{#i#}_fill_done;
-wire signed [`kSLength-1:0] sw{#i#}_hs_s_val;
+wire [`kSLength-1:0] sw{#i#}_hs_s_val;
 wire signed [`kFilteredDataLength-1:0] sw{#i#}_pr0_val, sw{#i#}_pr1_val;
 {% end %}
 
