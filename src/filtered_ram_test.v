@@ -40,10 +40,13 @@ begin:hs_angle_iterate
     hs_has_next_angle = 1;
     while (hs_angle <= {# to_a(80) #})
     begin
+        @(posedge hs_next_angle_ack);
+        if (hs_angle = {# to_a(80) #})
+            hs_has_next_angle = 0;
         @(negedge hs_next_angle_ack);
         hs_angle = hs_angle + {# to_a(20) #};
     end
-    hs_has_next_angle = 0;
+    @(posedge hs_next_angle);
     $finish;
 end
 
