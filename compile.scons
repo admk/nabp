@@ -1,9 +1,20 @@
-# compile
-verilog_builder = Builder(
-        action='iverilog -o $TARGET $SOURCES',
-        suffix='.vvp', src_suffix='.vx')
+import os
 
-env = Environment()
+env = Environment(ENV=os.environ)
+if env['PLATFORM'] == 'posix':
+    vlib_path = os.path.join(Dir('.').abspath, 'work')
+    os.system('vlib ' + vlib_path)
+    os.system('vmap work ' + vlib_path)
+    verilog_action = 'echo "building $TARGET";' + \
+            'vlog -work ' + vlib_path + ' $SOURCES'
+    verilog_builder = Builder(
+            action=verilog_action,
+            suffix='', src_suffix='.vx')
+else:
+    verilog_builder = Builder(
+            action='iverilog -o $TARGET $SOURCES',
+            suffix='.vvp', src_suffix='.vx')
+
 env.Append(
         BUILDERS = {
             'Verilog': verilog_builder,
@@ -32,7 +43,9 @@ sources = {
     }
 
 compile_all = env.Verilog(target='nabp', source=sources['all'])
-filtered_ram_test = env.Verilog(target='fr_test', source=sources['fr_test'])
+filtered_ram_test = env.Verilog(
+        target='fr_test',
+        source=sources['fr_test'])
 env.Alias('fr_test', filtered_ram_test)
 
 # vim:ft=python:
