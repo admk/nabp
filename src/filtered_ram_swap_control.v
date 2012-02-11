@@ -45,8 +45,8 @@ module NABPFilteredRAMSwapControl
     // input from filter
     input wire [`kFilteredDataLength-1:0] hs_val,
     // inputs from processing swappables
-    input wire signed [`kSLength-1:0] pr0_s_val,
-    input wire signed [`kSLength-1:0] pr1_s_val,
+    input wire [`kSLength-1:0] pr0_s_val,
+    input wire [`kSLength-1:0] pr1_s_val,
     input wire pr_next_angle,
     // outputs to host RAM
     output wire [`kSLength-1:0] hs_s_val,
@@ -94,10 +94,10 @@ always @(posedge clk)
         pr_angle <= hs_angle;
 
 // mealy outputs
-assign swap = (hs_next_angle_ack && pr_next_angle && fill_done);
-assign hs_next_angle = (state == ready_s || swap);
+assign swap = hs_next_angle_ack; // swap should only be high for 1 cycle
+assign hs_next_angle = (state == ready_s) || (fill_done && pr_next_angle);
 assign fill_kick = swap;
-assign pr_next_angle_ack = swap;
+assign pr_next_angle_ack = (state != ready_s) && swap;
 
 // mealy state transition
 always @(posedge clk)

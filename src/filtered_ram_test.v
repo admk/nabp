@@ -29,22 +29,19 @@ module NABPFilteredRAMTest();
 
 // outputs to UUT
 reg [`kAngleLength-1:0] hs_angle;
-reg hs_has_next_angle, hs_next_angle_ack;
+reg hs_has_next_angle;
 // inputs from UUT
-wire hs_next_angle;
+wire hs_next_angle, hs_next_angle_ack;
+assign hs_next_angle_ack = hs_next_angle;
 initial
 begin:hs_angle_iterate
+    @(posedge reset_n);
     hs_angle = {# to_a(0) #};
     hs_has_next_angle = 1;
-    hs_next_angle_ack = 0;
     while (hs_angle < {# to_a(180) #})
     begin
-        @(posedge clk);
-        hs_next_angle_ack = 0;
-        @(hs_next_angle);
-        if (hs_next_angle)
-            hs_angle = hs_angle + {# to_a(20) #};
-            hs_next_angle_ack = 1;
+        @(posedge hs_next_angle_ack);
+        hs_angle = hs_angle + {# to_a(20) #};
     end
     hs_has_next_angle = 0;
     $finish;
