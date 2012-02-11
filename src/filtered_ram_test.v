@@ -29,20 +29,22 @@ module NABPFilteredRAMTest();
 
 // outputs to UUT
 reg [`kAngleLength-1:0] hs_angle;
-wire hs_has_next_angle;
+reg hs_has_next_angle;
 // inputs from UUT
 wire hs_next_angle, hs_next_angle_ack;
-assign hs_next_angle_ack = hs_has_next_angle && hs_next_angle;
-assign hs_has_next_angle = (hs_angle < {# to_a(80) #});
+assign hs_next_angle_ack = hs_next_angle;
 initial
 begin:hs_angle_iterate
-    hs_angle = {# to_a(0) #};
     @(posedge reset_n);
-    while (hs_has_next_angle)
+    hs_angle = {# to_a(0) #};
+    hs_has_next_angle = 1;
+    while (hs_angle <= {# to_a(80) #})
     begin
         @(negedge hs_next_angle_ack);
         hs_angle = hs_angle + {# to_a(20) #};
     end
+    hs_has_next_angle = 0;
+    $finish;
 end
 
 function signed [`kFilteredDataLength-1:0] data_test_vals;
@@ -55,66 +57,43 @@ function signed [`kFilteredDataLength-1:0] data_test_vals;
 endfunction
 
 wire [`kSLength-1:0] hs_s_val;
-reg[`kFilteredDataLength-1:0] val_out;
-always @(posedge clk)
-begin:hs_look_up
-    val_out <= data_test_vals(hs_s_val, hs_angle);
-end
-
-// FIFO to model filtering
-`define kDelayDataLength `kFilteredDataLength*`kDelayLength
-wire filter_enable, filter_clear;
-assign filter_enable = 1;
-assign filter_clear = hs_next_angle;
-reg [`kDelayDataLength-1:0] filter_data;
-wire [`kFilteredDataLength-1:0] filter_in, filter_out;
-assign filter_in = val_out;
-assign filter_out = filter_data[
-            `kDelayDataLength-1:
-            `kFilteredDataLength*(`kDelayLength-1)];
-always @(posedge clk)
-begin:filter
-    if (filter_enable)
-        filter_data[`kDelayDataLength-1:`kFilteredDataLength]
-                <= {filter_data[`kFilteredDataLength*(`kDelayLength-1)-1:0],
-                    filter_in};
-    if (filter_clear)
-        filter_data <= `kDelayDataLength'd0;
-end
+wire [`kFilteredDataLength-1:0] filter_out, filter_in;
+assign filter_in = data_test_vals(hs_s_val, hs_angle);
+// shift register to model filtering
+shift_register sr_filter_model
+(
+    .clk(clk),
+    .reset_n(reset_n),
+    .enable(1'd1), 
+    .clear(hs_next_angle),
+    .val_in(filter_in),
+    .val_out(filter_out)
+);
 
 // processing model, verifies output
 reg pr_next_angle;
-reg pr_finish_next_round;
 wire pr_next_angle_ack;
 wire [`kAngleLength-1:0] pr_angle;
 reg [`kFilteredDataLength-1:0] pr_val_ori;
 reg [`kSLength-1:0] pr_s_val;
 wire [`kFilteredDataLength-1:0] pr_val;
-initial
+always
 begin:pr_verification
-    pr_finish_next_round = 0;
-    forever
+    pr_next_angle = 1;
+    @(pr_next_angle_ack);
+    if (pr_next_angle_ack)
     begin
-        pr_next_angle = 1;
-        @(pr_next_angle_ack);
-        if (pr_next_angle_ack)
+        @(posedge clk);
+        pr_next_angle = 0;
+        pr_s_val = 0;
+        while (pr_s_val < {# to_s(conf()['projection_line_size']) #})
         begin
             @(posedge clk);
-            pr_next_angle = 0;
-            pr_s_val = 0;
-            while (pr_s_val < {# to_s(conf()['projection_line_size']) #})
-            begin
-                @(posedge clk);
-                pr_val_ori = data_test_vals(pr_s_val, pr_angle);
-                $display("Angle %d, S Val: %d, Expected: %d, Found: %d",
-                        pr_angle, pr_s_val, pr_val_ori, pr_val);
-                pr_s_val = pr_s_val + 1;
-            end
+            pr_val_ori = data_test_vals(pr_s_val, pr_angle);
+            $display("Angle %d, S iteration: %d", pr_angle, pr_s_val);
+            $display("Expected: %d, Found: %d", pr_val_ori, pr_val);
+            pr_s_val = pr_s_val + 1;
         end
-        if (pr_finish_next_round)
-        	$finish;
-        if (!hs_has_next_angle)
-            pr_finish_next_round = 1;
     end
 end
 

@@ -25,6 +25,7 @@ sources = Split("""
     shifter_lut.v
     state_control.v
     filtered_ram_test.v
+    shift_register.v
     """)
 
 for src in sources:

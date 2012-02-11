@@ -33,12 +33,14 @@ sources = {
             shifter.vx
             shifter_lut.vx
             state_control.vx
+            shift_register.vx
             """),
         'fr_test': Split("""
             dual_port_ram.vx
             filtered_ram_swappable.vx
             filtered_ram_swap_control.vx
             filtered_ram_test.vx
+            shift_register.vx
             """)
     }
 
