@@ -8,3 +8,4 @@
 // The source code is best viewed when typesetted with minted package
 // using $\LaTeX$.
 // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+`timescale 1ns/10ps
