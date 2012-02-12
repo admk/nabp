@@ -7,9 +7,8 @@
     from pynabp.utils import bin_width_of_dec, dec_repr
     filtered_data_len = conf()['kFilteredDataLength']
     delay = conf()['filter']['order'] / 2
+    delay_len = bin_width_of_dec(delay)
 #}
-`define kFilteredDataLength {# filtered_data_len #}
-`define kDelayLength {# delay #}
 
 module shift_register
 (
@@ -18,29 +17,34 @@ module shift_register
     val_in, val_out
 );
 
-parameter pDelayLength = `kDelayLength;
-parameter pDataLength = `kFilteredDataLength;
-parameter pDelayDataLength = pDataLength * pDelayLength;
+parameter pDelayLength = {# delay #};
+parameter pPtrLength = {# delay_len #};
+parameter pDataLength = {# filtered_data_len #};
 
 input wire clk, reset_n, enable, clear;
 input wire [pDataLength-1:0] val_in;
-output wire [pDataLength-1:0] val_out;
+output reg [pDataLength-1:0] val_out;
 
-reg [pDataLength-1:0] data[pDelayLength-1:0];
-assign val_out = data[pDelayDataLength-1];
+reg [pDataLength-1:0] data[pDelayLength-2:0];
+reg [pPtrLength-1:0] ptr;
+integer i;
 always @(posedge clk)
-begin:shift_reg
-    {% for idx in xrange(delay) %}
+begin:ptr_update
     if (clear)
-        data[{#idx#}] <= {pDataLength{1'b0}};
+    begin
+        ptr <= {pPtrLength{1'd0}};
+        for(i = 0; i < pDelayLength; i = i + 1)
+            data[i] <= {pPtrLength{1'd0}};
+    end
     else if (enable)
-        data[{#idx#}] <=
-                {% if idx == 0 %}
-                    val_in
-                {% else %}
-                    data[{# idx - 1 #}]
-                {% end %};
-    {% end %}
+    begin
+        if (ptr == pDelayLength - 2)
+            ptr <= {pPtrLength{1'd0}};
+        else
+            ptr <= ptr + 1;
+        val_out <= data[ptr];
+        data[ptr] <= val_in;
+    end
 end
 
 endmodule

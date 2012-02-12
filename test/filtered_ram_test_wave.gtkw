@@ -1,43 +1,80 @@
 [*]
 [*] GTKWave Analyzer v3.3.31 (w)1999-2012 BSI
-[*] Sun Feb 12 20:39:13 2012
+[*] Sun Feb 12 21:47:24 2012
 [*]
 [dumpfile] "/Users/admko/Documents/Sorcery/NABP/build/filtered_ram_test.v.vcd"
-[dumpfile_mtime] "Sun Feb 12 20:37:51 2012"
-[dumpfile_size] 533461
+[dumpfile_mtime] "Sun Feb 12 21:35:14 2012"
+[dumpfile_size] 907769
 [optimize_vcd]
 [savefile] "/Users/admko/Documents/Sorcery/NABP/test/filtered_ram_test_wave.gtkw"
 [timestart] 0
-[size] 1197 844
-[pos] 722 31
-*-15.000000 77400 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+[size] 1020 844
+[pos] 601 134
+*-23.750465 0 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
 [treeopen] NABPFilteredRAMTest.
 [treeopen] NABPFilteredRAMTest.filtered_ram_swap_control_uut.
 [treeopen] NABPFilteredRAMTest.filtered_ram_swap_control_uut.sw0.
 [treeopen] NABPFilteredRAMTest.filtered_ram_swap_control_uut.sw1.
 [sst_width] 198
-[signals_width] 210
+[signals_width] 207
 [sst_expanded] 1
 [sst_vpaned_height] 286
 @28
 NABPFilteredRAMTest.clk
 NABPFilteredRAMTest.reset
+@200
+-host
+@28
 NABPFilteredRAMTest.hs_next_angle
 NABPFilteredRAMTest.hs_has_next_angle
 NABPFilteredRAMTest.hs_next_angle_ack
 @24
 NABPFilteredRAMTest.hs_angle[7:0]
-NABPFilteredRAMTest.filter_in[8:0]
-NABPFilteredRAMTest.filtered_ram_swap_control_uut.hs_s_val[8:0]
 @28
 NABPFilteredRAMTest.filtered_ram_swap_control_uut.state[1:0]
-NABPFilteredRAMTest.filtered_ram_swap_control_uut.fill_done
+@200
+-data from host
+@8024
+NABPFilteredRAMTest.filtered_ram_swap_control_uut.hs_s_val[8:0]
+@20000
+-
+@28
+NABPFilteredRAMTest.sr_filter_model.clear
+@8024
+NABPFilteredRAMTest.filter_in[8:0]
+@20000
+-
+@8022
+NABPFilteredRAMTest.filter_out[8:0]
+@20000
+-
+@200
+-swap control
+@28
 NABPFilteredRAMTest.filtered_ram_swap_control_uut.fill_kick
+NABPFilteredRAMTest.filtered_ram_swap_control_uut.fill_done
+@29
+NABPFilteredRAMTest.filtered_ram_swap_control_uut.sw_sel
+@200
+-sw0
+@8024
+NABPFilteredRAMTest.filtered_ram_swap_control_uut.sw0.read_itr[8:0]
+NABPFilteredRAMTest.filtered_ram_swap_control_uut.sw0.write_itr[8:0]
+@28
+NABPFilteredRAMTest.filtered_ram_swap_control_uut.sw0.write_enable
+@200
+-sw1
+@8024
+NABPFilteredRAMTest.filtered_ram_swap_control_uut.sw1.read_itr[8:0]
+NABPFilteredRAMTest.filtered_ram_swap_control_uut.sw1.write_itr[8:0]
+@28
+NABPFilteredRAMTest.filtered_ram_swap_control_uut.sw1.write_enable
+@200
+-verification
+@28
 NABPFilteredRAMTest.pr_next_angle_ack
 NABPFilteredRAMTest.pr_next_angle
-@25
+@24
 NABPFilteredRAMTest.pr_angle[7:0]
-@28
-NABPFilteredRAMTest.pr_test
 [pattern_trace] 1
 [pattern_trace] 0
