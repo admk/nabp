@@ -1,0 +1,43 @@
+[*]
+[*] GTKWave Analyzer v3.3.31 (w)1999-2012 BSI
+[*] Sun Feb 12 20:39:13 2012
+[*]
+[dumpfile] "/Users/admko/Documents/Sorcery/NABP/build/filtered_ram_test.v.vcd"
+[dumpfile_mtime] "Sun Feb 12 20:37:51 2012"
+[dumpfile_size] 533461
+[optimize_vcd]
+[savefile] "/Users/admko/Documents/Sorcery/NABP/test/filtered_ram_test_wave.gtkw"
+[timestart] 0
+[size] 1197 844
+[pos] 722 31
+*-15.000000 77400 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+[treeopen] NABPFilteredRAMTest.
+[treeopen] NABPFilteredRAMTest.filtered_ram_swap_control_uut.
+[treeopen] NABPFilteredRAMTest.filtered_ram_swap_control_uut.sw0.
+[treeopen] NABPFilteredRAMTest.filtered_ram_swap_control_uut.sw1.
+[sst_width] 198
+[signals_width] 210
+[sst_expanded] 1
+[sst_vpaned_height] 286
+@28
+NABPFilteredRAMTest.clk
+NABPFilteredRAMTest.reset
+NABPFilteredRAMTest.hs_next_angle
+NABPFilteredRAMTest.hs_has_next_angle
+NABPFilteredRAMTest.hs_next_angle_ack
+@24
+NABPFilteredRAMTest.hs_angle[7:0]
+NABPFilteredRAMTest.filter_in[8:0]
+NABPFilteredRAMTest.filtered_ram_swap_control_uut.hs_s_val[8:0]
+@28
+NABPFilteredRAMTest.filtered_ram_swap_control_uut.state[1:0]
+NABPFilteredRAMTest.filtered_ram_swap_control_uut.fill_done
+NABPFilteredRAMTest.filtered_ram_swap_control_uut.fill_kick
+NABPFilteredRAMTest.pr_next_angle_ack
+NABPFilteredRAMTest.pr_next_angle
+@25
+NABPFilteredRAMTest.pr_angle[7:0]
+@28
+NABPFilteredRAMTest.pr_test
+[pattern_trace] 1
+[pattern_trace] 0

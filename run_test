@@ -1,5 +1,15 @@
 #!/bin/sh
 scons
-scons fr_test &&
-cd build/ &&
-vsim work.NABPFilteredRAMTest -do "source ../test/filtered_ram_test_wave.do; run -all" 
+scons fr_test
+if [ $? -eq 0 ]; then
+    hash vsim &> /dev/null
+    if [ $? -eq 0 ]; then
+        cd build/
+        vsim work.NABPFilteredRAMTest -do \
+                "source ../test/filtered_ram_test_wave.do; run -all"
+    else
+        vvp build/fr_test.vvp && \
+        gtkwave -o build/filtered_ram_test.v.vcd \
+                test/filtered_ram_test_wave.gtkw
+    fi
+fi

@@ -77,6 +77,7 @@ wire [`kAngleLength-1:0] pr_angle;
 reg [`kFilteredDataLength-1:0] pr_val_ori;
 reg [`kSLength-1:0] pr_s_val;
 wire [`kFilteredDataLength-1:0] pr_val;
+reg pr_test;
 initial
 begin:pr_verification
     pr_finish_next_round = 0;
@@ -94,7 +95,8 @@ begin:pr_verification
                 @(posedge clk);
                 pr_val_ori = data_test_vals(pr_s_val, pr_angle);
                 #1; // to make sure pr_s_val is updated
-                if (pr_val != pr_val_ori)
+                pr_test = (pr_val != pr_val_ori);
+                if (pr_test != 0)
                     $display(
                             "Error: S Val: %d, Expected: %d, Found: %d",
                             pr_s_val, pr_val_ori, pr_val);
