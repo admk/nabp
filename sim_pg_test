@@ -1,6 +1,6 @@
 #!/bin/sh
 scons
-scons fr_test
+scons pg_test
 if [ $? -eq 0 ]; then
     hash vsim &> /dev/null
     if [ $? -eq 0 ]; then
