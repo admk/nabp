@@ -53,7 +53,7 @@ sources = {
             shift_register.vx
             state_control.vx
             processing_swappable.vx
-            processing_swap_control.vx
+            processing_swappable_test.vx
             """)
     }
 
