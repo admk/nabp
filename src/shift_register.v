@@ -7,7 +7,7 @@
     from pynabp.utils import bin_width_of_dec, dec_repr
     filtered_data_len = conf()['kFilteredDataLength']
     delay = conf()['filter']['order'] / 2
-    delay_len = bin_width_of_dec(delay)
+    delay_len = bin_width_of_dec(delay - 1)
 #}
 
 module shift_register

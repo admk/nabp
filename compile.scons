@@ -50,6 +50,7 @@ sources = {
             mapper_lut.vx
             shifter.vx
             shifter_lut.vx
+            shift_register.vx
             state_control.vx
             processing_swappable.vx
             processing_swap_control.vx
