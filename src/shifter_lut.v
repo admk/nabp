@@ -15,7 +15,7 @@
 #}
 `define kAngleLength {# a_len #}
 
-module NABPShiferLUT
+module NABPShifterLUT
 (
     input wire clk,
     input wire [`kAngleLength-1:0] sh_angle,

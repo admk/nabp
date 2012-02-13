@@ -61,7 +61,7 @@ begin:counters
         // it is ok to let it overflow
         // we only need to observe integer boundaries
         accu_prev <= accu;
-        accu <= accu + accu_base;
+        accu <= accu + sc_accu_base;
         if (accu_prev{# accu_floor_slice #} ==
                 accu_prev{# accu_floor_slice #})
             mp_shift_en <= 0;

@@ -88,11 +88,12 @@ wire sw0_next_itr_ack, sw1_next_itr_ack;
 
 // mealy outputs
 wire swa_swap;
-wire swb_next_itr;
+wire swa_next_itr, swb_next_itr;
 wire swa_next_itr_ack, swb_next_itr_ack;
 wire swap_ack;
 wire has_next_itr;
 assign swa_swap = sw_sel ? sw1_swap : sw0_swap;
+assign swa_next_itr = sw_sel ? sw1_next_itr : sw0_next_itr;
 assign swb_next_itr = sw_sel ? sw0_next_itr : sw1_next_itr;
 assign swap_ack = (state == fill_s || state == fill_and_shift_s) &&
                   (swa_swap && swb_next_itr);
@@ -160,11 +161,11 @@ always @(posedge clk)
 begin:pe_setup
     if (state == setup_s)
     begin
-        if (hs_angle < `kAngle45 || hs_angle >= `kAngle135)
+        if (fr_angle < `kAngle45 || fr_angle >= `kAngle135)
             scan_mode <= {# scan_mode.x #};
         else
             scan_mode <= {# scan_mode.y #};
-        if (hs_angle < `kAngle90)
+        if (fr_angle < `kAngle90)
             scan_direction <= {# scan_direction.forward #};
         else
             scan_direction <= {# scan_direction.reverse #};
@@ -229,7 +230,7 @@ NABPMapperLUT mapper_lut
 (
     // inputs
     .clk(clk),
-    .mp_angle(hs_angle),
+    .mp_angle(fr_angle),
     // outputs
     .mp_accu_part(mp_accu_part),
     .mp_accu_base(mp_accu_base)
@@ -238,7 +239,7 @@ NABPShifterLUT shifter_lut
 (
     // inputs
     .clk(clk),
-    .sh_angle(hs_angle),
+    .sh_angle(fr_angle),
     // output
     .sh_accu_base(sh_accu_base)
 );
