@@ -1,7 +1,10 @@
+import os
+import itertools
 from akpytemp import Template
 
 def generate_derived_sources(target, source, env):
-    Template(path=str(source[0])).save(str(target[0]), **env.__dict__)
+    for tgt, src in itertools.izip(target, source):
+        Template(path=str(src)).save(str(tgt), **env.__dict__)
     return 0
 
 env = Environment()
@@ -27,8 +30,12 @@ sources = Split("""
     filtered_ram_test.v
     shift_register.v
     """)
-
+targets = []
 for src in sources:
-    env.Generate(src)
+    name, _ = os.path.splitext(src)
+    targets.append(name + '.vx')
+
+generate_sources = env.Generate(target=targets, source=sources)
+env.Alias('gen_only', generate_sources)
 
 # vim:ft=python:

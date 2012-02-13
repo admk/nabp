@@ -44,6 +44,15 @@ sources = {
             filtered_ram_swap_control.vx
             filtered_ram_test.vx
             shift_register.vx
+            """),
+        'pg_test': Split("""
+            mapper.vx
+            mapper_lut.vx
+            shifter.vx
+            shifter_lut.vx
+            state_control.vx
+            processing_swappable.vx
+            processing_swap_control.vx
             """)
     }
 
@@ -53,6 +62,12 @@ filtered_ram_test = env.Verilog(
         source=sources['fr_test'])
 # filtered_ram_stems = env.GenerateStems(sources['fr_test'])
 # env.Requires(filtered_ram_test, filtered_ram_stems)
+processing_generator_test = env.Verilog(
+        target='pg_test',
+        source=sources['pg_test'])
+
+
 env.Alias('fr_test', filtered_ram_test)
+env.Alias('pg_test', processing_generator_test)
 
 # vim:ft=python:
