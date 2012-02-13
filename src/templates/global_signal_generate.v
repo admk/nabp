@@ -17,3 +17,16 @@ begin:reset_generate
 	#(3.5*clk_period);
 	reset = 1'b0;
 end
+
+// simulation time limit
+integer clk_cnt;
+initial
+begin:clk_limit
+    clk_cnt = 0;
+    while (clk_cnt < 10000)
+    begin
+        @(posedge clk); 
+        clk_cnt = clk_cnt + 1;
+    end
+    $finish;
+end

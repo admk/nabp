@@ -1,0 +1,15 @@
+#!/bin/sh
+scons
+scons fr_test
+if [ $? -eq 0 ]; then
+    hash vsim &> /dev/null
+    if [ $? -eq 0 ]; then
+        cd build/
+        vsim work.NABPProcessingSwapableTest -do \
+                "source ../test/processing_swappable_test_wave.do; run -all"
+    else
+        vvp build/pg_test.vvp -lxt2
+        gtkwave -o build/processing_swappable_test.v.lxt \
+                test/processing_swappable_test_wave.gtkw
+    fi
+fi

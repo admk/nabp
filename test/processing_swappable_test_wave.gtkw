@@ -1,0 +1,98 @@
+[*]
+[*] GTKWave Analyzer v3.3.32 (w)1999-2012 BSI
+[*] Mon Feb 13 15:15:05 2012
+[*]
+[dumpfile] "/Users/admko/Documents/Sorcery/NABP/build/processing_swappable_test.v.lxt"
+[dumpfile_mtime] "Mon Feb 13 14:42:51 2012"
+[dumpfile_size] 22028
+[savefile] "/Users/admko/Documents/Sorcery/NABP/test/processing_swappable_test_wave.gtkw"
+[timestart] 0
+[size] 1366 720
+[pos] -1 -1
+*-22.000000 0 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+[treeopen] NABPProcessingSwappableTest.
+[treeopen] NABPProcessingSwappableTest.uut.
+[sst_width] 198
+[signals_width] 256
+[sst_expanded] 1
+[sst_vpaned_height] 208
+@28
+NABPProcessingSwappableTest.clk[0]
+@29
+NABPProcessingSwappableTest.reset[0]
+@24
+NABPProcessingSwappableTest.hs_angle[7:0]
+@200
+-host<->swappable
+@28
+NABPProcessingSwappableTest.sw_next_itr_ack[0]
+NABPProcessingSwappableTest.sw_swap_ack[0]
+NABPProcessingSwappableTest.uut.state_control.state[2:0]
+NABPProcessingSwappableTest.sw_next_itr[0]
+NABPProcessingSwappableTest.sw_swap[0]
+NABPProcessingSwappableTest.sw_pe_en[0]
+@200
+-shifter->mapper
+@28
+NABPProcessingSwappableTest.uut.shifter.mp_kick[0]
+NABPProcessingSwappableTest.uut.shifter.mp_done[0]
+NABPProcessingSwappableTest.uut.shifter.mp_shift_en[0]
+@200
+-mapper->fr
+@88024
+NABPProcessingSwappableTest.fr_s_val[8:0]
+@20000
+-
+@88022
+NABPProcessingSwappableTest.fr_val[8:0]
+@20000
+-
+@200
+-pe
+@88028
+NABPProcessingSwappableTest.pe_taps[179:0]
+@20000
+-
+@200
+-misc
+@c00420
+NABPProcessingSwappableTest.uut.state_control.mp_accu_base[9:0]
+@28
+(0)NABPProcessingSwappableTest.uut.state_control.mp_accu_base[9:0]
+(1)NABPProcessingSwappableTest.uut.state_control.mp_accu_base[9:0]
+(2)NABPProcessingSwappableTest.uut.state_control.mp_accu_base[9:0]
+(3)NABPProcessingSwappableTest.uut.state_control.mp_accu_base[9:0]
+(4)NABPProcessingSwappableTest.uut.state_control.mp_accu_base[9:0]
+(5)NABPProcessingSwappableTest.uut.state_control.mp_accu_base[9:0]
+(6)NABPProcessingSwappableTest.uut.state_control.mp_accu_base[9:0]
+(7)NABPProcessingSwappableTest.uut.state_control.mp_accu_base[9:0]
+(8)NABPProcessingSwappableTest.uut.state_control.mp_accu_base[9:0]
+(9)NABPProcessingSwappableTest.uut.state_control.mp_accu_base[9:0]
+@1401600
+-group_end
+@420
+NABPProcessingSwappableTest.uut.state_control.mp_accu_init[17:0]
+@c00024
+NABPProcessingSwappableTest.uut.state_control.sh_accu_base[8:0]
+@28
+(0)NABPProcessingSwappableTest.uut.state_control.sh_accu_base[8:0]
+(1)NABPProcessingSwappableTest.uut.state_control.sh_accu_base[8:0]
+(2)NABPProcessingSwappableTest.uut.state_control.sh_accu_base[8:0]
+(3)NABPProcessingSwappableTest.uut.state_control.sh_accu_base[8:0]
+(4)NABPProcessingSwappableTest.uut.state_control.sh_accu_base[8:0]
+(5)NABPProcessingSwappableTest.uut.state_control.sh_accu_base[8:0]
+(6)NABPProcessingSwappableTest.uut.state_control.sh_accu_base[8:0]
+(7)NABPProcessingSwappableTest.uut.state_control.sh_accu_base[8:0]
+(8)NABPProcessingSwappableTest.uut.state_control.sh_accu_base[8:0]
+@1401204
+-group_end
+@420
+NABPProcessingSwappableTest.sw_mp_accu_init[17:0]
+@24
+NABPProcessingSwappableTest.sw_mp_accu_base[9:0]
+@420
+NABPProcessingSwappableTest.sw_mp_accu_part[12:0]
+@24
+NABPProcessingSwappableTest.sw_sh_accu_base[8:0]
+[pattern_trace] 1
+[pattern_trace] 0

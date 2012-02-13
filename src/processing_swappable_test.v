@@ -28,13 +28,9 @@ reg [`kFilteredDataLength-1:0] fr_val;
 
 // a simple preliminary test for 45 degrees
 // currently only tests controls
-integer clk_cnt;
 initial
 begin:hs_angle_update
     hs_angle = {# dec_repr(45, a_len) #};
-    while (clk_cnt < 10000)
-        @(posedge clk); 
-    $finish;
 end
 
 always @(posedge clk)
