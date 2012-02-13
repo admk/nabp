@@ -115,13 +115,15 @@ NABPMapper mapper
 );
 
 reg signed [`kFilteredDataLength-1:0] pe_tap0;
-wire [(`kNoOfPartitions-1)*`kFilteredDataLength] pe_shift_taps;
+always @(posedge clk)
+    pe_tap0 <= fr_val;
 
+wire [(`kNoOfPartitions-1)*`kFilteredDataLength-1:0] pe_shift_taps;
 assign pe_taps = {pe_shift_taps, pe_tap0};
 
 altshift_taps
 #(
-    intended_device_family = {# conf()['device'] #},
+    intended_device_family = "{# conf()['device'] #}",
     number_of_taps = `kNoOfPartitions - 1,
     power_up_state = "CLEARED",
     taps_distance = {# conf()['partition_scheme']['size'] #},
@@ -133,7 +135,7 @@ altshift_taps
     .aclr(sw_next_itr),
     .clken(sh_mp_shift_en),
     .clock(clk),
-    .shiftin(fr_val),
+    .shiftin(pe_tap0),
     .taps(pe_shift_taps)
 );
 

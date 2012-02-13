@@ -12,6 +12,8 @@ def dec2bin(num, width=0):
     '11101001'
     >>> dec2bin(23, 8)
     '00010111'
+    >>> dec2bin(256)
+    '100000000'
     """
     if num < 0:
         if not width:
@@ -35,7 +37,13 @@ def dec2bin(num, width=0):
     return binary[::-1]
 
 def bin_width_of_dec(num):
-    return int(math.ceil(math.log(num, 2)))
+    """
+    >>> bin_width_of_dec(255)
+    8
+    >>> bin_width_of_dec(256)
+    9
+    """
+    return int(math.ceil(math.log(num + 1, 2)))
 
 def dec_repr(num, width=0):
     if not width:
@@ -83,3 +91,7 @@ class enum(object):
 
     def enum_keys(self):
         return self.enum_dict().keys()
+
+if __name__ == '__main__':
+    import doctest
+    doctest.testmod()

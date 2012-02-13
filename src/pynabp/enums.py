@@ -12,7 +12,7 @@ class scan_mode(enum):
 
 class scan_direction(enum):
     forward = '0'
-    backward = '1'
+    reverse = '1'
 
 class buff_step_mode(enum):
     tan = '0'

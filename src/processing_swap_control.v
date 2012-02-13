@@ -25,7 +25,7 @@
 // | ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲|̲ ̲b̲-̲>̲1̲ ̲|̲ ̲b̲-̲>̲0̲ ̲|
 {#
     from pynabp.conf import conf
-    from pynabp.enums import swap_control_states, scan_mode
+    from pynabp.enums import swap_control_states, scan_mode, scan_direction
     from pynabp.utils import bin_width_of_dec, dec_repr
 
     s_val_len = bin_width_of_dec(conf()['projection_line_size'])
@@ -54,7 +54,7 @@ module NABPProcessingSwapControl
     input wire clk,
     input wire reset_n,
     // inputs from filtered RAM swap control
-    input wire unsigned [`kAngleLength-1:0] fr_angle,
+    input wire [`kAngleLength-1:0] fr_angle,
     input wire fr_next_angle_ack,
     input wire signed [`kFilteredDataLength-1:0] fr0_val,
     input wire signed [`kFilteredDataLength-1:0] fr1_val,
@@ -63,6 +63,7 @@ module NABPProcessingSwapControl
     output wire pe_kick,
     output wire pe_en,
     output wire pe_scan_mode,
+    output wire pe_scan_direction,
     output wire [`kFilteredDataLength*`kNoOfPartitions-1:0] pe_taps,
     // output to RAM
     output wire fr_next_angle,
@@ -73,7 +74,7 @@ module NABPProcessingSwapControl
 {# include('templates/state_decl(states).v', states=swap_control_states()) #}
 
 // line iteration
-reg unsigned [`kPartitionSizeLength-1:0] line_itr;
+reg [`kPartitionSizeLength-1:0] line_itr;
 
 // inputs from swappables
 wire sw0_swap, sw1_swap;
@@ -93,10 +94,10 @@ wire swap_ack;
 wire has_next_itr;
 assign swa_swap = sw_sel ? sw1_swap : sw0_swap;
 assign swb_next_itr = sw_sel ? sw0_next_itr : sw1_next_itr;
-assign swap_ack = (state == fill_s or state == fill_and_shift_s) and
-                  (swa_swap and swb_next_itr);
-assign swa_next_itr_ack = (state == setup_s and hs_next_angle_ack);
-assign swb_next_itr_ack = (has_next_itr and swap_ack);
+assign swap_ack = (state == fill_s || state == fill_and_shift_s) &&
+                  (swa_swap && swb_next_itr);
+assign swa_next_itr_ack = (state == setup_s && hs_next_angle_ack);
+assign swb_next_itr_ack = (has_next_itr && swap_ack);
 assign sw0_next_itr_ack = sw_sel ? swb_next_itr_ack : swa_next_itr_ack;
 assign sw1_next_itr_ack = sw_sel ? swa_next_itr_ack : swb_next_itr_ack;
 assign sw0_swap_ack = sw_sel ? 0 : swap_ack;
@@ -136,7 +137,7 @@ begin:mealy_next_state
                 else
                     next_state <= fill_and_shift_s;
         fill_and_shift_s:
-            if (swap_ack and !has_next_itr)
+            if (swap_ack && !has_next_itr)
                 next_state <= shift_s;
         shift_s:
             if (swb_next_itr)
@@ -149,18 +150,25 @@ begin:mealy_next_state
 end
 
 // pe control outputs
-reg scan_mode;
+reg scan_mode, scan_direction;
 assign pe_en = sw_sel ? sw1_pe_en : sw0_pe_en;
 assign pe_reset = swa_next_itr_ack;
 assign pe_kick = swap_ack;
 assign pe_scan_mode = scan_mode;
+assign pe_scan_direction = scan_direction;
 always @(posedge clk)
 begin:pe_setup
     if (state == setup_s)
-        if (hs_angle < `kAngle45 or hs_angle >= `kAngle135)
+    begin
+        if (hs_angle < `kAngle45 || hs_angle >= `kAngle135)
             scan_mode <= {# scan_mode.x #};
         else
             scan_mode <= {# scan_mode.y #};
+        if (hs_angle < `kAngle90)
+            scan_direction <= {# scan_direction.forward #};
+        else
+            scan_direction <= {# scan_direction.reverse #};
+    end
 end
 
 // lut vals

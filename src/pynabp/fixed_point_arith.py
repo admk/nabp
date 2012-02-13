@@ -54,7 +54,7 @@ class FixedPoint(object):
         >>> FixedPoint(4, 4, True).verilog_decl()
         'signed [8:0]'
         """
-        signed = 'signed' if self.signed else 'unsigned'
+        signed = 'signed' if self.signed else ''
         return signed + ' [' + str(self.width() - 1) + ':0]'
 
     def verilog_repr_decorator(self, func):

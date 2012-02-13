@@ -67,6 +67,7 @@ module NABPProcessingElement
     input wire sw_kick,
     input wire sw_en,
     input wire sw_scan_mode,
+    input wire sw_scan_direction,
     // input from line buffer
     input wire signed [`kFilteredDataLength-1:0] lb_val,
     // inputs from cache control

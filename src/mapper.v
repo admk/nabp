@@ -30,7 +30,7 @@ module NABPMapper
     input wire sh_shift_en,
     input wire sh_done,
     // outputs to RAM
-    output wire signed [`kSLength-1:0] fr_s_val
+    output reg signed [`kSLength-1:0] fr_s_val
 );
 
 {# include('templates/state_decl(states).v', states=mapper_states()) #}
@@ -40,8 +40,8 @@ reg {# accu_fixed.verilog_decl() #} accu;
 always @(accu or state)
 begin:fr_s_val_update
     fr_s_val <= 0;
-    if ((state != mapping_s) or
-        (accu < 0 or accu >= {# accu_max #}))
+    if ((state != mapping_s) ||
+        (accu < 0 || accu >= {# accu_max #}))
         fr_s_val <= {# dec_repr(0, s_val_len) #};
     else
         fr_s_val <= accu {# accu_fixed.verilog_floor_shift() #};

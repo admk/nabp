@@ -34,12 +34,12 @@ module NABPShifter
     output wire sc_shift_done,
     // outputs to mapper
     output wire mp_kick,
-    output reg mp_shift_en
-    output wire mp_done,
+    output reg mp_shift_en,
+    output wire mp_done
 );
 
-reg unsigned [{# fill_cnt_width - 1 #}:0] fill_cnt;
-reg unsigned [{# shift_cnt_width - 1 #}:0] shift_cnt;
+reg [{# fill_cnt_width - 1 #}:0] fill_cnt;
+reg [{# shift_cnt_width - 1 #}:0] shift_cnt;
 reg {# accu_fixed.verilog_decl() #} accu;
 reg {# accu_fixed.verilog_decl() #} accu_prev;
 
@@ -47,7 +47,7 @@ always @(posedge clk)
 begin:counters
     mp_shift_en <= 0;
 
-    if (state == fill_s and fill_cnt != {# fill_cnt_width #}'d0)
+    if (state == fill_s && fill_cnt != {# fill_cnt_width #}'d0)
     begin
         fill_cnt <= fill_cnt - 1;
         mp_shift_en <= 1;
@@ -55,7 +55,7 @@ begin:counters
     else
         fill_cnt <= {# dec_repr(fill_cnt_init) #};
 
-    if (state == shift_s and shift_cnt != {# shift_cnt_width #}'d0)
+    if (state == shift_s && shift_cnt != {# shift_cnt_width #}'d0)
     begin
         shift_cnt <= shift_cnt - 1;
         // it is ok to let it overflow
@@ -87,8 +87,8 @@ begin:transition
 end
 
 // mealy outputs
-assign sc_fill_done  = (fill_cnt == 0) and (state == fill_s);
-assign sc_shift_done = (shift_cnt == 0) and (state == shift_s);
+assign sc_fill_done  = (fill_cnt == 0) && (state == fill_s);
+assign sc_shift_done = (shift_cnt == 0) && (state == shift_s);
 assign mp_kick = sc_fill_kick;
 assign mp_done = sc_shift_done;
 
