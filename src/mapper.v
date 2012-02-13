@@ -37,7 +37,7 @@ module NABPMapper
 
 reg {# accu_fixed.verilog_decl() #} accu;
 
-always @(accu or state)
+always @(*)
 begin:fr_s_val_update
     fr_s_val <= 0;
     if ((state != mapping_s) ||
@@ -63,9 +63,6 @@ begin:transition
     else
         state <= next_state;
 end
-
-// mealy outputs
-assign sh_ack = (state == mapping_s);
 
 always @(state or sh_kick)
 begin:mealy_next_state

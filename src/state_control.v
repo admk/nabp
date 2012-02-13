@@ -61,7 +61,7 @@ assign sh_fill_kick  = (next_state != state) && (next_state == fill_s);
 assign sh_shift_kick = (next_state != state) && (next_state == shift_s);
 
 // mealy next state
-always @(state, sw_next_itr_ack, sh_fill_done, sw_swap_ack, sh_shift_done)
+always @(*)
 begin:mealy_next_state
     next_state <= state;
     // fsm cases

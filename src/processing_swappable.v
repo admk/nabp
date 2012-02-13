@@ -125,9 +125,7 @@ assign pe_taps = {
         };
 
 {% if conf()['debug'] %}
-{#
-    delay_len = conf()['partition_scheme']['size']
-#}
+{# delay_len = conf()['partition_scheme']['size'] #}
 {% for i in xrange(no_pes - 1) %}
 wire [`kFilteredDataLength-1:0] pe_tap{#i+1#};
 
