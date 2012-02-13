@@ -26,7 +26,7 @@
 module NABPFilteredRAMTest();
 
 {# include('templates/global_signal_generate.v') #}
-{# include('templates/dump_vcd.v') #}
+{# include('templates/dump_wave.v') #}
 
 // outputs to UUT
 reg [`kAngleLength-1:0] hs_angle;
