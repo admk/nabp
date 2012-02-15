@@ -33,6 +33,7 @@ begin:ptr_update
     if (clear)
     begin
         ptr <= {pPtrLength{1'd0}};
+        val_out <= {pDataLength{1'd0}};
         for(i = 0; i < pDelayLength; i = i + 1)
             data[i] <= {pPtrLength{1'd0}};
     end

@@ -49,11 +49,11 @@ end
 
 always @(posedge clk)
 begin:counter
-    if (state == mapping_s)
+    if (state == ready_s)
+        accu <= mp_accu_init;
+    else if (state == mapping_s)
         if (sh_shift_en)
             accu <= accu + mp_accu_base;
-    else
-        accu <= mp_accu_init;
 end
 
 always @(posedge clk)

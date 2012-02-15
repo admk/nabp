@@ -45,8 +45,8 @@ wire [`kFilteredDataLength*`kNoOfPartitions-1:0] pe_taps;
 always @(posedge clk)
 begin:control_test_signals
     // always send acks to requests with 1 cycle delay
-    sw_swap_ack <= sw_swap;
-    sw_next_itr_ack <= sw_next_itr;
+    sw_swap_ack <= reset_n && sw_swap;
+    sw_next_itr_ack <= reset_n && sw_next_itr;
 end
 
 // unit under test
