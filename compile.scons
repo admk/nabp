@@ -52,6 +52,7 @@ sources = {
             shifter_lut.vx
             shift_register.vx
             state_control.vx
+            line_buffer.vx
             processing_swappable.vx
             processing_swappable_test.vx
             """)

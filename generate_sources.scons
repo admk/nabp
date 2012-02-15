@@ -29,6 +29,7 @@ sources = Split("""
     state_control.v
     filtered_ram_test.v
     shift_register.v
+    line_buffer.v
     processing_swappable_test.v
     """)
 targets = []

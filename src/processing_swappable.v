@@ -13,6 +13,7 @@
     s_val_len = bin_width_of_dec(p_line_size)
     data_len = conf()['kFilteredDataLength']
     no_pes = conf()['partition_scheme']['no_of_partitions']
+    delay_len = conf()['partition_scheme']['size']
 #}
 `define kSLength {# s_val_len #}
 `define kFilteredDataLength {# data_len #}
@@ -115,35 +116,29 @@ NABPMapper mapper
 );
 
 reg signed [`kFilteredDataLength-1:0] pe_tap0;
+wire [(`kNoOfPartitions-1)*`kFilteredDataLength-1:0] pe_shift_taps;
+
 always @(posedge clk)
     pe_tap0 <= fr_val;
 
-assign pe_taps = {
-        {% for i in xrange(no_pes) %}
-            pe_tap{#i#}{% if i < no_pes - 1 %},{% end %}
-        {% end %}
-        };
+assign pe_taps = {pe_shift_taps, pe_tap0};
 
 {% if conf()['debug'] %}
-{# delay_len = conf()['partition_scheme']['size'] #}
-{% for i in xrange(no_pes - 1) %}
-wire [`kFilteredDataLength-1:0] pe_tap{#i+1#};
-
-shift_register
+line_buffer
 #(
-    .pDelayLength({# delay_len #}),
+    .pNoTaps({# no_pes - 1 #}),
+    .pTapsWidth({# delay_len #}),
     .pPtrLength({# bin_width_of_dec(delay_len) #}),
     .pDataLength(`kFilteredDataLength)
 )
-sr{#i#}
+pe_line_buff
 (
     .clk(clk),
+    .clear(sw_next_itr_ack),
     .enable(sh_mp_shift_en),
-    .clear(sw_next_itr),
-    .val_in(pe_tap{#i#}),
-    .val_out(pe_tap{#i+1#})
+    .shift_in(pe_tap0),
+    .taps(pe_shift_taps)
 );
-{% end %}
 {% else %}
 altshift_taps
 #(
@@ -155,10 +150,10 @@ altshift_taps
     .lpm_type("altshift_taps"),
     .lpm_hint("unused")
 )
-line_buff
+pe_line_buff
 (
     // FIXME aclr too early?
-    .aclr(sw_next_itr),
+    .aclr(sw_next_itr_ack),
     .clken(sh_mp_shift_en),
     .clock(clk),
     .shiftin(pe_tap0),
