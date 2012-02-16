@@ -92,4 +92,12 @@ NABPShifterLUT shifter_lut
     .sh_accu_base(sw_sh_accu_base)
 );
 
+// stopping condition
+initial
+begin
+    @(posedge sw_next_itr);
+    @(posedge sw_next_itr);
+    $finish;
+end
+
 endmodule

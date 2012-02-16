@@ -64,7 +64,7 @@ begin:transition
         state <= next_state;
 end
 
-always @(state or sh_kick)
+always @(*)
 begin:mealy_next_state
     next_state <= state;
     case (state) // synopsys parallel_case full_case
