@@ -6,10 +6,12 @@
 {#
     from pynabp.conf import conf
     from pynabp.utils import bin_width_of_dec, dec_repr
+    no_pes = conf()['partition_scheme']['no_of_partitions']
     filtered_data_len = conf()['kFilteredDataLength']
     a_len = conf()['kAngleLength']
     s_val_len = bin_width_of_dec(conf()['projection_line_size'])
 #}
+`define kNoOfPartitions {# no_pes #}
 `define kAngleLength {# a_len #}
 `define kSLength {# s_val_len #}
 `define kFilteredDataLength {# filtered_data_len #}
