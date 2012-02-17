@@ -14,6 +14,7 @@ def conf(
     global _conf
     if _conf:
         return _conf
+    # update conf with inputs TODO should use os.environ?
     _conf = dict(kwargs)
     # general confs
     _conf['debug'] = True
