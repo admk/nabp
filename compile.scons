@@ -1,6 +1,8 @@
 import os
 
-env = Environment(ENV=os.environ)
+Import('env derived_sources')
+
+# builders
 if env['PLATFORM'] == 'posix':
     vlib_path = os.path.join(Dir('.').abspath, 'work')
     os.system('vlib ' + vlib_path)
@@ -10,66 +12,17 @@ if env['PLATFORM'] == 'posix':
     verilog_builder = Builder(
             action=verilog_action,
             suffix='', src_suffix='.vx')
-    env.Append(BUILDERS = { 'Verilog': verilog_builder })
 else:
     verilog_builder = Builder(
             action='iverilog -o $TARGET $SOURCES',
             suffix='.vvp', src_suffix='.vx')
-    # stems_generator = Builder(
-    #         action='vermin $SOURCE -emitstems > $TARGET',
-    #         suffix='.stems', src_suffix='.vx')
-    env.Append(BUILDERS = {
-                'Verilog': verilog_builder,
-                # 'GenerateStems': stems_generator,
-            })
+env.Append(BUILDERS = { 'Verilog': verilog_builder })
 
-sources = {
-        'all': Split("""
-            dual_port_ram.vx
-            filtered_ram_swappable.vx
-            filtered_ram_swap_control.vx
-            processing_element.vx
-            processing_swappable.vx
-            processing_swap_control.vx
-            mapper.vx
-            mapper_lut.vx
-            shifter.vx
-            shifter_lut.vx
-            state_control.vx
-            shift_register.vx
-            """),
-        'fr_test': Split("""
-            dual_port_ram.vx
-            filtered_ram_swappable.vx
-            filtered_ram_swap_control.vx
-            filtered_ram_test.vx
-            shift_register.vx
-            """),
-        'pg_test': Split("""
-            mapper.vx
-            mapper_lut.vx
-            shifter.vx
-            shifter_lut.vx
-            shift_register.vx
-            state_control.vx
-            line_buffer.vx
-            processing_swappable.vx
-            processing_swappable_test.vx
-            """)
-    }
-
-compile_all = env.Verilog(target='nabp', source=sources['all'])
-filtered_ram_test = env.Verilog(
-        target='fr_test',
-        source=sources['fr_test'])
-# filtered_ram_stems = env.GenerateStems(sources['fr_test'])
-# env.Requires(filtered_ram_test, filtered_ram_stems)
-processing_generator_test = env.Verilog(
-        target='pg_test',
-        source=sources['pg_test'])
-
-
-env.Alias('fr_test', filtered_ram_test)
-env.Alias('pg_test', processing_generator_test)
+# target aliases
+for alias in derived_sources.iterkeys():
+    target = env.Verilog(
+            target=alias,
+            source=derived_sources[alias])
+    env.Alias(alias, target)
 
 # vim:ft=python:

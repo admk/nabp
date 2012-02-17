@@ -1,6 +1,7 @@
 import os
 import itertools
 from akpytemp import Template
+from scons_utils import add_extension
 
 def generate_derived_sources(target, source, env):
     for tgt, src in itertools.izip(target, source):
@@ -8,6 +9,8 @@ def generate_derived_sources(target, source, env):
     return 0
 
 env = Environment()
+Import('sources')
+
 source_generator = Builder(
         action=generate_derived_sources, suffix='.vx', src_suffix='.v')
 env.Append(
@@ -15,29 +18,19 @@ env.Append(
             'Generate': source_generator,
         })
 
-sources = Split("""
-    dual_port_ram.v
-    filtered_ram_swappable.v
-    filtered_ram_swap_control.v
-    processing_element.v
-    processing_swappable.v
-    processing_swap_control.v
-    mapper.v
-    mapper_lut.v
-    shifter.v
-    shifter_lut.v
-    state_control.v
-    filtered_ram_test.v
-    shift_register.v
-    line_buffer.v
-    processing_swappable_test.v
-    """)
-targets = []
-for src in sources:
-    name, _ = os.path.splitext(src)
-    targets.append(name + '.vx')
+derived_sources = {}
+for alias, sources in sources.iteritems():
+    derived_list = map(
+            lambda src:
+                env.Generate(
+                        target=add_extension(src, 'vx'),
+                        source=src),
+            sources)
+    derived_sources[alias] = derived_list
 
-generate_sources = env.Generate(target=targets, source=sources)
-env.Alias('gen_only', generate_sources)
+# generate only target alias
+env.Alias('gen_only', derived_sources['all'])
+
+Export('env derived_sources')
 
 # vim:ft=python:
