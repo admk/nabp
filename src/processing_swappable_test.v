@@ -78,6 +78,7 @@ NABPProcessingDataPathVerify data_path_verify
     .reset_n(reset_n),
     .tt_angle(hs_angle),
     .tt_line_itr(0),
+    .tt_verify_kick(sw_swap_ack),
     .pv_s_val(fr_s_val),
     .pv_val(fr_val),
     .pe_en(sw_pe_en),

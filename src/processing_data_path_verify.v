@@ -14,8 +14,10 @@
     partition_size_len = bin_width_of_dec(partition_size)
     filtered_data_len = conf()['kFilteredDataLength']
     a_len = conf()['kAngleLength']
-    s_val_len = bin_width_of_dec(conf()['projection_line_size'])
-    scan_max = conf()['image_size'] - 1
+    p_line_size = conf()['projection_line_size']
+    s_val_len = bin_width_of_dec(p_line_size)
+    i_size = conf()['image_size']
+    scan_max = i_size - 1
 
     angle_defines = dict(
             (k, v) for k, v in conf().iteritems() if 'kAngle' in k)
@@ -46,6 +48,11 @@ module NABPProcessingDataPathVerify
     input wire [`kFilteredDataLength*`kNoOfPartitions-1:0] pe_taps
 );
 
+always @(posedge clk)
+    // a simple preliminary test with values exactly equals to the s_val
+    // also used to determine if the s_val provided is correct
+    pv_val <= pv_s_val;
+
 integer status;
 initial
     @(status)
@@ -53,9 +60,14 @@ initial
             $finish_and_return(status);
 initial
 begin
-    status = $pyeval("from math import cos, sin, radians as rad");
+    status = $pyeval("from math import cos, sin, radians");
     status = $pyeval(
-    "def project(a, x, y):\na = rad(a)\nreturn -x * sin(a) + y * cos(a)\n");
+            "def project(a, x, y):\n",
+            "    a = radians(a)\n",
+            "    x = x - {# i_size #}\n",
+            "    y = y - {# i_size #}\n",
+            "    s = -x * sin(a) + y * cos(a)\n",
+            "    return s + {# p_line_size #}\n");
 end
 
 integer scan_itr, scan_end, scan_base;
