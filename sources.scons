@@ -18,6 +18,7 @@ sources = {
             line_buffer.v
             processing_swappable.v
             processing_swappable_test.v
+            processing_data_path_verify.v
             """)
     }
 
