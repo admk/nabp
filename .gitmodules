@@ -1,3 +1,6 @@
 [submodule "akpytemp"]
 	path = akpytemp
 	url = git@github.com:admk/akpytemp.git
+[submodule "vpi_pyeval"]
+	path = vpi_pyeval
+	url = git@github.com:admk/vpi_pyeval.git
