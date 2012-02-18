@@ -26,7 +26,7 @@ wire {# conf()['tShiftAccuBase'].verilog_decl() #} sw_sh_accu_base;
 wire {# conf()['tMapAccuInit'].verilog_decl() #} sw_mp_accu_init;
 wire {# conf()['tMapAccuBase'].verilog_decl() #} sw_mp_accu_base;
 wire [`kSLength-1:0] fr_s_val;
-reg [`kFilteredDataLength-1:0] fr_val;
+wire [`kFilteredDataLength-1:0] fr_val;
 
 // a simple preliminary test for 45 degrees
 // currently only tests controls
@@ -34,10 +34,6 @@ initial
 begin:hs_angle_update
     hs_angle = {# dec_repr(45, a_len) #};
 end
-
-always @(posedge clk)
-    // a simple preliminary test with values exactly equals to the s_val
-    fr_val <= fr_s_val;
 
 // controls
 reg sw_swap_ack, sw_next_itr_ack;
@@ -72,6 +68,19 @@ NABPProcessingSwappable uut
     // output to RAM
     .fr_s_val(fr_s_val),
     // output to PEs
+    .pe_taps(pe_taps)
+);
+
+// data path verifier
+NABPProcessingDataPathVerify data_path_verify
+(
+    .clk(clk),
+    .reset_n(reset_n),
+    .tt_angle(hs_angle),
+    .tt_line_itr(0),
+    .pv_s_val(fr_s_val),
+    .pv_val(fr_val),
+    .pe_en(sw_pe_en),
     .pe_taps(pe_taps)
 );
 

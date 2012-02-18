@@ -46,11 +46,6 @@ module NABPProcessingDataPathVerify
     input wire [`kFilteredDataLength*`kNoOfPartitions-1:0] pe_taps
 );
 
-always @(posedge clk)
-    // a simple preliminary test with values exactly equals to the s_val
-    // also used to determine if the s_val provided is correct
-    pv_val <= pv_s_val;
-
 integer status;
 initial
     @(status)
@@ -75,6 +70,7 @@ assign tap_val[{#i#}] = pe_taps[
 reg scan_mode;
 always
 begin:verification
+    @(posedge reset_n);
     @(negedge tt_verify_kick);
     if (tt_angle < `kAngle45 || tt_angle >= `kAngle135)
         scan_mode = {# scan_mode.x #};
@@ -92,6 +88,7 @@ begin:verification
         scan_end = 0;
         scan_base = -1;
     end
+    $display("Angle: %d", tt_angle);
     while (scan_itr != scan_end)
     begin
         // verify output for all PEs
@@ -110,7 +107,8 @@ begin:verification
             end
             tap_val_ori = $pyeval(
                     "project(", tt_angle, ",", x, ",", y, ")");
-            $display("Expected %d, Acutal %d", tap_val_ori, tap_val[i]);
+            $display("Tap %d, Expected %d, Acutal %d",
+                    i, tap_val_ori, tap_val[i]);
         end
         // next scan iteration
         @(posedge clk);
