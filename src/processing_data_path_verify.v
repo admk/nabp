@@ -46,6 +46,11 @@ module NABPProcessingDataPathVerify
     input wire [`kFilteredDataLength*`kNoOfPartitions-1:0] pe_taps
 );
 
+always @(posedge clk)
+    // a simple preliminary test with values exactly equals to the s_val
+    // also used to determine if the s_val provided is correct
+    pv_val <= pv_s_val;
+
 integer status;
 initial
     @(status)
