@@ -4,6 +4,10 @@ build
 .ropeproject
 .sconsign.dblite
 
+# iVerilog VPI
+*.o
+*.vpi
+
 # Mac
 .DS_Store
 

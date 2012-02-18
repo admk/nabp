@@ -1,5 +1,4 @@
 #!/bin/sh
-scons
 scons fr_test
 if [ $? -eq 0 ]; then
     hash vsim &> /dev/null
