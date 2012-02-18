@@ -3,7 +3,7 @@ import os
 def add_extension(file_list, ext):
     def _iterator():
         for f in file_list:
-            f, _ = os.path.splitext(f)
+            f, _ = os.path.splitext(str(f))
             yield f + os.path.extsep + ext
     if type(file_list) is str:
         file_list = [file_list]

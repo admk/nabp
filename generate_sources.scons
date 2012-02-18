@@ -13,10 +13,7 @@ Import('sources')
 
 source_generator = Builder(
         action=generate_derived_sources, suffix='.vx', src_suffix='.v')
-env.Append(
-        BUILDERS = {
-            'Generate': source_generator,
-        })
+env.Append(BUILDERS = {'Generate': source_generator})
 
 derived_sources = {}
 for alias, sources in sources.iteritems():
@@ -24,8 +21,8 @@ for alias, sources in sources.iteritems():
             lambda src:
                 env.Generate(
                         target=add_extension(src, 'vx'),
-                        source=src),
-            sources)
+                        source=src), sources)
+    SideEffect(add_extension(sources, 'vx.tf'), derived_list)
     derived_sources[alias] = derived_list
 
 # generate only target alias

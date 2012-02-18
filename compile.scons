@@ -1,4 +1,5 @@
 import os
+from scons_utils import add_extension
 
 Import('env derived_sources')
 
@@ -16,7 +17,7 @@ else:
     verilog_builder = Builder(
             action='iverilog -o $TARGET $SOURCES',
             suffix='.vvp', src_suffix='.vx')
-env.Append(BUILDERS = { 'Verilog': verilog_builder })
+env.Append(BUILDERS={'Verilog': verilog_builder})
 
 # target aliases
 for alias in derived_sources.iterkeys():

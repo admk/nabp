@@ -6,3 +6,10 @@ parameter [{# states.width - 1 #}:0] // synopsys enum code{#
 // synopsys state_vector state
 reg [{# states.width - 1 #}:0] // synopsys enum code
         state, next_state;
+{#
+    # write translate filter file
+    with open(parent.target_path() + '.tf', 'w') as f:
+        f.write('# gtkwave translate filter file for %s\n' % parent.name())
+        for key, val in states.enum_dict().iteritems():
+            f.write(str(val) + ' ' + str(key) + '_s\n')
+#}
