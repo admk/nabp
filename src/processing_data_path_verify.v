@@ -7,14 +7,15 @@
 {#
     from pynabp.conf import conf
     from pynabp.utils import bin_width_of_dec, dec_repr
+    from pynabp.enums import scan_mode
 
     no_pes = conf()['partition_scheme']['no_of_partitions']
-    partition_size = conf['partition_scheme']['size']
+    partition_size = conf()['partition_scheme']['size']
     partition_size_len = bin_width_of_dec(partition_size)
     filtered_data_len = conf()['kFilteredDataLength']
     a_len = conf()['kAngleLength']
     s_val_len = bin_width_of_dec(conf()['projection_line_size'])
-    scan_max = conf['image_size'] - 1
+    scan_max = conf()['image_size'] - 1
 
     angle_defines = dict(
             (k, v) for k, v in conf().iteritems() if 'kAngle' in k)
@@ -52,20 +53,23 @@ initial
             $finish_and_return(status);
 initial
 begin
-    status = $pyeval("from math import cos, sin, radians");
+    status = $pyeval("from math import cos, sin, radians as rad");
     status = $pyeval(
-            "def project(a, x, y):\n
-                a = radians(a)\n
-                return -x * sin(a) + y * cos(a)\n");
+    "def project(a, x, y):\na = rad(a)\nreturn -x * sin(a) + y * cos(a)\n");
 end
 
 integer scan_itr, scan_end, scan_base;
 integer line, x, y, angle, i;
-reg [`kFilteredDataLength-1:0] tap_val, tap_val_ori;
+reg [`kFilteredDataLength-1:0] tap_val_ori;
+wire [`kFilteredDataLength-1:0] tap_val[`kNoOfPartitions-1:0];
+// FIXME iverilog does not like part select in a for loop
+{% for i in xrange(no_pes) %}
+assign tap_val[{#i#}] = pe_taps[
+        `kFilteredDataLength*{#i+1#}-1:`kFilteredDataLength*{#i#}];
+{% end %}
 reg scan_mode;
 always
 begin:verification
-    tt_verify_done = 0;
     @(negedge tt_verify_kick);
     if (tt_angle < `kAngle45 || tt_angle >= `kAngle135)
         scan_mode = {# scan_mode.x #};
@@ -101,9 +105,7 @@ begin:verification
             end
             tap_val_ori = $pyeval(
                     "project(", tt_angle, ",", x, ",", y, ")");
-            tap_val = pe_taps[
-                    `kFilteredDataLength*(i+1)-1:`kFilteredDataLength*i];
-            $display("Expected %d, Acutal %d", tap_val_ori, tap_val);
+            $display("Expected %d, Acutal %d", tap_val_ori, tap_val[i]);
         end
         // next scan iteration
         @(posedge clk);
