@@ -55,7 +55,8 @@ begin:counters
     else
         fill_cnt <= {# dec_repr(fill_cnt_init) #};
 
-    if (state == shift_s && shift_cnt != {# shift_cnt_width #}'d0)
+    if ((state == shift_s || next_state == shift_s) &&
+        shift_cnt != {# shift_cnt_width #}'d0)
     begin
         shift_cnt <= shift_cnt - 1;
         // it is ok to let it overflow

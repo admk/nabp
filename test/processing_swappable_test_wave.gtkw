@@ -1,26 +1,24 @@
 [*]
 [*] GTKWave Analyzer v3.3.31 (w)1999-2012 BSI
-[*] Thu Feb 16 00:08:05 2012
+[*] Sat Feb 18 18:27:13 2012
 [*]
 [dumpfile] "/Users/admko/Documents/Sorcery/NABP/build/processing_swappable_test.v.lxt"
-[dumpfile_mtime] "Thu Feb 16 00:06:42 2012"
-[dumpfile_size] 26366
+[dumpfile_mtime] "Sat Feb 18 18:26:01 2012"
+[dumpfile_size] 26877
 [savefile] "/Users/admko/Documents/Sorcery/NABP/test/processing_swappable_test_wave.gtkw"
-[timestart] 0
+[timestart] 4646800
 [size] 1479 931
 [pos] 159 189
-*-21.000000 0 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+*-17.000000 5070000 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
 [treeopen] NABPProcessingSwappableTest.
-[treeopen] NABPProcessingSwappableTest.uut.
 [treeopen] NABPProcessingSwappableTest.uut.pe_line_buff.
 [treeopen] NABPProcessingSwappableTest.uut.pe_line_buff.gen_taps_inst[18].
 [sst_width] 198
 [signals_width] 256
 [sst_expanded] 1
-[sst_vpaned_height] 282
-@29
-NABPProcessingSwappableTest.clk[0]
+[sst_vpaned_height] 278
 @28
+NABPProcessingSwappableTest.clk[0]
 NABPProcessingSwappableTest.reset[0]
 @24
 NABPProcessingSwappableTest.hs_angle[7:0]
@@ -43,6 +41,7 @@ NABPProcessingSwappableTest.sw_pe_en[0]
 @28
 NABPProcessingSwappableTest.uut.state_control.sh_fill_done[0]
 NABPProcessingSwappableTest.uut.state_control.sh_shift_done[0]
+@29
 NABPProcessingSwappableTest.uut.shifter.state[2:0]
 @200
 -mapper
@@ -51,25 +50,22 @@ NABPProcessingSwappableTest.uut.shifter.mp_shift_en[0]
 NABPProcessingSwappableTest.uut.shifter.mp_kick[0]
 NABPProcessingSwappableTest.uut.shifter.mp_done[0]
 NABPProcessingSwappableTest.uut.mapper.state[1:0]
-@88024
+@80024
 NABPProcessingSwappableTest.fr_s_val[8:0]
-@20000
--
-@88022
 NABPProcessingSwappableTest.fr_val[8:0]
-@20000
--
 @200
 -line_buffer
 @88024
 +{last tap} NABPProcessingSwappableTest.uut.pe_line_buff.gen_taps_inst[18].tap_sr.val_out[8:0]
+@80022
 NABPProcessingSwappableTest.pe_taps[179:0]
-@20000
--
 @28
 NABPProcessingSwappableTest.uut.pe_line_buff.clear[0]
-@20000
--
+@200
+-data path verify
+@24
+NABPProcessingSwappableTest.data_path_verify.tap_val0[8:0]
+NABPProcessingSwappableTest.data_path_verify.tap_val_exp[8:0]
 @200
 -misc
 @c00420
@@ -107,9 +103,6 @@ NABPProcessingSwappableTest.uut.state_control.sh_accu_base[8:0]
 NABPProcessingSwappableTest.sw_mp_accu_init[17:0]
 @24
 NABPProcessingSwappableTest.sw_mp_accu_base[9:0]
-@420
-NABPProcessingSwappableTest.sw_mp_accu_part[12:0]
-@24
 NABPProcessingSwappableTest.sw_sh_accu_base[8:0]
 [pattern_trace] 1
 [pattern_trace] 0

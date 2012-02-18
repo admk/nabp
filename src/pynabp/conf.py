@@ -111,8 +111,10 @@ def map_lut_conf(config):
             utils.xfrange(0, 180, conf()['projection_angle_step']))
     accu_part_int_len, accu_part_signed = utils.bin_width_of_dec_vals(
             config['lutMapAccuPart'])
-    config['tMapAccuPart'] = FixedPoint(
+    config['tLUTMapAccuPart'] = FixedPoint(
             accu_part_int_len, conf()['kSEvalPrecision'], accu_part_signed)
+    config['tMapAccuPart'] = FixedPoint(
+            accu_part_int_len, conf()['kMapAccuPrecision'], accu_part_signed)
     # setup mapper accu_base
     def accu_base_lookup(angle):
         if ((0 <= angle and angle < 45) or

@@ -70,11 +70,28 @@ begin
             "    return int(s + {# (p_line_size - 1) / 2.0 #})\n");
 end
 
+reg [`kFilteredDataLength-1:0] tap_val_exp;
+task verify;
+    input [`kFilteredDataLength-1:0] actual;
+    input integer x;
+    input integer y;
+    integer diff;
+    begin
+        tap_val_exp = $pyeval(
+                "project(", tt_angle, ",", x, ",", y, ")");
+        diff = tap_val_exp - actual;
+        if (diff < -1 || diff > 1)
+            $display("Tap %d, Expected %d, Acutal %d, Diff %d",
+                    i, tap_val_exp, actual, diff);
+    end
+endtask
+
 integer scan_itr, scan_end, scan_base;
 integer line, x, y, angle, i;
 integer tap_val_diff;
-reg [`kFilteredDataLength-1:0] tap_val_ori;
 wire [`kFilteredDataLength-1:0] tap_val[`kNoOfPartitions-1:0];
+wire [`kFilteredDataLength-1:0] tap_val0;
+assign tap_val0 = pe_taps[`kFilteredDataLength-1:0];
 // FIXME iverilog does not like part select in a for loop
 {% for i in xrange(no_pes) %}
 assign tap_val[{#i#}] = pe_taps[
@@ -82,9 +99,9 @@ assign tap_val[{#i#}] = pe_taps[
 {% end %}
 reg scan_mode;
 always
-begin:verification
+begin:pe_verify
     @(posedge reset_n);
-    @(negedge tt_verify_kick);
+    @(posedge pe_en);
     if (tt_angle < `kAngle45 || tt_angle >= `kAngle135)
         scan_mode = {# scan_mode.x #};
     else
@@ -118,11 +135,7 @@ begin:verification
                 x = line;
                 y = scan_itr;
             end
-            tap_val_ori = $pyeval(
-                    "project(", tt_angle, ",", x, ",", y, ")");
-            tap_val_diff = tap_val_ori - tap_val[i];
-            $display("Tap %d, Expected %d, Acutal %d, Diff %d",
-                    i, tap_val_ori, tap_val[i], tap_val_diff);
+            verify(tap_val[i], x, y);
         end
         // next scan iteration
         @(posedge clk);
