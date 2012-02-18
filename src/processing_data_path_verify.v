@@ -64,14 +64,15 @@ begin
     status = $pyeval(
             "def project(a, x, y):\n",
             "    a = radians(a)\n",
-            "    x = x - {# i_size #}\n",
-            "    y = y - {# i_size #}\n",
+            "    x = x - {# (i_size - 1) / 2.0 #}\n",
+            "    y = y - {# (i_size - 1) / 2.0 #}\n",
             "    s = -x * sin(a) + y * cos(a)\n",
-            "    return s + {# p_line_size #}\n");
+            "    return int(s + {# (p_line_size - 1) / 2.0 #})\n");
 end
 
 integer scan_itr, scan_end, scan_base;
 integer line, x, y, angle, i;
+integer tap_val_diff;
 reg [`kFilteredDataLength-1:0] tap_val_ori;
 wire [`kFilteredDataLength-1:0] tap_val[`kNoOfPartitions-1:0];
 // FIXME iverilog does not like part select in a for loop
@@ -104,7 +105,7 @@ begin:verification
     while (scan_itr != scan_end)
     begin
         // verify output for all PEs
-        for (i = 0; i < `kNoOfPartitions; i = i + 1)
+        for (i = 0; i < 1; i = i + 1)
         begin
             line = tt_line_itr + i * `kPartitionSize;
             if (scan_mode == {# scan_mode.x #})
@@ -119,8 +120,9 @@ begin:verification
             end
             tap_val_ori = $pyeval(
                     "project(", tt_angle, ",", x, ",", y, ")");
-            $display("Tap %d, Expected %d, Acutal %d",
-                    i, tap_val_ori, tap_val[i]);
+            tap_val_diff = tap_val_ori - tap_val[i];
+            $display("Tap %d, Expected %d, Acutal %d, Diff %d",
+                    i, tap_val_ori, tap_val[i], tap_val_diff);
         end
         // next scan iteration
         @(posedge clk);
