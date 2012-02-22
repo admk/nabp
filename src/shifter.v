@@ -8,11 +8,17 @@
     from pynabp.utils import bin_width_of_dec, dec_repr
     from pynabp.fixed_point_arith import FixedPoint
 
+    # fill count varies from the position of the last PE tap to 0
     fill_cnt_init = conf()['partition_scheme']['partitions'][-1]
     fill_cnt_width = bin_width_of_dec(fill_cnt_init)
 
+    # shift count varies from the position of the last pixel to 0
     shift_cnt_init = conf()['image_size'] - 1
     shift_cnt_width = bin_width_of_dec(shift_cnt_init)
+
+    if shift_cnt_init < fill_cnt_init:
+        raise RuntimeError(
+                'Fill count should always be smaller or equal to shift count.')
 
     accu_fixed = conf()['tShiftAccuBase']
     accu_init_str = accu_fixed.verilog_repr()
@@ -34,46 +40,44 @@ module NABPShifter
     output wire sc_shift_done,
     // outputs to mapper
     output wire mp_kick,
-    output reg mp_shift_en,
+    output wire mp_shift_en,
     output wire mp_done
 );
 
-reg [{# fill_cnt_width - 1 #}:0] fill_cnt;
-reg [{# shift_cnt_width - 1 #}:0] shift_cnt;
+reg [{# shift_cnt_width - 1 #}:0] cnt;
+wire {# accu_fixed.verilog_decl() #} accu_next;
 reg {# accu_fixed.verilog_decl() #} accu;
-reg {# accu_fixed.verilog_decl() #} accu_prev;
+
+assign accu_next = accu + sc_accu_base;
+// it is ok to let it overflow, we only need to observe integer boundaries
+assign mp_shift_en = (state == fill_s) ||
+                     (state == shift_s &&
+                      accu_next{# accu_floor_slice #} !=
+                      accu{# accu_floor_slice #});
 
 always @(posedge clk)
 begin:counters
-    mp_shift_en <= 0;
-
-    if (state == fill_s && fill_cnt != {# fill_cnt_width #}'d0)
+    if (state == fill_s)
     begin
-        fill_cnt <= fill_cnt - 1;
-        mp_shift_en <= 1;
-    end
-    else
-        fill_cnt <= {# dec_repr(fill_cnt_init) #};
-
-    if ((state == shift_s || next_state == shift_s) &&
-        shift_cnt != {# shift_cnt_width #}'d0)
-    begin
-        shift_cnt <= shift_cnt - 1;
-        // it is ok to let it overflow
-        // we only need to observe integer boundaries
-        accu_prev <= accu;
-        accu <= accu + sc_accu_base;
-        if (accu{# accu_floor_slice #} ==
-                accu_prev{# accu_floor_slice #})
-            mp_shift_en <= 0;
+        if (cnt != {# dec_repr(0, fill_cnt_width) #})
+            cnt <= cnt - 1;
         else
-            mp_shift_en <= 1;
+            cnt <= {# dec_repr(fill_cnt_init, fill_cnt_width) #};
+    end
+    else if (state == shift_s)
+    begin
+        if (cnt != {# dec_repr(0, shift_cnt_width) #})
+        begin
+            cnt <= cnt - 1;
+            accu <= accu_next;
+        end
+        else
+            cnt <= {# dec_repr(shift_cnt_init) #};
     end
     else
     begin
-        shift_cnt <= {# dec_repr(shift_cnt_init) #};
+        cnt <= {# dec_repr(fill_cnt_init, fill_cnt_width) #};
         accu <= {# accu_init_str #};
-        accu_prev <= {# accu_init_str #};
     end
 end
 
@@ -88,13 +92,12 @@ begin:transition
 end
 
 // mealy outputs
-assign sc_fill_done  = (fill_cnt == 0) && (state == fill_s);
-assign sc_shift_done = (shift_cnt == 0) && (state == shift_s);
+assign sc_fill_done  = (cnt == 0) && (state == fill_s);
+assign sc_shift_done = (cnt == 0) && (state == shift_s);
 assign mp_kick = sc_fill_kick;
 assign mp_done = sc_shift_done;
 
-always @(sc_fill_kick or sc_shift_kick or sc_fill_done or sc_shift_done or
-         state)
+always @(*)
 begin:mealy_next_state
     next_state <= state;
     case (state) // synopsys parallel_case full_case

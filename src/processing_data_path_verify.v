@@ -80,9 +80,8 @@ task verify;
         tap_val_exp = $pyeval(
                 "project(", tt_angle, ",", x, ",", y, ")");
         diff = tap_val_exp - actual;
-        if (diff < -1 || diff > 1)
-            $display("Tap %d, Expected %d, Acutal %d, Diff %d",
-                    i, tap_val_exp, actual, diff);
+        $display("Tap %d, Expected %d, Acutal %d, Diff %d",
+                i, tap_val_exp, actual, diff);
     end
 endtask
 
