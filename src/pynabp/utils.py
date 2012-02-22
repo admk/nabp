@@ -76,7 +76,7 @@ class enum(object):
         no = len(keys)
         width = bin_width_of_dec(no)
         for idx, key in enumerate(keys):
-            self.__dict__[key] = '%d\'b%s' % (width, dec2bin(idx, width))
+            self.__dict__[key] = idx
         self.no = no
         self.width = width
         return self
@@ -84,8 +84,7 @@ class enum(object):
     def enum_dict(self):
         d = {}
         for k, v in self.__dict__.iteritems():
-            if (type(v) is str or v is None) and \
-                    not k.startswith('_'):
+            if (type(v) is int or v is None) and not k.startswith('_'):
                 d[k] = v
         return d
 

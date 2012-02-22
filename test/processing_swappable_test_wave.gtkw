@@ -1,24 +1,25 @@
 [*]
-[*] GTKWave Analyzer v3.3.31 (w)1999-2012 BSI
-[*] Sat Feb 18 18:27:13 2012
+[*] GTKWave Analyzer v3.3.32 (w)1999-2012 BSI
+[*] Wed Feb 22 18:09:49 2012
 [*]
 [dumpfile] "/Users/admko/Documents/Sorcery/NABP/build/processing_swappable_test.v.lxt"
-[dumpfile_mtime] "Sat Feb 18 18:26:01 2012"
-[dumpfile_size] 26877
+[dumpfile_mtime] "Wed Feb 22 18:09:21 2012"
+[dumpfile_size] 26863
 [savefile] "/Users/admko/Documents/Sorcery/NABP/test/processing_swappable_test_wave.gtkw"
-[timestart] 4646800
-[size] 1479 931
-[pos] 159 189
-*-17.000000 5070000 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+[timestart] 0
+[size] 1366 720
+[pos] 0 44
+*-17.000000 70000 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
 [treeopen] NABPProcessingSwappableTest.
-[treeopen] NABPProcessingSwappableTest.uut.pe_line_buff.
+[treeopen] NABPProcessingSwappableTest.uut.
 [treeopen] NABPProcessingSwappableTest.uut.pe_line_buff.gen_taps_inst[18].
 [sst_width] 198
 [signals_width] 256
 [sst_expanded] 1
 [sst_vpaned_height] 278
-@28
+@29
 NABPProcessingSwappableTest.clk[0]
+@28
 NABPProcessingSwappableTest.reset[0]
 @24
 NABPProcessingSwappableTest.hs_angle[7:0]
@@ -32,7 +33,10 @@ NABPProcessingSwappableTest.sw_swap_ack[0]
 @28
 NABPProcessingSwappableTest.sw_next_itr[0]
 NABPProcessingSwappableTest.sw_swap[0]
+@2024
+^1 /Users/admko/Documents/Sorcery/NABP/test/../derived_src/state_control.vx.tf
 NABPProcessingSwappableTest.uut.state_control.state[2:0]
+@28
 NABPProcessingSwappableTest.uut.state_control.sh_fill_kick[0]
 NABPProcessingSwappableTest.uut.state_control.sh_shift_kick[0]
 NABPProcessingSwappableTest.sw_pe_en[0]
@@ -41,7 +45,8 @@ NABPProcessingSwappableTest.sw_pe_en[0]
 @28
 NABPProcessingSwappableTest.uut.state_control.sh_fill_done[0]
 NABPProcessingSwappableTest.uut.state_control.sh_shift_done[0]
-@29
+@2024
+^2 /Users/admko/Documents/Sorcery/NABP/test/../derived_src/shifter.vx.tf
 NABPProcessingSwappableTest.uut.shifter.state[2:0]
 @200
 -mapper
@@ -49,6 +54,8 @@ NABPProcessingSwappableTest.uut.shifter.state[2:0]
 NABPProcessingSwappableTest.uut.shifter.mp_shift_en[0]
 NABPProcessingSwappableTest.uut.shifter.mp_kick[0]
 NABPProcessingSwappableTest.uut.shifter.mp_done[0]
+@2024
+^3 /Users/admko/Documents/Sorcery/NABP/test/../derived_src/mapper.vx.tf
 NABPProcessingSwappableTest.uut.mapper.state[1:0]
 @80024
 NABPProcessingSwappableTest.fr_s_val[8:0]
@@ -57,6 +64,8 @@ NABPProcessingSwappableTest.fr_val[8:0]
 -line_buffer
 @88024
 +{last tap} NABPProcessingSwappableTest.uut.pe_line_buff.gen_taps_inst[18].tap_sr.val_out[8:0]
+@28
+NABPProcessingSwappableTest.uut.pe_line_buff.enable[0]
 @80022
 NABPProcessingSwappableTest.pe_taps[179:0]
 @28
