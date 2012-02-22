@@ -21,8 +21,8 @@ sources = {
             processing_data_path_verify.v
             """)
     }
-
 sources['all'] = flatten(sources)
+
 Export('sources')
 
 # vim:ft=python:
