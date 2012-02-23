@@ -61,7 +61,6 @@ NABPStateControl state_control
     .sw_mp_accu_base(sw_mp_accu_base),
     .sw_swap_ack(sw_swap_ack),
     .sw_next_itr_ack(sw_next_itr_ack),
-    .sw_pe_en(sw_pe_en),
     // inputs from shifter
     .sh_fill_done(sh_sc_fill_done),
     .sh_shift_done(sh_sc_shift_done),
@@ -78,7 +77,7 @@ NABPStateControl state_control
 );
 
 wire sh_mp_kick;
-wire sh_mp_shift_en;
+wire sh_mpsr_shift_en;
 wire sh_mp_done;
 
 NABPShifter shifter
@@ -95,8 +94,10 @@ NABPShifter shifter
     .sc_shift_done(sh_sc_shift_done),
     // outputs to mapper
     .mp_kick(sh_mp_kick),
-    .mp_shift_en(sh_mp_shift_en),
-    .mp_done(sh_mp_done)
+    .mpsr_shift_en(sh_mpsr_shift_en),
+    .mp_done(sh_mp_done),
+    // outputs to PEs
+    .sw_pe_en(sw_pe_en)
 );
 
 NABPMapper mapper
@@ -109,7 +110,7 @@ NABPMapper mapper
     .mp_accu_base(sc_mp_accu_base),
     // inputs from shifter
     .sh_kick(sh_mp_kick),
-    .sh_shift_en(sh_mp_shift_en),
+    .sh_shift_en(sh_mpsr_shift_en),
     .sh_done(sh_mp_done),
     // outputs to RAM
     .fr_s_val(fr_s_val)
@@ -135,7 +136,7 @@ pe_line_buff
 (
     .clk(clk),
     .clear(sw_next_itr_ack),
-    .enable(sh_mp_shift_en),
+    .enable(sh_mpsr_shift_en),
     .shift_in(pe_tap0),
     .taps(pe_shift_taps)
 );
@@ -154,7 +155,7 @@ pe_line_buff
 (
     // FIXME aclr too early?
     .aclr(sw_next_itr_ack),
-    .clken(sh_mp_shift_en),
+    .clken(sh_mpsr_shift_en),
     .clock(clk),
     .shiftin(pe_tap0),
     .taps(pe_shift_taps)
