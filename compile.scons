@@ -1,7 +1,7 @@
 import os
 from scons_utils import add_extension
 
-Import('env derived_sources')
+Import('env derived_sources translate_filter_processes')
 
 # builders
 if env['PLATFORM'] == 'posix':
@@ -27,6 +27,7 @@ for alias in derived_sources.iterkeys():
             source=derived_sources[alias])
     if 'test' in alias:
         tests.append(target)
+        Depends(target, translate_filter_processes)
     env.Alias(alias, target)
 
 Export('tests')

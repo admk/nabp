@@ -156,7 +156,7 @@ def map_lut_conf(config):
             accu_len, config['kMapAccuPrecision'], accu_init_signed)
     return config
 
-def fixed_points():
+def fixed_point_translate_filter_process_files():
     for k, v in conf().iteritems():
         if type(v) is FixedPoint:
-            yield k, v
+            yield k + '.pytf'
