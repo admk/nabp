@@ -27,7 +27,7 @@ def conf(
         # FIXME projection_line_size
         # odd size for integer-valued center,
         # or use (x).(1) fixed precision
-        _conf['projection_line_size'] = 360
+        _conf['projection_line_size'] = 361
         _conf['projection_angles_size'] = 180
     _conf['projection_angle_step'] = 180 / _conf['projection_angles_size']
     _conf['projection_line_center'] = (_conf['projection_line_size'] - 1) / 2

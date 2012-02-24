@@ -32,7 +32,7 @@ wire [`kFilteredDataLength-1:0] fr_val;
 // currently only tests controls
 initial
 begin:hs_angle_update
-    hs_angle = {# dec_repr(45, a_len) #};
+    hs_angle = {# dec_repr(0, a_len) #};
 end
 
 // controls
@@ -109,6 +109,8 @@ initial
 begin
     @(posedge sw_next_itr);
     @(posedge sw_next_itr);
+    @(posedge clk);
+    @(posedge clk);
     $finish;
 end
 

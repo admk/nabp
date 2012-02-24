@@ -1,15 +1,15 @@
 [*]
 [*] GTKWave Analyzer v3.3.32 (w)1999-2012 BSI
-[*] Wed Feb 22 18:09:49 2012
+[*] Fri Feb 24 00:45:12 2012
 [*]
 [dumpfile] "/Users/admko/Documents/Sorcery/NABP/build/processing_swappable_test.v.lxt"
-[dumpfile_mtime] "Wed Feb 22 18:09:21 2012"
-[dumpfile_size] 26863
+[dumpfile_mtime] "Fri Feb 24 00:35:13 2012"
+[dumpfile_size] 12474
 [savefile] "/Users/admko/Documents/Sorcery/NABP/test/processing_swappable_test_wave.gtkw"
-[timestart] 0
+[timestart] 4785700
 [size] 1366 720
 [pos] 0 44
-*-17.000000 70000 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+*-17.000000 5150000 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
 [treeopen] NABPProcessingSwappableTest.
 [treeopen] NABPProcessingSwappableTest.uut.
 [treeopen] NABPProcessingSwappableTest.uut.pe_line_buff.gen_taps_inst[18].
@@ -17,9 +17,8 @@
 [signals_width] 256
 [sst_expanded] 1
 [sst_vpaned_height] 278
-@29
-NABPProcessingSwappableTest.clk[0]
 @28
+NABPProcessingSwappableTest.clk[0]
 NABPProcessingSwappableTest.reset[0]
 @24
 NABPProcessingSwappableTest.hs_angle[7:0]
@@ -72,6 +71,8 @@ NABPProcessingSwappableTest.pe_taps[179:0]
 NABPProcessingSwappableTest.uut.pe_line_buff.clear[0]
 @200
 -data path verify
+@29
+NABPProcessingSwappableTest.data_path_verify.pe_en[0]
 @24
 NABPProcessingSwappableTest.data_path_verify.tap_val0[8:0]
 NABPProcessingSwappableTest.data_path_verify.tap_val_exp[8:0]
