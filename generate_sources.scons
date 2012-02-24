@@ -36,7 +36,7 @@ for alias, sources in sources.iteritems():
                 env.Generate(
                         target=add_extension(src, 'vx'),
                         source=src), sources)
-    SideEffect(add_extension(sources, 'vx.tf'), derived_list)
+    SideEffect(add_extension(sources, 'vxtf'), derived_list)
     derived_sources[alias] = derived_list
 
 translate_filter_processes = []
