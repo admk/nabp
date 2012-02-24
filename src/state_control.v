@@ -25,7 +25,6 @@ module NABPStateControl
     // output to swap control
     output wire sw_swap,
     output wire sw_next_itr,
-    output wire sw_pe_en,
     // output to shifter
     output wire sh_fill_kick,
     output wire sh_shift_kick,
@@ -54,7 +53,6 @@ end
 // mealy outputs
 assign sw_swap       = (state == fill_done_s);
 assign sw_next_itr   = reset_n && (state == ready_s);
-assign sw_pe_en      = (state == shift_s);
 assign sh_fill_kick  = (next_state != state) && (next_state == fill_s);
 assign sh_shift_kick = (next_state != state) && (next_state == shift_s);
 
