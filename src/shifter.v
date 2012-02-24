@@ -93,10 +93,10 @@ reg {# accu_fixed.verilog_decl() #} accu;
 
 assign accu_next = accu + sc_accu_base;
 // it is ok to let it overflow, we only need to observe integer boundaries
-assign mp_shift_en = (state == fill_s) ||
-                      (state == shift_s &&
-                       accu_next{# accu_floor_slice #} !=
-                       accu{# accu_floor_slice #});
+assign mp_shift_en = (state == fill_s && next_state == fill_s) ||
+                     (state == shift_s &&
+                      accu_next{# accu_floor_slice #} !=
+                      accu{# accu_floor_slice #});
 // lb_shift_en is exactly 2-cycle delayed mp_shift_en
 assign lb_shift_en_l = mp_shift_en;
 

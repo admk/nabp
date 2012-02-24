@@ -32,7 +32,7 @@ wire [`kFilteredDataLength-1:0] fr_val;
 // currently only tests controls
 initial
 begin:hs_angle_update
-    hs_angle = {# dec_repr(0, a_len) #};
+    hs_angle = {# dec_repr(30, a_len) #};
 end
 
 // controls

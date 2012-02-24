@@ -16,8 +16,9 @@
     a_len = conf()['kAngleLength']
     p_line_size = conf()['projection_line_size']
     s_val_len = bin_width_of_dec(p_line_size)
-    i_size = conf()['image_size']
-    scan_max = i_size - 1
+    i_center = conf()['image_center']
+    p_line_center = conf()['projection_line_center']
+    scan_max = conf()['image_size'] - 1
 
     angle_defines = dict(
             (k, v) for k, v in conf().iteritems() if 'kAngle' in k)
@@ -64,10 +65,10 @@ begin
     status = $pyeval(
             "def project(a, x, y):\n",
             "    a = radians(a)\n",
-            "    x = x - {# (i_size - 1) / 2.0 #}\n",
-            "    y = y - {# (i_size - 1) / 2.0 #}\n",
+            "    x = x - {# i_center #}\n",
+            "    y = y - {# i_center #}\n",
             "    s = -x * sin(a) + y * cos(a)\n",
-            "    return int(s + {# (p_line_size - 1) / 2.0 #})\n");
+            "    return int(s + {# p_line_center #})\n");
 end
 
 reg [`kFilteredDataLength-1:0] tap_val_exp;

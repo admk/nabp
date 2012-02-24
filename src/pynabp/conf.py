@@ -90,6 +90,8 @@ def map_lut_conf(config):
     config['kMapAccuPrecision'] = 8
     last_pe = config['partition_scheme']['partitions'][-1]
     i_size = config['image_size']
+    i_center = config['image_center']
+    p_center = config['projection_line_center']
     def accu_part_lookup(angle):
         sin_val = math.sin(math.radians(angle))
         cos_val = math.cos(math.radians(angle))
@@ -103,10 +105,7 @@ def map_lut_conf(config):
             val = last_pe * cos_val - i_size * sin_val
         else:
             raise RuntimeError('Invalid angle encountered')
-        val += config['image_center'] * sin_val
-        val -= config['image_center'] * cos_val
-        val += config['projection_line_center']
-        return val
+        return val + i_center * sin_val - i_center * cos_val + p_center
     config['lutMapAccuPart'] = map(accu_part_lookup,
             utils.xfrange(0, 180, conf()['projection_angle_step']))
     accu_part_int_len, accu_part_signed = utils.bin_width_of_dec_vals(
