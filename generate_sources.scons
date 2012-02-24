@@ -1,14 +1,17 @@
-import os
+import os, sys
 import itertools
 from akpytemp import Template
 from scons_utils import add_extension
 
 def generate_derived_sources(target, source, env):
+    pynap_path = env['PYNABP_PATH']
+    if not (pynap_path in sys.path):
+        sys.path.append(pynap_path)
     for tgt, src in itertools.izip(target, source):
         Template(path=str(src)).save(str(tgt), **env.__dict__)
     return 0
 
-env = Environment()
+env = Environment(PYNABP_PATH=Dir('#').abspath)
 Import('sources')
 
 source_generator = Builder(

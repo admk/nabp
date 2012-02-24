@@ -155,3 +155,8 @@ def map_lut_conf(config):
     config['tMapAccu'] = FixedPoint(
             accu_len, config['kMapAccuPrecision'], accu_init_signed)
     return config
+
+def fixed_points():
+    for k, v in conf().iteritems():
+        if type(v) is FixedPoint:
+            yield k, v
