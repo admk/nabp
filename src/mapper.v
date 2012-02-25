@@ -36,15 +36,17 @@ module NABPMapper
 {# include('templates/state_decl(states).v', states=mapper_states()) #}
 
 reg {# accu_fixed.verilog_decl() #} accu;
+wire {# accu_fixed.verilog_decl() #} accu_rounded;
+assign accu_rounded = accu + {# accu_fixed.verilog_repr(0.5) #};
 
 always @(*)
 begin:fr_s_val_update
     fr_s_val <= 0;
     if ((state != mapping_s) ||
-        (accu < 0 || accu >= {# accu_max #}))
+        (accu_rounded < 0 || accu_rounded >= {# accu_max #}))
         fr_s_val <= {# dec_repr(0, s_val_len) #};
     else
-        fr_s_val <= accu {# accu_fixed.verilog_floor_shift() #};
+        fr_s_val <= accu_rounded {# accu_fixed.verilog_floor_shift() #};
 end
 
 always @(posedge clk)

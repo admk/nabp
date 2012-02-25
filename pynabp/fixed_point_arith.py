@@ -101,10 +101,10 @@ class FixedPoint(object):
     def bin_repr_of_value(self, value):
         """
         >>> FixedPoint(4, 4, True).bin_repr_of_value(-6.1875)
-        '110011101'
+        '110011110'
         """
         value *= 2 ** self.fractional_width
-        return dec2bin(int(value), self.width())
+        return dec2bin(int(value + .5), self.width())
 
     def value_of_bin_repr(self, repr_str):
         """
