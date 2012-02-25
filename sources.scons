@@ -1,26 +1,48 @@
 from scons_utils import flatten
 
-sources = {
-        'fr_test': Split("""
+ingredients = {
+        'common': Split("""
+            shift_register.v
+            hs_angles.v
+            """),
+        'filtered_ram': Split("""
             dual_port_ram.v
             filtered_ram_swappable.v
             filtered_ram_swap_control.v
-            filtered_ram_test.v
-            shift_register.v
             """),
-        'pg_test': Split("""
+        'processing': Split("""
             mapper.v
             mapper_lut.v
             shifter.v
             shifter_lut.v
-            shift_register.v
             state_control.v
             line_buffer.v
             processing_swappable.v
-            processing_swappable_test.v
             processing_data_path_verify.v
-            """)
+            """),
     }
+sources = {
+        'fr_test':
+            ingredients['filtered_ram'] +
+            Split("""
+                filtered_ram_test.v
+                """),
+        'pg_test':
+            ingredients['processing'] +
+            Split("""
+                processing_swappable_test.v
+                """),
+        'pw_test':
+            ingredients['processing'] +
+            Split("""
+                processing_swap_control.v
+                processing_test.v
+                """),
+    }
+
+for target in sources.iterkeys():
+    sources[target] += ingredients['common']
+
 sources['all'] = flatten(sources)
 
 Export('sources')

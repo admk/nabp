@@ -20,16 +20,16 @@ else:
 env.Append(BUILDERS={'Verilog': verilog_builder})
 
 # target aliases
-tests = []
+compiled_tests = []
 for alias in derived_sources.iterkeys():
     target = env.Verilog(
             target=alias,
             source=derived_sources[alias])
     if 'test' in alias:
-        tests.append(target)
+        compiled_tests.append(target)
         Depends(target, translate_filter_processes)
     env.Alias(alias, target)
 
-Export('tests')
+Export('compiled_tests')
 
 # vim:ft=python:

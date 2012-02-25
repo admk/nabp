@@ -11,7 +11,7 @@ env.SConscript(
         duplicate=0)
 compile_vpi = env.SConscript('vpi_pyeval/SConstruct')
 
-Import('tests')
-Depends(tests, compile_vpi)
+Import('compiled_tests')
+Depends(compiled_tests, compile_vpi)
 
 # vim:ft=python:

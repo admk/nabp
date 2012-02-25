@@ -1,9 +1,9 @@
-import os, sys
+import sys
 import itertools
 from akpytemp import Template
 from scons_utils import add_extension
 from translate_process_generate import write_translate_process
-from pynabp.conf import conf, fixed_point_translate_filter_process_files
+from pynabp.conf import fixed_point_translate_filter_process_files
 
 def generate_derived_sources(target, source, env):
     pynap_path = env['PYNABP_PATH']
@@ -39,10 +39,9 @@ for alias, sources in sources.iteritems():
     SideEffect(add_extension(sources, 'vxtf'), derived_list)
     derived_sources[alias] = derived_list
 
-translate_filter_processes = []
-for tf_proc in fixed_point_translate_filter_process_files():
-    translate_filter_processes.append(
-            env.GenerateTFProcess(target=tf_proc, source='#/pynabp/conf.py'))
+translate_filter_processes = [
+        env.GenerateTFProcess(target=tf_proc, source='#/pynabp/conf.py')
+        for tf_proc in fixed_point_translate_filter_process_files()]
 
 # generate only target alias
 env.Alias('gen_only', derived_sources['all'])

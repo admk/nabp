@@ -7,7 +7,7 @@ if [ $? -eq 0 ]; then
         vsim work.NABPFilteredRAMTest -do \
                 "source ../test/filtered_ram_test_wave.do; run -all"
     else
-        vvp build/fr_test.vvp -lxt2
+        vvp -M vpi_pyeval/build/vpi_pyeval -m pyeval build/fr_test.vvp -lxt2
         gtkwave -o build/filtered_ram_test.v.lxt \
                 test/filtered_ram_test_wave.gtkw
     fi
