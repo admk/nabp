@@ -14,7 +14,4 @@ compile_vpi = env.SConscript('vpi_pyeval/SConstruct')
 Import('tests')
 Depends(tests, compile_vpi)
 
-# FIXME iverilog-vpi generates the output in incorrect folder
-SideEffect(['vpi_pyeval.vpi', 'vpi_pyeval.o'], compile_vpi)
-
 # vim:ft=python:
