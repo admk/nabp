@@ -10,8 +10,6 @@
     a_len = conf()['kAngleLength']
     s_val_len = bin_width_of_dec(conf()['projection_line_size'])
 
-    def to_a(val):
-        return dec_repr(val, a_len)
     def to_s(val):
         return dec_repr(val, s_val_len)
     def to_v(val):
@@ -28,32 +26,20 @@ module NABPFilteredRAMTest();
 {# include('templates/global_signal_generate.v') #}
 {# include('templates/dump_wave.v') #}
 
-// outputs to UUT
-reg [`kAngleLength-1:0] hs_angle;
-wire hs_has_next_angle;
-// inputs from UUT
-wire hs_next_angle, hs_next_angle_ack;
-assign hs_next_angle_ack = hs_has_next_angle && hs_next_angle;
-assign hs_has_next_angle = (hs_angle < {# to_a(80) #});
-initial
-begin:hs_angle_iterate
-    hs_angle = {# to_a(0) #};
-    @(posedge reset_n);
-    while (hs_has_next_angle)
-    begin
-        @(negedge hs_next_angle_ack);
-        hs_angle = hs_angle + {# to_a(20) #};
-    end
-end
+{# include('templates/data_test_vals.v') #}
 
-function signed [`kFilteredDataLength-1:0] data_test_vals;
-    input [`kSLength-1:0] s;
-    input [`kAngleLength-1:0] a;
-    begin
-        // a simple function to generate a hash value
-        data_test_vals = s + a;
-    end
-endfunction
+// angle value generator
+wire hs_next_angle, hs_next_angle_ack, hs_has_next_angle;
+wire [`kAngleLength-1:0] hs_angle;
+hs_angles angles_generate
+(
+    .clk(clk),
+    .reset_n(reset_n),
+    .hs_next_angle(hs_next_angle),
+    .hs_next_angle_ack(hs_next_angle_ack),
+    .hs_angle(hs_angle),
+    .hs_has_next_angle(hs_has_next_angle)
+);
 
 wire [`kSLength-1:0] hs_s_val;
 wire [`kFilteredDataLength-1:0] filter_out, filter_in;

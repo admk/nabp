@@ -29,7 +29,6 @@ wire [`kSLength-1:0] fr_s_val;
 wire [`kFilteredDataLength-1:0] fr_val;
 
 // a simple preliminary test for 45 degrees
-// currently only tests controls
 initial
 begin:hs_angle_update
     hs_angle = {# dec_repr(30, a_len) #};
