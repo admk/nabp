@@ -12,7 +12,7 @@
 
 module shift_register
 (
-    clk, reset_n,
+    clk,
     enable, clear,
     val_in, val_out
 );
@@ -21,7 +21,7 @@ parameter pDelayLength = {# delay #};
 parameter pPtrLength = {# delay_len #};
 parameter pDataLength = {# filtered_data_len #};
 
-input wire clk, reset_n, enable, clear;
+input wire clk, enable, clear;
 input wire [pDataLength-1:0] val_in;
 output reg [pDataLength-1:0] val_out;
 

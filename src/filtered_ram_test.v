@@ -48,7 +48,6 @@ assign filter_in = data_test_vals(hs_s_val, hs_angle);
 shift_register sr_filter_model
 (
     .clk(clk),
-    .reset_n(reset_n),
     .enable(1'd1), 
     .clear(hs_next_angle),
     .val_in(filter_in),
