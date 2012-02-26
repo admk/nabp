@@ -15,7 +15,7 @@ if env['PLATFORM'] == 'posix':
             suffix='', src_suffix='.vx')
 else:
     verilog_builder = Builder(
-            action='iverilog -o $TARGET $SOURCES',
+            action='iverilog -Wall -Winfloop -o $TARGET $SOURCES',
             suffix='.vvp', src_suffix='.vx')
 env.Append(BUILDERS={'Verilog': verilog_builder})
 
