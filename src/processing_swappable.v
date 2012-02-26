@@ -3,7 +3,7 @@
 //     9 Jan 2012
 // The top level entity for data processing modules that are to be swapped
 // together
-
+// TODO optimise by allowing interleaved angles when processing
 {#
     from pynabp.enums import state_control_states
     from pynabp.conf import conf
