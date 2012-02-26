@@ -92,7 +92,11 @@ begin:pr_verification
             pr_s_val = `kSLength'bx;
         end
         if (pr_finish_next_round)
+        begin
+            @(posedge clk);
+            @(posedge clk);
         	$finish;
+        end
         if (!hs_has_next_angle)
             pr_finish_next_round = 1;
     end

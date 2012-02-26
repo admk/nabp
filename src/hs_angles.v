@@ -29,25 +29,14 @@ module hs_angles
 assign hs_has_next_angle = (hs_angle < {# to_a(80) #});
 assign hs_next_angle_ack = hs_has_next_angle && hs_next_angle;
 
-initial
+always @(posedge clk)
 begin:hs_angle_iterate
-    hs_angle = {# to_a(0) #};
-    @(posedge reset_n);
-    while (hs_has_next_angle)
+    if (!reset_n)
+        hs_angle = {# to_a(0) #};
+    else
     begin
-        @(negedge hs_next_angle_ack or reset_n);
-        if (!reset_n)
-        begin
-            @(posedge clk);
-            hs_angle = {# to_a(0) #};
-        end
-        else
-        begin
-            if (hs_has_next_angle)
-                hs_angle = hs_angle + {# to_a(20) #};
-            else
-                hs_angle = `kAngleLength'dx;
-        end
+        if (hs_next_angle && hs_has_next_angle)
+            hs_angle = hs_angle + {# to_a(20) #};
     end
 end
 

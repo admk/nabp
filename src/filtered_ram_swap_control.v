@@ -82,42 +82,48 @@ wire [`kSLength-1:0] sw{#i#}_hs_s_val;
 wire signed [`kFilteredDataLength-1:0] sw{#i#}_pr0_val, sw{#i#}_pr1_val;
 {% end %}
 
-wire fill_done, fill_kick, swap;
+wire fill_done, fill_kick;
 assign fill_done = sw_sel ? sw0_fill_done : sw1_fill_done;
 assign sw0_fill_kick = sw_sel ? 0 : fill_kick;
 assign sw1_fill_kick = sw_sel ? fill_kick : 0;
 assign hs_s_val = sw_sel ? sw0_hs_s_val : sw1_hs_s_val;
 
+reg swap_prev;
+wire swap, swap_curr;
+assign swap = (!swap_prev && swap_curr);
+always @(posedge clk)
+begin:swap_pulse
+    if (!reset_n)
+        swap_prev <= 0;
+    else
+        swap_prev <= swap_curr;
+end
 // angle update
 always @(posedge clk)
-    if (swap)
+    if (pr_next_angle_ack)
         pr_angle <= hs_angle;
 
 // mealy outputs
-assign swap = hs_has_next_angle ?
-              hs_next_angle_ack :
-              (fill_done && pr_next_angle && next_state != ready_s);
+assign swap_curr = hs_has_next_angle ?
+                   hs_next_angle_ack : (fill_done && pr_next_angle);
 assign hs_next_angle = reset_n &&
                        ((state == ready_s) ||
                        (hs_has_next_angle && fill_done && pr_next_angle));
-assign fill_kick = swap;
+assign fill_kick = swap && (next_state != work_s);
 assign pr_next_angle_ack = (state != ready_s) && swap;
 
 // mealy state transition
-reg swap_prev;
 always @(posedge clk)
 begin:transition
     if (!reset_n)
     begin
         state <= ready_s;
         sw_sel <= 0;
-        swap_prev <= 0;
     end
     else
     begin
         state <= next_state;
-        swap_prev <= swap;
-        if (!swap_prev && swap)
+        if (swap)
             sw_sel <= !sw_sel;
     end
 end
@@ -143,7 +149,7 @@ begin:mealy_next_state
                 else 
                     next_state <= work_s;
         work_s:
-            if (fill_done && pr_next_angle)
+            if (fill_done)
                 next_state <= ready_s;
     endcase
 end
