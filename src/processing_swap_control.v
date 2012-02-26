@@ -15,14 +15,19 @@
 //         |                           |
 // sw_sel -*---------------------------*
 //
-// Value Tabel
-// -----------
+// V̲a̲l̲u̲e̲ ̲T̲a̲b̲l̲e̲
 //  _______________________
 // | ̲s̲w̲_̲s̲e̲l̲ ̲ ̲|̲ ̲0̲ ̲ ̲ ̲ ̲|̲ ̲1̲ ̲ ̲ ̲ ̲|
 // | inputs  | 0->a | 0->b |
 // | ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲|̲ ̲1̲-̲>̲b̲ ̲|̲ ̲1̲-̲>̲a̲ ̲|
 // | outputs | a->0 | a->1 |
 // | ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲|̲ ̲b̲-̲>̲1̲ ̲|̲ ̲b̲-̲>̲0̲ ̲|
+//
+// S̲w̲a̲p̲p̲a̲b̲l̲e̲ ̲S̲t̲a̲t̲e̲s̲ ̲T̲a̲b̲l̲e̲
+//   ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲
+// | ̲s̲w̲_̲s̲e̲l̲ ̲|̲ ̲ ̲ ̲ ̲s̲w̲0̲ ̲ ̲ ̲|̲ ̲ ̲ ̲ ̲s̲w̲1̲ ̲ ̲ ̲|
+// |    0   |  filling | shifting |
+// | ̲ ̲ ̲ ̲1̲ ̲ ̲ ̲|̲ ̲s̲h̲i̲f̲t̲i̲n̲g̲ ̲|̲ ̲ ̲f̲i̲l̲l̲i̲n̲g̲ ̲|
 {#
     from pynabp.conf import conf
     from pynabp.enums import swap_control_states, scan_mode, scan_direction
