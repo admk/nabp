@@ -97,20 +97,21 @@ assign swa_next_itr = sw_sel ? sw1_next_itr : sw0_next_itr;
 assign swb_next_itr = sw_sel ? sw0_next_itr : sw1_next_itr;
 assign swap_ack = (state == fill_s || state == fill_and_shift_s) &&
                   (swa_swap && swb_next_itr);
-assign swa_next_itr_ack = (state == setup_s && hs_next_angle_ack);
+assign swa_next_itr_ack = (state == setup_s);
 assign swb_next_itr_ack = (has_next_itr && swap_ack);
 assign sw0_next_itr_ack = sw_sel ? swb_next_itr_ack : swa_next_itr_ack;
 assign sw1_next_itr_ack = sw_sel ? swa_next_itr_ack : swb_next_itr_ack;
 assign sw0_swap_ack = sw_sel ? 0 : swap_ack;
 assign sw1_swap_ack = sw_sel ? swap_ack : 0;
-assign hs_next_angle = (next_state == ready_s);
-assign has_next_itr = (line_itr != {# to_v(partition_size_len - 1) #});
+assign fr_next_angle = state == ready_s ||
+                       (state == shift_s && swb_next_itr);
+assign has_next_itr = (line_itr != {# to_v(partition_size - 1) #});
 
 always @(posedge clk)
 begin:transition
     if (!reset_n)
     begin
-        state <= setup_s;
+        state <= ready_s;
         sw_sel <= 0;
     end
     else
@@ -121,12 +122,12 @@ begin:transition
     end
 end
 
-always @(state)
+always @(*)
 begin:mealy_next_state
     next_state <= state;
     case (state) // synopsys parallel_case full_case
         ready_s:
-            if (hs_next_angle_ack)
+            if (fr_next_angle_ack)
                 next_state <= setup_s;
         setup_s:
             if (swa_next_itr)
@@ -142,7 +143,10 @@ begin:mealy_next_state
                 next_state <= shift_s;
         shift_s:
             if (swb_next_itr)
-                next_state <= ready_s;
+                if (fr_next_angle_ack)
+                    next_state <= setup_s;
+                else
+                    next_state <= ready_s;
         default:
             $display(
                 "<NABPProcessingSwapControl> Invalid state encountered: %d",

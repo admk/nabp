@@ -1,19 +1,21 @@
 [*]
 [*] GTKWave Analyzer v3.3.31 (w)1999-2012 BSI
-[*] Sat Feb 25 22:14:00 2012
+[*] Sun Feb 26 02:08:28 2012
 [*]
 [dumpfile] "/Users/admko/Documents/Sorcery/NABP/build/processing_test.v.lxt"
-[dumpfile_mtime] "Sat Feb 25 22:05:23 2012"
-[dumpfile_size] 89192
+[dumpfile_mtime] "Sun Feb 26 02:00:37 2012"
+[dumpfile_size] 499323
 [savefile] "/Users/admko/Documents/Sorcery/NABP/test/processing_test_wave.gtkw"
 [timestart] 0
 [size] 1448 988
 [pos] 270 68
-*-19.000000 0 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+*-25.000000 67900000 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
 [treeopen] NABPProcessingTest.
 [treeopen] NABPProcessingTest.uut.
+[treeopen] NABPProcessingTest.uut.sw0.
+[treeopen] NABPProcessingTest.uut.sw1.
 [sst_width] 198
-[signals_width] 222
+[signals_width] 265
 [sst_expanded] 1
 [sst_vpaned_height] 302
 @29
@@ -24,7 +26,7 @@ NABPProcessingTest.reset[0]
 -host
 @28
 NABPProcessingTest.hs_has_next_angle[0]
-@22
+@24
 NABPProcessingTest.uut.fr_angle[7:0]
 @28
 NABPProcessingTest.uut.fr_next_angle_ack[0]
@@ -35,7 +37,7 @@ NABPProcessingTest.uut.fr_next_angle_ack[0]
 @28
 NABPProcessingTest.uut.fr_next_angle[0]
 @2024
-^1 /Users/admko/Documents/Sorcery/NABP/derived_src/processing_swap_control.vxtf
+^1 /Users/admko/Documents/Sorcery/NABP/test/../derived_src/processing_swap_control.vxtf
 NABPProcessingTest.uut.state[2:0]
 @28
 NABPProcessingTest.uut.sw_sel[0]
@@ -43,7 +45,7 @@ NABPProcessingTest.uut.sw_sel[0]
 -line itr
 @28
 NABPProcessingTest.uut.has_next_itr[0]
-@22
+@24
 NABPProcessingTest.uut.line_itr[3:0]
 @1000200
 -line itr
@@ -54,6 +56,9 @@ NABPProcessingTest.uut.sw0_next_itr[0]
 NABPProcessingTest.uut.sw0_next_itr_ack[0]
 NABPProcessingTest.uut.sw0_swap[0]
 NABPProcessingTest.uut.sw0_swap_ack[0]
+@2024
+^2 /Users/admko/Documents/Sorcery/NABP/test/../derived_src/state_control.vxtf
+NABPProcessingTest.uut.sw0.state_control.state[2:0]
 @1000200
 -sw0
 @800200
@@ -63,6 +68,9 @@ NABPProcessingTest.uut.sw1_next_itr[0]
 NABPProcessingTest.uut.sw1_next_itr_ack[0]
 NABPProcessingTest.uut.sw1_swap[0]
 NABPProcessingTest.uut.sw1_swap_ack[0]
+@2024
+^2 /Users/admko/Documents/Sorcery/NABP/test/../derived_src/state_control.vxtf
+NABPProcessingTest.uut.sw1.state_control.state[2:0]
 @1000200
 -sw1
 -swap control

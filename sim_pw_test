@@ -1,8 +1,8 @@
 #!/bin/sh
-scons pg_test
+scons pw_test
 if [ ! $? -eq 0 ]; then
-    exit(-1);
+    exit -1
 fi
-vvp -M vpi_pyeval/build/vpi_pyeval -m pyeval build/pg_test.vvp -lxt2
+vvp -M vpi_pyeval/build/vpi_pyeval -m pyeval build/pw_test.vvp -lxt2
 gtkwave -o build/processing_test.v.lxt \
         test/processing_test_wave.gtkw
