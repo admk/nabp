@@ -84,8 +84,11 @@ class enum(object):
     def enum_dict(self):
         d = {}
         for k, v in self.__dict__.iteritems():
-            if (type(v) is int or v is None) and not k.startswith('_'):
-                d[k] = v
+            if not (type(v) is int or v is None):
+                continue
+            if k == 'width' or k == 'no' or k.startswith('_'):
+                continue
+            d[k] = v
         return d
 
     def enum_keys(self):
