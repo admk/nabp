@@ -1,35 +1,25 @@
-{# include('templates/info.v') #}
+{# include('templates/defines.v') #}
 // NABPDualPortRAM
 //     5 Feb 2012
 // The RAM that stores the filtered projection data
 
-{#
-    from pynabp.conf import conf
-    from pynabp.utils import bin_width_of_dec
-
-    p_line_size = conf()['projection_line_size']
-    s_val_len = bin_width_of_dec(p_line_size)
-    data_len = conf()['kFilteredDataLength']
-
-    port_list = range(2)
-#}
-`define kSLength {# s_val_len #}
-`define kProjectionLineSize {# p_line_size #}
-
 module NABPDualPortRAM
 (
     clk,
-    {% for i in port_list %}
-    we_{#i#}, addr_{#i#},
-    data_in_{#i#}, data_out_{#i#}{% if i != port_list[-1] %},{% end %}
+    {% for i in range(2) %}
+        we_{#i#},
+        addr_{#i#},
+        data_in_{#i#},
+        data_out_{#i#}
+        {% if i != 1 %},{% end %}
     {% end %}
 );
 
-parameter pDataLength = {# data_len #};
+parameter pDataLength = {# c['kFilteredDataLength'] #};
 
 // global signals
 input wire clk;
-{% for i in port_list %}
+{% for i in range(2) %}
 // inputs for port {#i#}
 input wire we_{#i#};
 input wire [`kSLength-1:0] addr_{#i#};
@@ -40,7 +30,7 @@ output reg [pDataLength-1:0] data_out_{#i#};
 
 reg [pDataLength-1:0] ram[`kProjectionLineSize-1:0];
 
-{% for i in port_list %}
+{% for i in range(2) %}
 always @(posedge clk)
 begin:port_{#i#}_read_write
     if (we_{#i#})

@@ -1,13 +1,10 @@
-{# include('templates/info.v') #}
+{# include('templates/defines.v') #}
 // shift_register
 //     11 Feb 2012
 // A shift register for testing as an FIR filter
 {#
-    from pynabp.conf import conf
-    from pynabp.utils import bin_width_of_dec, dec_repr
-    filtered_data_len = conf()['kFilteredDataLength']
-    delay = conf()['filter']['order'] / 2
-    delay_len = bin_width_of_dec(delay - 1)
+    delay = c['filter']['order'] / 2
+    delay_len = bin_width(delay - 1)
 #}
 
 module shift_register
@@ -19,7 +16,7 @@ module shift_register
 
 parameter pDelayLength = {# delay #};
 parameter pPtrLength = {# delay_len #};
-parameter pDataLength = {# filtered_data_len #};
+parameter pDataLength = `kFilteredDataLength;
 
 input wire clk, enable, clear;
 input wire [pDataLength-1:0] val_in;
