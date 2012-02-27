@@ -1,4 +1,4 @@
-{# include('templates/info.v') #}
+{# include('templates/defines.v') #}
 // NABPFilteredRAMSwapControl
 //     5 Feb 2012
 // Controls the swapping between filtered RAM swappables
@@ -18,20 +18,9 @@
 // FIR is not in NABPFilteredRAMSwapControl to make early testing easier. 
 // Possible TODO: refactor FIR to be a part of NABPFilteredRAMSwapControl.
 {#
-    from pynabp.conf import conf
-    from pynabp.utils import bin_width_of_dec
     from pynabp.enums import filtered_ram_swap_control_states
-    data_len = conf()['kDataLength']
-    filtered_data_len = conf()['kFilteredDataLength']
-    a_len = conf()['kAngleLength']
-    s_val_len = bin_width_of_dec(conf()['projection_line_size'])
-
     swap_list = range(2)
 #}
-`define kAngleLength {# a_len #}
-`define kSLength {# s_val_len #}
-`define kDataLength {# data_len #}
-`define kFilteredDataLength {# filtered_data_len #}
 
 module NABPFilteredRAMSwapControl
 (
