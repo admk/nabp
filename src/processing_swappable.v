@@ -36,7 +36,7 @@ wire sh_sc_shift_done;
 wire {# c['tMapAccuInit'].verilog_decl() #} sc_mp_accu_init;
 wire {# c['tMapAccuBase'].verilog_decl() #} sc_mp_accu_base;
 
-NABPStateControl state_control
+NABPProcessingSwappableStateControl state_control
 (
     // global signals
     .clk(clk),

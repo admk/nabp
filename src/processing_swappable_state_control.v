@@ -1,5 +1,5 @@
 {# include('templates/defines.v') #}
-// NABPStateControl
+// NABPProcessingSwappableStateControl
 //     31 Dec 2011
 // Hold system states for the NABP architecture for the swappable modules
 // Coordinate the shifter and mapper modules
@@ -7,7 +7,7 @@
     from pynabp.enums import state_control_states
 #}
 
-module NABPStateControl
+module NABPProcessingSwappableStateControl
 (
     // global signals
     input wire clk,
@@ -75,7 +75,8 @@ begin:mealy_next_state
                 next_state <= ready_s;
         default:
             $display(
-                "<NABPStateControl> Invalid state encountered: %d", state);
+                "<NABPProcessingSwappableStateControl> Invalid state: %d",
+                state);
     endcase
 end
 
