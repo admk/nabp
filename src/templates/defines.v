@@ -1,5 +1,5 @@
 {#
-    include('info.v')
+    include('_info.v')
 
     from pynabp.conf import conf
     from pynabp.utils import bin_width_of_dec as bin_width, dec_repr
@@ -14,6 +14,7 @@
     def to_v(val):
         return dec_repr(val, c['kFilteredDataLength'])
 #}
+`timescale 1ns/10ps
 
 `define kAngleLength {# c['kAngleLength'] #}
 
