@@ -1,20 +1,7 @@
-{# include('templates/info.v') #}
+{# include('templates/defines.v') #}
 // NABPProcessingSwappableTest
 //     13 Feb 2012
 // This test bench tests the functionality of NABPProcessingSwappable
-
-{#
-    from pynabp.conf import conf
-    from pynabp.utils import bin_width_of_dec, dec_repr
-    no_pes = conf()['partition_scheme']['no_of_partitions']
-    filtered_data_len = conf()['kFilteredDataLength']
-    a_len = conf()['kAngleLength']
-    s_val_len = bin_width_of_dec(conf()['projection_line_size'])
-#}
-`define kNoOfPartitions {# no_pes #}
-`define kAngleLength {# a_len #}
-`define kSLength {# s_val_len #}
-`define kFilteredDataLength {# filtered_data_len #}
 
 module NABPProcessingSwappableTest();
 
@@ -31,7 +18,7 @@ wire [`kFilteredDataLength-1:0] fr_val;
 // a simple preliminary test for 45 degrees
 initial
 begin:hs_angle_update
-    hs_angle = {# dec_repr(30, a_len) #};
+    hs_angle = {# to_a(30) #};
 end
 
 // controls

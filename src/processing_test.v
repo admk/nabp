@@ -1,4 +1,4 @@
-{# include('templates/info.v') #}
+{# include('templates/defines.v') #}
 // NABPProcessingSwappableTest
 //     25 Feb 2012
 // This test bench tests the functionality of NABPProcessingSwapControl
