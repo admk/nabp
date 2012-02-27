@@ -31,6 +31,7 @@ NABPProcessingSwapControl uut
     .reset_n(reset_n),
     // inputs from filtered RAM swap control
     .fr_angle(hs_angle),
+    .fr_has_next_angle(hs_has_next_angle),
     .fr_next_angle_ack(hs_next_angle_ack),
     .fr0_val(fr0_val),
     .fr1_val(fr1_val),

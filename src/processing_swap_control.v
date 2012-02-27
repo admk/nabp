@@ -39,6 +39,7 @@ module NABPProcessingSwapControl
     input wire reset_n,
     // inputs from filtered RAM swap control
     input wire [`kAngleLength-1:0] fr_angle,
+    input wire fr_has_next_angle,
     input wire fr_next_angle_ack,
     input wire signed [`kFilteredDataLength-1:0] fr0_val,
     input wire signed [`kFilteredDataLength-1:0] fr1_val,
@@ -71,26 +72,27 @@ wire sw0_swap_ack, sw1_swap_ack;
 wire sw0_next_itr_ack, sw1_next_itr_ack;
 
 // mealy outputs
+// internal
 wire swa_swap;
 wire swa_next_itr, swb_next_itr;
 wire swa_next_itr_ack, swb_next_itr_ack;
 wire swap_ack;
-wire has_next_itr;
 assign swa_swap = sw_sel ? sw1_swap : sw0_swap;
 assign swa_next_itr = sw_sel ? sw1_next_itr : sw0_next_itr;
 assign swb_next_itr = sw_sel ? sw0_next_itr : sw1_next_itr;
 assign swap_ack = (state == fill_s || state == fill_and_shift_s) &&
                   (swa_swap && swb_next_itr);
 assign swa_next_itr_ack = (state == setup_s);
-assign swb_next_itr_ack = (has_next_itr && swap_ack);
+assign swb_next_itr_ack = (fr_has_next_angle && swap_ack);
 assign sw0_next_itr_ack = sw_sel ? swb_next_itr_ack : swa_next_itr_ack;
 assign sw1_next_itr_ack = sw_sel ? swa_next_itr_ack : swb_next_itr_ack;
 assign sw0_swap_ack = sw_sel ? 0 : swap_ack;
 assign sw1_swap_ack = sw_sel ? swap_ack : 0;
-assign fr_next_angle = state == ready_s ||
-                       (state == shift_s && swb_next_itr);
-assign has_next_itr = (line_itr !=
-                       {# to_v(c['partition_scheme']['size'] - 1) #});
+// external
+assign fr_next_angle = reset_n && fr_has_next_angle &&
+                       (state == ready_s) || (swb_next_itr &&
+                        (line_itr ==
+                         {# to_v(c['partition_scheme']['size'] - 1) #}));
 
 always @(posedge clk)
 begin:transition
@@ -119,12 +121,12 @@ begin:mealy_next_state
                 next_state <= fill_s;
         fill_s:
             if (swap_ack)
-                if (!has_next_itr)
+                if (!fr_has_next_angle)
                     next_state <= shift_s;
                 else
                     next_state <= fill_and_shift_s;
         fill_and_shift_s:
-            if (swap_ack && !has_next_itr)
+            if (swap_ack && !fr_has_next_angle)
                 next_state <= shift_s;
         shift_s:
             if (swb_next_itr)
@@ -175,7 +177,10 @@ begin:line_itr_update
         mp_accu_init <= mp_accu_part;
     else if (swap_ack)
     begin
-        line_itr <= line_itr + {# to_v(1) #};
+        if (fr_next_angle)
+            line_itr <= {# to_v(0) #};
+        else
+            line_itr <= line_itr + {# to_v(1) #};
         mp_accu_init <= mp_accu_init - mp_accu_base;
     end
 end
