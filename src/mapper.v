@@ -1,21 +1,14 @@
-{# include('templates/info.v') #}
+{# include('templates/defines.v') #}
 // NABPMapper
 //     3 Jan 2012
 // Provides addresses of the mapped projection line for line buffer
 
 {#
-    from pynabp.conf import conf
     from pynabp.enums import mapper_states
-    from pynabp.utils import bin_width_of_dec, dec_repr
-    from pynabp.fixed_point_arith import FixedPoint
 
-    p_line_size = conf()['projection_line_size']
-    s_val_len = bin_width_of_dec(p_line_size)
     accu_fixed = conf()['tMapAccu']
-    accu_max = accu_fixed.verilog_repr(p_line_size)
+    accu_max = accu_fixed.verilog_repr(c['projection_line_size'])
 #}
-`define kSLength {# s_val_len #}
-`define kAngleLength {# conf()['kAngleLength'] #}
 
 module NABPMapper
 (
@@ -44,7 +37,7 @@ begin:fr_s_val_update
     fr_s_val <= 0;
     if ((state != mapping_s) ||
         (accu_rounded < 0 || accu_rounded >= {# accu_max #}))
-        fr_s_val <= {# dec_repr(0, s_val_len) #};
+        fr_s_val <= {# to_s(0) #};
     else
         fr_s_val <= accu_rounded {# accu_fixed.verilog_floor_shift() #};
 end

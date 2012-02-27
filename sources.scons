@@ -15,8 +15,8 @@ ingredients = {
             mapper_lut.v
             shifter.v
             shifter_lut.v
-            state_control.v
             line_buffer.v
+            processing_swappable_state_control.v
             processing_swappable.v
             processing_data_path_verify.v
             """),

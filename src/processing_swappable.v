@@ -1,23 +1,9 @@
-{# include('templates/info.v') #}
+{# include('templates/defines.v') #}
 // NABPProcessingSwappable
 //     9 Jan 2012
 // The top level entity for data processing modules that are to be swapped
 // together
 // TODO optimise by allowing interleaved angles when processing
-{#
-    from pynabp.enums import state_control_states
-    from pynabp.conf import conf
-    from pynabp.utils import bin_width_of_dec
-
-    p_line_size = conf()['projection_line_size']
-    s_val_len = bin_width_of_dec(p_line_size)
-    data_len = conf()['kFilteredDataLength']
-    no_pes = conf()['partition_scheme']['no_of_partitions']
-    delay_len = conf()['partition_scheme']['size']
-#}
-`define kSLength {# s_val_len #}
-`define kFilteredDataLength {# data_len #}
-`define kNoOfPartitions {# no_pes #}
 
 module NABPProcessingSwappable
 (
@@ -25,9 +11,9 @@ module NABPProcessingSwappable
     input wire clk,
     input wire reset_n,
     // inputs from swap control
-    input wire {# conf()['tShiftAccuBase'].verilog_decl() #} sw_sh_accu_base,
-    input wire {# conf()['tMapAccuInit'].verilog_decl() #} sw_mp_accu_init,
-    input wire {# conf()['tMapAccuBase'].verilog_decl() #} sw_mp_accu_base,
+    input wire {# c['tShiftAccuBase'].verilog_decl() #} sw_sh_accu_base,
+    input wire {# c['tMapAccuInit'].verilog_decl() #} sw_mp_accu_init,
+    input wire {# c['tMapAccuBase'].verilog_decl() #} sw_mp_accu_base,
     input wire sw_swap_ack,
     input wire sw_next_itr_ack,
     // input from Filtered RAM
@@ -44,13 +30,13 @@ module NABPProcessingSwappable
 
 wire sc_sh_fill_kick;
 wire sc_sh_shift_kick;
-wire {# conf()['tShiftAccuBase'].verilog_decl() #} sc_sh_accu_base;
+wire {# c['tShiftAccuBase'].verilog_decl() #} sc_sh_accu_base;
 wire sh_sc_fill_done;
 wire sh_sc_shift_done;
-wire {# conf()['tMapAccuInit'].verilog_decl() #} sc_mp_accu_init;
-wire {# conf()['tMapAccuBase'].verilog_decl() #} sc_mp_accu_base;
+wire {# c['tMapAccuInit'].verilog_decl() #} sc_mp_accu_init;
+wire {# c['tMapAccuBase'].verilog_decl() #} sc_mp_accu_base;
 
-NABPStateControl state_control
+NABPProcessingSwappableStateControl state_control
 (
     // global signals
     .clk(clk),
@@ -126,12 +112,12 @@ always @(posedge clk)
 
 assign pe_taps = {pe_shift_taps, pe_tap0};
 
-{% if conf()['debug'] %}
+{% if c['debug'] %}
 line_buffer
 #(
-    .pNoTaps({# no_pes - 1 #}),
-    .pTapsWidth({# delay_len #}),
-    .pPtrLength({# bin_width_of_dec(delay_len) #}),
+    .pNoTaps({# c['partition_scheme']['no_of_partitions'] - 1 #}),
+    .pTapsWidth({# c['partition_scheme']['size'] #}),
+    .pPtrLength({# bin_width(c['partition_scheme']['size']) #}),
     .pDataLength(`kFilteredDataLength)
 )
 pe_line_buff
@@ -145,10 +131,10 @@ pe_line_buff
 {% else %}
 altshift_taps
 #(
-    .intended_device_family("{# conf()['device'] #}"),
+    .intended_device_family("{# c['device'] #}"),
     .number_of_taps(`kNoOfPartitions - 1),
     .power_up_state("CLEARED"),
-    .taps_distance({# conf()['partition_scheme']['size'] #}),
+    .taps_distance({# c['partition_scheme']['size'] #}),
     .width(`kFilteredDataLength),
     .lpm_type("altshift_taps"),
     .lpm_hint("unused")

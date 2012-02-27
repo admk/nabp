@@ -1,4 +1,4 @@
-{# include('templates/info.v') #}
+{# include('templates/defines.v') #}
 // NABPProcessingSwapControl
 //     24 Jan 2012
 // Provides control for the swappables
@@ -29,29 +29,8 @@
 // |    0   |  filling | shifting |
 // | ̲ ̲ ̲ ̲1̲ ̲ ̲ ̲|̲ ̲s̲h̲i̲f̲t̲i̲n̲g̲ ̲|̲ ̲ ̲f̲i̲l̲l̲i̲n̲g̲ ̲|
 {#
-    from pynabp.conf import conf
     from pynabp.enums import swap_control_states, scan_mode, scan_direction
-    from pynabp.utils import bin_width_of_dec, dec_repr
-
-    s_val_len = bin_width_of_dec(conf()['projection_line_size'])
-    data_len = conf()['kFilteredDataLength']
-    partition_size = conf()['partition_scheme']['size']
-    partition_size_len = bin_width_of_dec(partition_size)
-    no_pes = conf()['partition_scheme']['no_of_partitions']
-
-    angle_defines = dict(
-            (k, v) for k, v in conf().iteritems() if 'kAngle' in k)
-
-    def to_v(val):
-        return dec_repr(val, partition_size_len)
 #}
-{% for key, val in angle_defines.iteritems() %}
-`define {# key #} {# val #} {% end %}
-
-`define kSLength {# s_val_len #}
-`define kFilteredDataLength {# data_len #}
-`define kPartitionSizeLength {# partition_size_len #}
-`define kNoOfPartitions {# no_pes #}
 
 module NABPProcessingSwapControl
 (
@@ -110,7 +89,8 @@ assign sw0_swap_ack = sw_sel ? 0 : swap_ack;
 assign sw1_swap_ack = sw_sel ? swap_ack : 0;
 assign fr_next_angle = state == ready_s ||
                        (state == shift_s && swb_next_itr);
-assign has_next_itr = (line_itr != {# to_v(partition_size - 1) #});
+assign has_next_itr = (line_itr !=
+                       {# to_v(c['partition_scheme']['size'] - 1) #});
 
 always @(posedge clk)
 begin:transition
@@ -182,10 +162,10 @@ begin:pe_setup
 end
 
 // lut vals
-wire {# conf()['tShiftAccuBase'].verilog_decl() #} sh_accu_base;
-reg {# conf()['tMapAccuInit'].verilog_decl() #} mp_accu_init;
-wire {# conf()['tMapAccuBase'].verilog_decl() #} mp_accu_base;
-wire {# conf()['tMapAccuPart'].verilog_decl() #} mp_accu_part;
+wire {# c['tShiftAccuBase'].verilog_decl() #} sh_accu_base;
+reg {# c['tMapAccuInit'].verilog_decl() #} mp_accu_init;
+wire {# c['tMapAccuBase'].verilog_decl() #} mp_accu_base;
+wire {# c['tMapAccuPart'].verilog_decl() #} mp_accu_part;
 
 always @(posedge clk)
 begin:line_itr_update
@@ -202,9 +182,9 @@ end
 
 {% for i in [0, 1] %}
 // swappable {#i#}
-wire {# conf()['tShiftAccuBase'].verilog_decl() #} sw{#i#}_sh_accu_base;
-wire {# conf()['tMapAccuInit'].verilog_decl() #} sw{#i#}_mp_accu_init;
-wire {# conf()['tMapAccuBase'].verilog_decl() #} sw{#i#}_mp_accu_base;
+wire {# c['tShiftAccuBase'].verilog_decl() #} sw{#i#}_sh_accu_base;
+wire {# c['tMapAccuInit'].verilog_decl() #} sw{#i#}_mp_accu_init;
+wire {# c['tMapAccuBase'].verilog_decl() #} sw{#i#}_mp_accu_base;
 wire [`kFilteredDataLength*`kNoOfPartitions-1:0] sw{#i#}_pe_taps;
 assign sw{#i#}_sh_accu_base = sh_accu_base;
 assign sw{#i#}_mp_accu_init = mp_accu_init;

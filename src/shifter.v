@@ -1,30 +1,26 @@
-{# include('templates/info.v') #}
+{# include('templates/defines.v') #}
 // NABPShifter
 //     1 Jan 2012
 // Controls NABPFilterMapper by providing fm_shift_enable
 {#
-    from pynabp.conf import conf
     from pynabp.enums import shifter_states
-    from pynabp.utils import bin_width_of_dec, dec_repr
-    from pynabp.fixed_point_arith import FixedPoint
 
     # fill count varies from the position of the last PE tap to 0
-    fill_cnt_init = conf()['partition_scheme']['partitions'][-1]
-    fill_cnt_width = bin_width_of_dec(fill_cnt_init)
+    fill_cnt_init = c['partition_scheme']['partitions'][-1]
+    fill_cnt_width = bin_width(fill_cnt_init)
 
     # shift count varies from the position of the last pixel to 0
-    shift_cnt_init = conf()['image_size'] - 1
-    shift_cnt_width = bin_width_of_dec(shift_cnt_init)
+    shift_cnt_init = c['image_size'] - 1
+    shift_cnt_width = bin_width(shift_cnt_init)
 
     if shift_cnt_init < fill_cnt_init:
         raise RuntimeError(
                 'Fill count should always be smaller or equal to shift count.')
 
-    accu_fixed = conf()['tShiftAccuBase']
+    accu_fixed = c['tShiftAccuBase']
     accu_init_str = accu_fixed.verilog_repr()
     accu_floor_slice = accu_fixed.verilog_floor_slice()
 #}
-`define kAngleLength {# conf()['kAngleLength'] #}
 
 module NABPShifter
 (

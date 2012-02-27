@@ -1,25 +1,12 @@
-{# include('templates/info.v') #}
+{# include('templates/defines.v') #}
 // NABPFilteredRAMSwappable
 //     6 Feb 2012
 // Controls the filling of filtered RAM
 
 {#
-    from pynabp.conf import conf
     from pynabp.enums import filtered_ram_control_states
-    from pynabp.utils import bin_width_of_dec, dec_repr
-    data_len = conf()['kDataLength']
-    filtered_data_len = conf()['kFilteredDataLength']
-    p_line_size = conf()['projection_line_size']
-    s_val_len = bin_width_of_dec(p_line_size)
-
-    def to_s(val):
-        return dec_repr(val, s_val_len)
-    def to_v(val):
-        return dec_repr(val, filtered_data_len)
+    p_line_size = c['projection_line_size']
 #}
-`define kSLength {# s_val_len #}
-`define kDataLength {# data_len #}
-`define kFilteredDataLength {# filtered_data_len #}
 
 module NABPFilteredRAMSwappable
 (
@@ -80,7 +67,7 @@ assign hs_fill_done = (next_state == ready_s);
 assign hs_s_val = read_itr;
 assign write_enable = (state == fill_s);
 assign delay_done = (read_itr == {#
-        to_s(conf()['filter']['order'] / 2 - 1) #});
+        to_s(c['filter']['order'] / 2 - 1) #});
 
 // mealy next state
 always @(state or hs_fill_kick or delay_done or write_itr)

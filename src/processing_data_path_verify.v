@@ -1,36 +1,13 @@
-{# include('templates/info.v') #}
+{# include('templates/defines.v') #}
 // NABPProcessingDataPathVerify
 //     16 Feb 2012
 // This module verifies the data path for processing swappables by posing as
 // a filtered RAM and each processing element
 
 {#
-    from pynabp.conf import conf
-    from pynabp.utils import bin_width_of_dec, dec_repr
     from pynabp.enums import scan_mode
-
-    no_pes = conf()['partition_scheme']['no_of_partitions']
-    partition_size = conf()['partition_scheme']['size']
-    partition_size_len = bin_width_of_dec(partition_size)
-    filtered_data_len = conf()['kFilteredDataLength']
-    a_len = conf()['kAngleLength']
-    p_line_size = conf()['projection_line_size']
-    s_val_len = bin_width_of_dec(p_line_size)
-    i_center = conf()['image_center']
-    p_line_center = conf()['projection_line_center']
-    scan_max = conf()['image_size'] - 1
-
-    angle_defines = dict(
-            (k, v) for k, v in conf().iteritems() if 'kAngle' in k)
+    scan_max = c['image_size'] - 1
 #}
-{% for key, val in angle_defines.iteritems() %}
-`define {# key #} {# val #} {% end %}
-
-`define kNoOfPartitions {# no_pes #}
-`define kPartitionSize {# partition_size #}
-`define kPartitionSizeLength {# partition_size_len #}
-`define kSLength {# s_val_len #}
-`define kFilteredDataLength {# filtered_data_len #}
 
 module NABPProcessingDataPathVerify
 (
@@ -65,10 +42,10 @@ begin
     status = $pyeval(
             "def project(a, x, y):\n",
             "    a = radians(a)\n",
-            "    x = x - {# i_center #}\n",
-            "    y = y - {# i_center #}\n",
+            "    x = x - {# c['image_center'] #}\n",
+            "    y = y - {# c['image_center'] #}\n",
             "    s = -x * sin(a) + y * cos(a)\n",
-            "    return int(s + {# p_line_center #})\n");
+            "    return int(s + {# c['projection_line_center'] #})\n");
 end
 
 reg [`kFilteredDataLength-1:0] tap_val_exp;
@@ -93,7 +70,7 @@ wire [`kFilteredDataLength-1:0] tap_val[`kNoOfPartitions-1:0];
 wire [`kFilteredDataLength-1:0] tap_val0;
 assign tap_val0 = pe_taps[`kFilteredDataLength-1:0];
 // FIXME iverilog does not like part select in a for loop
-{% for i in xrange(no_pes) %}
+{% for i in xrange(c['partition_scheme']['no_of_partitions']) %}
 assign tap_val[{#i#}] = pe_taps[
         `kFilteredDataLength*{#i+1#}-1:`kFilteredDataLength*{#i#}];
 {% end %}
