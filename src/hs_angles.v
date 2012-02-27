@@ -2,10 +2,6 @@
 // hs_angles
 //     25 Feb 2012
 // This module generates angles for testing
-{#
-    def to_a(val):
-        return dec_repr(val, c['kAngleLength'])
-#}
 
 module hs_angles
 (
