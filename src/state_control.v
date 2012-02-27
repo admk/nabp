@@ -1,11 +1,10 @@
-{# include('templates/info.v') #}
+{# include('templates/defines.v') #}
 // NABPStateControl
 //     31 Dec 2011
 // Hold system states for the NABP architecture for the swappable modules
 // Coordinate the shifter and mapper modules
 {#
     from pynabp.enums import state_control_states
-    from pynabp.conf import conf
 #}
 
 module NABPStateControl
@@ -14,9 +13,9 @@ module NABPStateControl
     input wire clk,
     input wire reset_n,
     // inputs from swap control
-    input wire {# conf()['tShiftAccuBase'].verilog_decl() #} sw_sh_accu_base,
-    input wire {# conf()['tMapAccuInit'].verilog_decl() #} sw_mp_accu_init,
-    input wire {# conf()['tMapAccuBase'].verilog_decl() #} sw_mp_accu_base,
+    input wire {# c['tShiftAccuBase'].verilog_decl() #} sw_sh_accu_base,
+    input wire {# c['tMapAccuInit'].verilog_decl() #} sw_mp_accu_init,
+    input wire {# c['tMapAccuBase'].verilog_decl() #} sw_mp_accu_base,
     input wire sw_swap_ack,
     input wire sw_next_itr_ack,
     // inputs from shifter
@@ -28,10 +27,10 @@ module NABPStateControl
     // output to shifter
     output wire sh_fill_kick,
     output wire sh_shift_kick,
-    output reg {# conf()['tShiftAccuBase'].verilog_decl() #} sh_accu_base,
+    output reg {# c['tShiftAccuBase'].verilog_decl() #} sh_accu_base,
     // output to mapper
-    output reg {# conf()['tMapAccuInit'].verilog_decl() #} mp_accu_init,
-    output reg {# conf()['tMapAccuBase'].verilog_decl() #} mp_accu_base
+    output reg {# c['tMapAccuInit'].verilog_decl() #} mp_accu_init,
+    output reg {# c['tMapAccuBase'].verilog_decl() #} mp_accu_base
 );
 
 {# include('templates/state_decl(states).v', states=state_control_states()) #}
