@@ -1,17 +1,11 @@
-{# include('templates/info.v') #}
+{# include('templates/defines.v') #}
 // hs_angles
 //     25 Feb 2012
 // This module generates angles for testing
 {#
-    from pynabp.conf import conf
-    from pynabp.utils import dec_repr
-
-    a_len = conf()['kAngleLength']
-
     def to_a(val):
-        return dec_repr(val, a_len)
+        return dec_repr(val, c['kAngleLength'])
 #}
-`define kAngleLength {# a_len #}
 
 module hs_angles
 (
