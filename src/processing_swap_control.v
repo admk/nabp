@@ -174,15 +174,16 @@ always @(posedge clk)
 begin:line_itr_update
     if (state == ready_s)
         line_itr <= {# to_v(0) #};
-    else if (state == setup_s)
-        mp_accu_init <= mp_accu_part;
     else if (swap_ack)
     begin
         if (fr_next_angle)
             line_itr <= {# to_v(0) #};
+            mp_accu_init <= mp_accu_part;
         else
+        begin
             line_itr <= line_itr + {# to_v(1) #};
-        mp_accu_init <= mp_accu_init - mp_accu_base;
+            mp_accu_init <= mp_accu_init - mp_accu_base;
+        end
     end
 end
 
