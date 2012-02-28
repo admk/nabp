@@ -29,7 +29,8 @@
 // |    0   |  filling | shifting |
 // | ̲ ̲ ̲ ̲1̲ ̲ ̲ ̲|̲ ̲s̲h̲i̲f̲t̲i̲n̲g̲ ̲|̲ ̲ ̲f̲i̲l̲l̲i̲n̲g̲ ̲|
 {#
-    from pynabp.enums import swap_control_states, scan_mode, scan_direction
+    from pynabp.enums import \
+            processing_swap_control_states, scan_mode, scan_direction
 #}
 
 module NABPProcessingSwapControl

@@ -44,14 +44,14 @@ class mapper_states(enum):
         self.mapping = None
         super(mapper_states, self).__init__()
 
-class swap_control_states(enum):
+class processing_swap_control_states(enum):
     def __init__(self):
         self.ready = None
         self.setup = None
         self.fill = None
         self.fill_and_shift = None
         self.shift = None
-        super(swap_control_states, self).__init__()
+        super(processing_swap_control_states, self).__init__()
 
 class filtered_ram_control_states(enum):
     def __init__(self):
