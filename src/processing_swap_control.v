@@ -90,26 +90,31 @@ assign sw0_swap_ack = sw_sel ? 0 : swap_ack;
 assign sw1_swap_ack = sw_sel ? swap_ack : 0;
 // internal
 // initial kick to start swapping
-assign swa_next_itr_ack = (state == setup_s);
+assign swa_next_itr_ack = (state == setup_2_s);
 // swap_ack to the correct swappable
 assign swap_ack = // if wants next angle, then wish to insert angle setup
                   // bubble, swap when setup is done. Both swappable are
                   // guaranteed to be waiting when entering this state
-                  (state == angle_setup_s) ||
+                  (state == angle_setup_2_s) ||
                   // else if not wanting next angle
                   (!fr_next_angle &&
                    // proceed without delay when swa fill done
                    ((state == fill_s && swa_swap) ||
                    // or swa fill done and swb shift done
                    (state == fill_and_shift_s && swa_swap && swb_next_itr)));
-// kick happens when angles are not done yet
+// kick happens when angles are not done yet, at the same time as swap kick
 assign swb_next_itr_ack = (fr_has_next_angle && swap_ack);
 // external
-assign fr_next_angle = reset_n && fr_has_next_angle &&
+assign fr_next_angle = // only ask for next angle if has next angle
+                       reset_n && fr_has_next_angle &&
+                       // either it's ready to start processing from idle
                        (state == ready_s) ||
-                       ((state != angle_setup_s) && swb_next_itr &&
+                       // or it's done processing the current angle
+                       (state != angle_setup_1_s &&
+                        state != angle_setup_2_s &&
+                        swb_next_itr &&
                         (line_itr ==
-                         {# to_v(c['partition_scheme']['size'] - 1) #}));
+                         {# to_l(c['partition_scheme']['size'] - 1) #}));
 
 always @(posedge clk)
 begin:transition
@@ -132,8 +137,10 @@ begin:mealy_next_state
     case (state) // synopsys parallel_case full_case
         ready_s:
             if (fr_next_angle_ack)
-                next_state <= setup_s;
-        setup_s:
+                next_state <= setup_1_s;
+        setup_1_s:
+            next_state <= setup_2_s;
+        setup_2_s:
             if (swa_next_itr)
                 next_state <= fill_s;
         fill_s:
@@ -144,7 +151,7 @@ begin:mealy_next_state
                 else if (!fr_next_angle)
                     next_state <= fill_and_shift_s;
                 else if (fr_next_angle && fr_next_angle_ack)
-                    next_state <= angle_setup_s;
+                    next_state <= angle_setup_1_s;
             end
         fill_and_shift_s:
             if (swa_swap && swb_next_itr)
@@ -152,16 +159,15 @@ begin:mealy_next_state
                 if (!fr_has_next_angle)
                     next_state <= shift_s;
                 else if (fr_next_angle && fr_next_angle_ack)
-                    next_state <= angle_setup_s;
+                    next_state <= angle_setup_1_s;
             end
-        angle_setup_s:
+        angle_setup_1_s:
+            next_state <= angle_setup_2_s;
+        angle_setup_2_s:
             next_state <= fill_and_shift_s;
         shift_s:
             if (swb_next_itr)
-                if (fr_next_angle_ack)
-                    next_state <= setup_s;
-                else
-                    next_state <= ready_s;
+                next_state <= ready_s;
         default:
             $display(
                 "<NABPProcessingSwapControl> Invalid state encountered: %d",
@@ -178,7 +184,7 @@ assign pe_scan_mode = scan_mode;
 assign pe_scan_direction = scan_direction;
 always @(posedge clk)
 begin:pe_setup
-    if (state == setup_s)
+    if (state == setup_2_s || state == angle_setup_2_s)
     begin
         if (fr_angle < `kAngle45 || fr_angle >= `kAngle135)
             scan_mode <= {# scan_mode.x #};
@@ -199,18 +205,18 @@ wire {# c['tMapAccuPart'].verilog_decl() #} mp_accu_part;
 
 always @(posedge clk)
 begin:line_itr_update
-    if (state == ready_s)
+    if (state == ready_s || state == angle_setup_1_s)
         line_itr <= {# to_v(0) #};
+    else if (state == setup_2_s || state == angle_setup_2_s)
+        // value looked up for the angle only becomes available in the 2nd
+        // stage
+        mp_accu_init <= mp_accu_part;
     else if (swap_ack)
     begin
-        if (fr_next_angle)
-            line_itr <= {# to_v(0) #};
-            mp_accu_init <= mp_accu_part;
-        else
-        begin
-            line_itr <= line_itr + {# to_v(1) #};
-            mp_accu_init <= mp_accu_init - mp_accu_base;
-        end
+        // accumulate on swb_next_itr, which is the only swappable that wants
+        // new values
+        line_itr <= line_itr + {# to_v(1) #};
+        mp_accu_init <= mp_accu_init - mp_accu_base;
     end
 end
 

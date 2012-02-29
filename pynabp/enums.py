@@ -47,9 +47,11 @@ class mapper_states(enum):
 class processing_swap_control_states(enum):
     def __init__(self):
         self.ready = None
-        self.setup = None
+        self.setup_1 = None
+        self.setup_2 = None
         self.fill = None
-        self.angle_setup = None
+        self.angle_setup_1 = None
+        self.angle_setup_2 = None
         self.fill_and_shift = None
         self.shift = None
         super(processing_swap_control_states, self).__init__()
