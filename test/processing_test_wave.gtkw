@@ -1,15 +1,15 @@
 [*]
-[*] GTKWave Analyzer v3.3.32 (w)1999-2012 BSI
-[*] Wed Feb 29 04:48:12 2012
+[*] GTKWave Analyzer v3.3.31 (w)1999-2012 BSI
+[*] Wed Feb 29 21:03:03 2012
 [*]
 [dumpfile] "/Users/admko/Documents/Sorcery/NABP/build/processing_test.v.lxt"
-[dumpfile_mtime] "Wed Feb 29 04:46:47 2012"
-[dumpfile_size] 366801
+[dumpfile_mtime] "Wed Feb 29 21:00:55 2012"
+[dumpfile_size] 776387
 [savefile] "/Users/admko/Documents/Sorcery/NABP/test/processing_test_wave.gtkw"
-[timestart] 64223000
+[timestart] 221260000
 [size] 1366 720
 [pos] 0 44
-*-19.000000 65343800 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+*-24.000000 263110000 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
 [treeopen] NABPProcessingTest.
 [treeopen] NABPProcessingTest.uut.
 [treeopen] NABPProcessingTest.uut.sw0.
@@ -33,7 +33,7 @@ NABPProcessingTest.uut.fr_next_angle_ack[0]
 -host
 @800200
 -swap control
-@2025
+@2024
 ^1 /Users/admko/Documents/Sorcery/NABP/test/../derived_src/processing_swap_control.vxtf
 NABPProcessingTest.uut.state[3:0]
 @28
@@ -55,7 +55,7 @@ NABPProcessingTest.uut.sw0_next_itr_ack[0]
 NABPProcessingTest.uut.sw0_swap[0]
 NABPProcessingTest.uut.sw0_swap_ack[0]
 @2024
-^2 /Users/admko/Documents/Sorcery/NABP/test/../derived_src/state_control.vxtf
+^2 /Users/admko/Documents/Sorcery/NABP/derived_src/processing_swappable_state_control.vxtf
 NABPProcessingTest.uut.sw0.state_control.state[2:0]
 @1000200
 -sw0
@@ -66,8 +66,8 @@ NABPProcessingTest.uut.sw1_next_itr[0]
 NABPProcessingTest.uut.sw1_next_itr_ack[0]
 NABPProcessingTest.uut.sw1_swap[0]
 NABPProcessingTest.uut.sw1_swap_ack[0]
-@2024
-^2 /Users/admko/Documents/Sorcery/NABP/test/../derived_src/state_control.vxtf
+@2025
+^2 /Users/admko/Documents/Sorcery/NABP/derived_src/processing_swappable_state_control.vxtf
 NABPProcessingTest.uut.sw1.state_control.state[2:0]
 @1000200
 -sw1

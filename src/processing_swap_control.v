@@ -64,6 +64,25 @@ module NABPProcessingSwapControl
 
 // line iteration
 reg [`kPartitionSizeLength-1:0] line_itr;
+wire has_next_line_itr;
+assign has_next_line_itr = (line_itr !=
+                            {# to_l(c['partition_scheme']['size'] - 1) #});
+always @(posedge clk)
+begin:line_itr_update
+    if (state == ready_s || state == angle_setup_1_s)
+        line_itr <= {# to_v(0) #};
+    else if (state == setup_2_s || state == angle_setup_2_s)
+        // value looked up for the angle only becomes available in the 2nd
+        // stage
+        mp_accu_init <= mp_accu_part;
+    else if (swap_ack)
+    begin
+        // accumulate on swb_next_itr, which is the only swappable that wants
+        // new values
+        line_itr <= line_itr + {# to_v(1) #};
+        mp_accu_init <= mp_accu_init - mp_accu_base;
+    end
+end
 
 // inputs from swappables
 wire sw0_swap, sw1_swap;
@@ -92,6 +111,7 @@ assign sw1_swap_ack = sw_sel ? swap_ack : 0;
 // initial kick to start swapping
 assign swa_next_itr_ack = (state == setup_2_s);
 // swap_ack to the correct swappable
+// immediately swap swappables after swap_ack
 assign swap_ack = // if wants next angle, then wish to insert angle setup
                   // bubble, swap when setup is done. Both swappable are
                   // guaranteed to be waiting when entering this state
@@ -102,19 +122,22 @@ assign swap_ack = // if wants next angle, then wish to insert angle setup
                    ((state == fill_s && swa_swap) ||
                    // or swa fill done and swb shift done
                    (state == fill_and_shift_s && swa_swap && swb_next_itr)));
-// kick happens when angles are not done yet, at the same time as swap kick
-assign swb_next_itr_ack = (fr_has_next_angle && swap_ack);
+// kicks the other swappable
+assign swb_next_itr_ack = // if we want to swap
+                          swap_ack &&
+                          // and still has pending iterations
+                          (fr_has_next_angle || has_next_line_itr);
 // external
 assign fr_next_angle = // only ask for next angle if has next angle
                        reset_n && fr_has_next_angle &&
                        // either it's ready to start processing from idle
-                       (state == ready_s) ||
-                       // or it's done processing the current angle
-                       (state != angle_setup_1_s &&
-                        state != angle_setup_2_s &&
-                        swb_next_itr &&
-                        (line_itr ==
-                         {# to_l(c['partition_scheme']['size'] - 1) #}));
+                       ((state == ready_s) ||
+                        // or it's not starting a new angle
+                        (state != angle_setup_1_s &&
+                         state != angle_setup_2_s &&
+                         // and swb is ready to start with a new line and all
+                         // lines are being processed for the current angle
+                         swb_next_itr && !has_next_line_itr));
 
 always @(posedge clk)
 begin:transition
@@ -156,9 +179,12 @@ begin:mealy_next_state
         fill_and_shift_s:
             if (swa_swap && swb_next_itr)
             begin
-                if (!fr_has_next_angle)
+                // no more angles, and no more lines to scan besides one last
+                // shift!
+                if (!fr_has_next_angle && !has_next_line_itr)
                     next_state <= shift_s;
-                else if (fr_next_angle && fr_next_angle_ack)
+                // wait for next angle
+                else if (fr_next_angle_ack)
                     next_state <= angle_setup_1_s;
             end
         angle_setup_1_s:
@@ -202,23 +228,6 @@ wire {# c['tShiftAccuBase'].verilog_decl() #} sh_accu_base;
 reg {# c['tMapAccuInit'].verilog_decl() #} mp_accu_init;
 wire {# c['tMapAccuBase'].verilog_decl() #} mp_accu_base;
 wire {# c['tMapAccuPart'].verilog_decl() #} mp_accu_part;
-
-always @(posedge clk)
-begin:line_itr_update
-    if (state == ready_s || state == angle_setup_1_s)
-        line_itr <= {# to_v(0) #};
-    else if (state == setup_2_s || state == angle_setup_2_s)
-        // value looked up for the angle only becomes available in the 2nd
-        // stage
-        mp_accu_init <= mp_accu_part;
-    else if (swap_ack)
-    begin
-        // accumulate on swb_next_itr, which is the only swappable that wants
-        // new values
-        line_itr <= line_itr + {# to_v(1) #};
-        mp_accu_init <= mp_accu_init - mp_accu_base;
-    end
-end
 
 {% for i in [0, 1] %}
 // swappable {#i#}
