@@ -22,13 +22,13 @@ class buff_step_direction(enum):
     ascending = '0'
     descending = '1'
 
-class state_control_states(enum):
+class processing_state_control_states(enum):
     def __init__(self):
         self.ready = None
         self.fill = None
         self.fill_done = None
         self.shift = None
-        super(state_control_states, self).__init__()
+        super(processing_state_control_states, self).__init__()
 
 class shifter_states(enum):
     def __init__(self):

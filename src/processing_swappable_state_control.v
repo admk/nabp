@@ -4,7 +4,7 @@
 // Hold system states for the NABP architecture for the swappable modules
 // Coordinate the shifter and mapper modules
 {#
-    from pynabp.enums import state_control_states
+    from pynabp.enums import processing_state_control_states
 #}
 
 module NABPProcessingSwappableStateControl
@@ -33,7 +33,10 @@ module NABPProcessingSwappableStateControl
     output reg {# c['tMapAccuBase'].verilog_decl() #} mp_accu_base
 );
 
-{# include('templates/state_decl(states).v', states=state_control_states()) #}
+{#
+    include('templates/state_decl(states).v',
+            states=processing_state_control_states())
+#}
 
 always @(posedge clk)
 begin:transition
