@@ -57,7 +57,10 @@ module NABPProcessingSwapControl
     output wire signed [`kSLength-1:0] fr1_s_val
 );
 
-{# include('templates/state_decl(states).v', states=swap_control_states()) #}
+{#
+    include('templates/state_decl(states).v',
+            states=processing_swap_control_states())
+#}
 
 // line iteration
 reg [`kPartitionSizeLength-1:0] line_itr;
@@ -73,7 +76,7 @@ wire sw0_swap_ack, sw1_swap_ack;
 wire sw0_next_itr_ack, sw1_next_itr_ack;
 
 // mealy outputs
-// internal
+// swapping multiplexers & demultiplexers
 wire swa_swap;
 wire swa_next_itr, swb_next_itr;
 wire swa_next_itr_ack, swb_next_itr_ack;
@@ -81,17 +84,30 @@ wire swap_ack;
 assign swa_swap = sw_sel ? sw1_swap : sw0_swap;
 assign swa_next_itr = sw_sel ? sw1_next_itr : sw0_next_itr;
 assign swb_next_itr = sw_sel ? sw0_next_itr : sw1_next_itr;
-assign swap_ack = (state == fill_s || state == fill_and_shift_s) &&
-                  (swa_swap && swb_next_itr);
-assign swa_next_itr_ack = (state == setup_s);
-assign swb_next_itr_ack = (fr_has_next_angle && swap_ack);
 assign sw0_next_itr_ack = sw_sel ? swb_next_itr_ack : swa_next_itr_ack;
 assign sw1_next_itr_ack = sw_sel ? swa_next_itr_ack : swb_next_itr_ack;
 assign sw0_swap_ack = sw_sel ? 0 : swap_ack;
 assign sw1_swap_ack = sw_sel ? swap_ack : 0;
+// internal
+// initial kick to start swapping
+assign swa_next_itr_ack = (state == setup_s);
+// swap_ack to the correct swappable
+assign swap_ack = // if wants next angle, then wish to insert angle setup
+                  // bubble, swap when setup is done. Both swappable are
+                  // guaranteed to be waiting when entering this state
+                  (state == angle_setup_s) ||
+                  // else if not wanting next angle
+                  (!fr_next_angle &&
+                   // proceed without delay when swa fill done
+                   ((state == fill_s && swa_swap) ||
+                   // or swa fill done and swb shift done
+                   (state == fill_and_shift_s && swa_swap && swb_next_itr)));
+// kick happens when angles are not done yet
+assign swb_next_itr_ack = (fr_has_next_angle && swap_ack);
 // external
 assign fr_next_angle = reset_n && fr_has_next_angle &&
-                       (state == ready_s) || (swb_next_itr &&
+                       (state == ready_s) ||
+                       ((state != angle_setup_s) && swb_next_itr &&
                         (line_itr ==
                          {# to_v(c['partition_scheme']['size'] - 1) #}));
 
@@ -121,14 +137,25 @@ begin:mealy_next_state
             if (swa_next_itr)
                 next_state <= fill_s;
         fill_s:
-            if (swap_ack)
+            if (swa_swap)
+            begin
                 if (!fr_has_next_angle)
                     next_state <= shift_s;
-                else
+                else if (!fr_next_angle)
                     next_state <= fill_and_shift_s;
+                else if (fr_next_angle && fr_next_angle_ack)
+                    next_state <= angle_setup_s;
+            end
         fill_and_shift_s:
-            if (swap_ack && !fr_has_next_angle)
-                next_state <= shift_s;
+            if (swa_swap && swb_next_itr)
+            begin
+                if (!fr_has_next_angle)
+                    next_state <= shift_s;
+                else if (fr_next_angle && fr_next_angle_ack)
+                    next_state <= angle_setup_s;
+            end
+        angle_setup_s:
+            next_state <= fill_and_shift_s;
         shift_s:
             if (swb_next_itr)
                 if (fr_next_angle_ack)

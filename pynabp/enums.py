@@ -49,6 +49,7 @@ class processing_swap_control_states(enum):
         self.ready = None
         self.setup = None
         self.fill = None
+        self.angle_setup = None
         self.fill_and_shift = None
         self.shift = None
         super(processing_swap_control_states, self).__init__()
