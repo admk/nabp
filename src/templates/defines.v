@@ -13,10 +13,13 @@
         return dec_repr(val, bin_width(c['partition_scheme']['size']))
     def to_v(val):
         return dec_repr(val, c['kFilteredDataLength'])
+
+    __angle_defines = { k: v for k, v in c.iteritems() if 'kAngle' in k }
 #}
 `timescale 1ns/10ps
 
-`define kAngleLength {# c['kAngleLength'] #}
+{% for key, val in __angle_defines.iteritems() %}
+`define {# key #} {# val #} {% end %}
 
 `define kDataLength {# c['kDataLength'] #}
 `define kFilteredDataLength {# c['kFilteredDataLength'] #}
@@ -34,7 +37,3 @@
 `define kSLength {# bin_width(c['projection_line_size']) #}
 
 `define kImageSizeLength {# bin_width(c['image_size']) #}
-
-{# angle_defines = { k: v for k, v in c.iteritems() if 'kAngle' in k } #}
-{% for key, val in angle_defines.iteritems() %}
-`define {# key #} {# val #} {% end %}
