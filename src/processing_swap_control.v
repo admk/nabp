@@ -70,18 +70,36 @@ assign has_next_line_itr = (line_itr !=
 always @(posedge clk)
 begin:line_itr_update
     if (state == ready_s || state == angle_setup_1_s)
-        line_itr <= {# to_v(0) #};
-    else if (state == setup_2_s || state == angle_setup_2_s)
+        line_itr <= {# to_l(0) #};
+    else if (swap_ack)
+        line_itr <= line_itr + {# to_l(1) #};
+end
+
+// accumulator value set up
+// V̲a̲l̲u̲e̲ ̲T̲i̲m̲i̲n̲g̲ ̲D̲i̲a̲g̲r̲a̲m̲
+//
+//          clk  ̅ ̅ ̅ ̅ ̅|_____| ̅ ̅ ̅ ̅ ̅|_____| ̅ ̅ ̅ ̅ ̅|_____| ̅ ̅ ̅ ̅ ̅|_____| ̅ ̅ ̅ ̅ ̅|_____
+//
+//        angle _̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅X_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅
+//
+//     lut vals _̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅X_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅
+//
+// mp_accu_init _̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅X_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅
+//
+//        state  ̲̅r̲̅e̲̅a̲̅d̲̅y̲̅_̲̅s̲̅ ̲̅ ̲̅ ̲̅X ̲̅s̲̅e̲̅t̲̅u̲̅p̲̅_̲̅1̲̅_̲̅s̲̅ ̲̅X ̲̅s̲̅e̲̅t̲̅u̲̅p̲̅_̲̅2̲̅_̲̅s̲̅ ̲̅X ̲̅s̲̅e̲̅t̲̅u̲̅p̲̅_̲̅3̲̅_̲̅s̲̅ ̲̅X ̲̅f̲̅i̲̅l̲̅l̲̅_̲̅s̲̅ ̲̅ ̲̅ ̲̅ ̲̅
+//
+//   [comments]            ^ angle updated         ^ calculated mp_accu_init
+//                                     ^ mp_accu_part value    ^ safe to shift
+always @(posedge clk)
+begin:accu_setup
+    if (state == setup_2_s || state == angle_setup_2_s)
         // value looked up for the angle only becomes available in the 2nd
-        // stage
+        // stage, mp_accu_init will be available in the 3rd stage
         mp_accu_init <= mp_accu_part;
     else if (swap_ack)
-    begin
         // accumulate on swb_next_itr, which is the only swappable that wants
         // new values
-        line_itr <= line_itr + {# to_v(1) #};
         mp_accu_init <= mp_accu_init - mp_accu_base;
-    end
 end
 
 // inputs from swappables
@@ -109,13 +127,13 @@ assign sw0_swap_ack = sw_sel ? 0 : swap_ack;
 assign sw1_swap_ack = sw_sel ? swap_ack : 0;
 // internal
 // initial kick to start swapping
-assign swa_next_itr_ack = (state == setup_2_s);
+assign swa_next_itr_ack = (state == setup_3_s);
 // swap_ack to the correct swappable
 // immediately swap swappables after swap_ack
 assign swap_ack = // if wants next angle, then wish to insert angle setup
                   // bubble, swap when setup is done. Both swappable are
                   // guaranteed to be waiting when entering this state
-                  (state == angle_setup_2_s) ||
+                  (state == angle_setup_3_s) ||
                   // else if not wanting next angle
                   (!fr_next_angle &&
                    // proceed without delay when swa fill done
@@ -135,6 +153,7 @@ assign fr_next_angle = // only ask for next angle if has next angle
                         // or it's not starting a new angle
                         (state != angle_setup_1_s &&
                          state != angle_setup_2_s &&
+                         state != angle_setup_3_s &&
                          // and swb is ready to start with a new line and all
                          // lines are being processed for the current angle
                          swb_next_itr && !has_next_line_itr));
@@ -164,6 +183,8 @@ begin:mealy_next_state
         setup_1_s:
             next_state <= setup_2_s;
         setup_2_s:
+            next_state <= setup_3_s;
+        setup_3_s:
             if (swa_next_itr)
                 next_state <= fill_s;
         fill_s:
@@ -190,6 +211,8 @@ begin:mealy_next_state
         angle_setup_1_s:
             next_state <= angle_setup_2_s;
         angle_setup_2_s:
+            next_state <= angle_setup_3_s;
+        angle_setup_3_s:
             next_state <= fill_and_shift_s;
         shift_s:
             if (swb_next_itr)
@@ -201,27 +224,24 @@ begin:mealy_next_state
     endcase
 end
 
-// pe control outputs
-reg scan_mode, scan_direction;
-assign pe_en = sw_sel ? sw1_pe_en : sw0_pe_en;
+// decode angle and generate pe control outputs
+reg [{# c['kAngleLength'] #}-1:0] pe_angle;
+// PE signals
+// multiplexers & demultiplexers - always give the output using pe_taps
+assign pe_taps = sw_sel ? sw0_pe_taps : sw1_pe_taps;
+assign pe_en = sw_sel ? sw0_pe_en : sw1_pe_en;
 assign pe_reset = swa_next_itr_ack;
 assign pe_kick = swap_ack;
-assign pe_scan_mode = scan_mode;
-assign pe_scan_direction = scan_direction;
+// decode angle to give PE control signals
+assign pe_scan_mode = (pe_angle < `kAngle45 || pe_angle >= `kAngle135) ?
+                      {# scan_mode.x #} : {# scan_mode.y #};
+assign pe_scan_direction = (pe_angle < `kAngle90) ?
+                           {# scan_direction.forward #} :
+                           {# scan_direction.reverse #};
 always @(posedge clk)
-begin:pe_setup
-    if (state == setup_2_s || state == angle_setup_2_s)
-    begin
-        if (fr_angle < `kAngle45 || fr_angle >= `kAngle135)
-            scan_mode <= {# scan_mode.x #};
-        else
-            scan_mode <= {# scan_mode.y #};
-        if (fr_angle < `kAngle90)
-            scan_direction <= {# scan_direction.forward #};
-        else
-            scan_direction <= {# scan_direction.reverse #};
-    end
-end
+    // updates angle for PE with the current swappable ready for shifting
+    if ((state == fill_and_shift_s || state == fill_s) && swap_ack)
+        pe_angle <= fr_angle;
 
 // lut vals
 wire {# c['tShiftAccuBase'].verilog_decl() #} sh_accu_base;
@@ -281,8 +301,5 @@ NABPShifterLUT shifter_lut
     // output
     .sh_accu_base(sh_accu_base)
 );
-
-// PE taps values
-assign pe_taps = sw_sel ? sw0_pe_taps : sw1_pe_taps;
 
 endmodule
