@@ -29,7 +29,7 @@ module NABPProcessingSwappableStateControl
     output wire sh_shift_kick,
     output reg {# c['tShiftAccuBase'].verilog_decl() #} sh_accu_base,
     // output to mapper
-    output reg {# c['tMapAccuInit'].verilog_decl() #} mp_accu_init,
+    output wire {# c['tMapAccuInit'].verilog_decl() #} mp_accu_init,
     output reg {# c['tMapAccuBase'].verilog_decl() #} mp_accu_base
 );
 
@@ -38,15 +38,18 @@ module NABPProcessingSwappableStateControl
             states=processing_state_control_states())
 #}
 
+// mp_accu_init only used once, no need to hold its value
+// and eliminate 1 cycle delay by doing this
+assign mp_accu_init = sw_mp_accu_init;
+
 always @(posedge clk)
 begin:transition
     if (!reset_n)
         state <= ready_s;
     else
         state <= next_state;
-    if (state == ready_s)
+    if (sw_next_itr)
     begin
-        mp_accu_init <= sw_mp_accu_init;
         mp_accu_base <= sw_mp_accu_base;
         sh_accu_base <= sw_sh_accu_base;
     end
