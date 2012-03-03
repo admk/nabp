@@ -13,7 +13,7 @@ def ramp_filter(order):
     # imaginary part due to loss of precision
     fr = np.real(np.fft.ifftshift(np.fft.ifft(fr)))
     # normalise
-    return fr / np.max(fr)
+    return list(fr / np.max(fr))
 
 if __name__ == '__main__':
     print ramp_filter(64)

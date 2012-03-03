@@ -37,12 +37,12 @@ module NABPFilteredRAMSwapControl
     input wire [`kSLength-1:0] pr0_s_val,
     input wire [`kSLength-1:0] pr1_s_val,
     input wire pr_next_angle,
-    input wire pr_has_next_angle,
     // outputs to host RAM
     output wire [`kSLength-1:0] hs_s_val,
     output wire hs_next_angle,
     // outputs to processing swappables
     output reg [`kAngleLength-1:0] pr_angle,
+    output reg pr_has_next_angle,
     output wire pr_next_angle_ack,
     output wire signed [`kFilteredDataLength-1:0] pr0_val,
     output wire signed [`kFilteredDataLength-1:0] pr1_val
@@ -94,6 +94,7 @@ always @(posedge clk)
     begin
         pr_angle <= hs_angle;
         pr_has_next_angle <= hs_has_next_angle;
+    end
 
 // mealy outputs
 assign swap_curr = hs_has_next_angle ?

@@ -3,10 +3,7 @@
 //     15 Feb 2012
 // The line buffer implementation for simulation purposes
 
-{#
-    no_pes = conf()['partition_scheme']['no_of_partitions']
-    delay_len = conf()['partition_scheme']['size']
-#}
+{# delay_len = c['partition_scheme']['size'] #}
 
 module line_buffer
 (
@@ -14,7 +11,7 @@ module line_buffer
     shift_in, taps
 );
 
-parameter pNoTaps = {# no_pes - 1 #};
+parameter pNoTaps = {# c['partition_scheme']['no_of_partitions'] - 1 #};
 parameter pTapsWidth = {# delay_len #};
 parameter pPtrLength = {# bin_width(delay_len) #};
 

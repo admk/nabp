@@ -36,8 +36,7 @@ always @(posedge clk)
 begin
     {# set_eat_blanklines(True) #}
     case (mp_angle)
-        {% for idx, angle in enumerate(
-                xfrange(0, 180, c['projection_angle_step'])) %}
+        {% for idx, angle in enumerate(xrange(0, 180)) %}
         {# dec_repr(angle, c['kAngleLength']) #}:
         begin
             {#

@@ -9,9 +9,9 @@ module NABPProcessingSwappableTest();
 {# include('templates/dump_wave.v') #}
 
 reg [`kAngleLength-1:0] hs_angle;
-wire {# conf()['tShiftAccuBase'].verilog_decl() #} sw_sh_accu_base;
-wire {# conf()['tMapAccuInit'].verilog_decl() #} sw_mp_accu_init;
-wire {# conf()['tMapAccuBase'].verilog_decl() #} sw_mp_accu_base;
+wire {# c['tShiftAccuBase'].verilog_decl() #} sw_sh_accu_base;
+wire {# c['tMapAccuInit'].verilog_decl() #} sw_mp_accu_init;
+wire {# c['tMapAccuBase'].verilog_decl() #} sw_mp_accu_base;
 wire [`kSLength-1:0] fr_s_val;
 wire [`kFilteredDataLength-1:0] fr_val;
 
@@ -72,7 +72,7 @@ NABPProcessingDataPathVerify data_path_verify
 );
 
 // look-up tables
-wire {# conf()['tMapAccuPart'].verilog_decl() #} sw_mp_accu_part;
+wire {# c['tMapAccuPart'].verilog_decl() #} sw_mp_accu_part;
 assign sw_mp_accu_init = sw_mp_accu_part; // implicit sign extension
 NABPMapperLUT mapper_lut
 (

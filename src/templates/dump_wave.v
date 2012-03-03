@@ -1,8 +1,8 @@
 {#
-    from pynabp.conf import conf
-    pp_conf_excludes = ['lut', 'filter']
+    from pynabp.conf_gen import config
+    pp_conf_excludes = ['lut', 'coefs']
     pp_conf = []
-    for k, v in conf().iteritems():
+    for k, v in config.iteritems():
         spoil = False
         for exclude in pp_conf_excludes:
             if exclude in k:

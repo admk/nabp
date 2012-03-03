@@ -154,9 +154,9 @@ class FixedPoint(object):
     def __str__(self):
         """
         >>> FixedPoint(4, 4, True, value=-6.37)
-        FixedPoint: S(4).(4) = -6.3125
+        <FixedPoint: S(4).(4) = -6.3125>
         """
-        return 'FixedPoint: ' + self.type_repr() + ' = ' + str(self.value)
+        return '<FixedPoint: %s = %s>' % (self.type_repr(), str(self.value))
 
     def __repr__(self):
         return self.__str__()
