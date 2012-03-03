@@ -67,7 +67,7 @@ assign hs_fill_done = (next_state == ready_s);
 assign hs_s_val = read_itr;
 assign write_enable = (state == fill_s);
 assign delay_done = (read_itr == {#
-        to_s(c['filter']['order'] / 2 - 1) #});
+        to_s(c['fir_order'] / 2 - 1) #});
 
 // mealy next state
 always @(state or hs_fill_kick or delay_done or write_itr)

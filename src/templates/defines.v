@@ -1,7 +1,7 @@
 {#
     include('_info.v')
 
-    from pynabp.conf import conf as c
+    from pynabp.conf_gen import config as c
     from pynabp.utils import bin_width_of_dec as bin_width, dec_repr
 
     def to_a(val):
@@ -15,7 +15,7 @@
 
     __angle_defines = { k: v for k, v in c.iteritems() if 'kAngle' in k }
 #}
-`timescale 1ns/{# c['time_precision'] #}ps
+`timescale 1ns/{# c['time_precision'] #}
 
 {% for key, val in __angle_defines.iteritems() %}
 `define {# key #} {# val #} {% end %}

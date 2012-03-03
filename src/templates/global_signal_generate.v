@@ -1,6 +1,6 @@
-{# from pynabp.conf import conf #}
+{# from pynabp.conf_gen import config #}
 // clock & reset generate
-parameter clk_delay = {# conf()['clock_period'] #} / 2;
+parameter clk_delay = {# config['clock_period'] #} / 2;
 reg clk, reset;
 wire reset_n;
 assign reset_n = !reset;

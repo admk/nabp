@@ -6,7 +6,7 @@
 {#
     from pynabp.enums import mapper_states
 
-    accu_fixed = conf()['tMapAccu']
+    accu_fixed = c['tMapAccu']
     accu_max = accu_fixed.verilog_repr(c['projection_line_size'])
 #}
 
@@ -16,8 +16,8 @@ module NABPMapper
     input wire clk,
     input wire reset_n,
     // inputs from state_control
-    input wire {# conf()['tMapAccuInit'].verilog_decl() #} mp_accu_init,
-    input wire {# conf()['tMapAccuBase'].verilog_decl() #} mp_accu_base,
+    input wire {# c['tMapAccuInit'].verilog_decl() #} mp_accu_init,
+    input wire {# c['tMapAccuBase'].verilog_decl() #} mp_accu_base,
     // inputs from shifter
     input wire sh_kick,
     input wire sh_shift_en,

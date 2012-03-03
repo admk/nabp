@@ -3,7 +3,7 @@
 //     11 Feb 2012
 // A shift register for testing as an FIR filter
 {#
-    delay = c['filter']['order'] / 2
+    delay = c['fir_order'] / 2
     delay_len = bin_width(delay - 1)
 #}
 

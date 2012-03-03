@@ -14,15 +14,15 @@ module NABPShifterLUT
 (
     input wire clk,
     input wire [`kAngleLength-1:0] sh_angle,
-    output reg {# conf()['tShiftAccuBase'].verilog_decl() #} sh_accu_base
+    output reg {# c['tShiftAccuBase'].verilog_decl() #} sh_accu_base
 );
 
 always @(posedge clk)
 begin
     {# set_eat_blanklines(True) #}
     case (sh_angle)
-        {% for angle in xfrange(0, 180, conf()['projection_angle_step']) %}
-        {# dec_repr(angle, conf()['kAngleLength']) #}:
+        {% for angle in xrange(0, 180) %}
+        {# dec_repr(angle, c['kAngleLength']) #}:
             sh_accu_base <= {# lookup(angle) #};
         {% end %}
     endcase
