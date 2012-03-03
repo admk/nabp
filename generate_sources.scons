@@ -37,11 +37,12 @@ for alias, sources in sources.iteritems():
                 env.Generate(
                         target=add_extension(src, 'vx'),
                         source=src), sources)
+    Depends(derived_list, '#default.naconfig')
     SideEffect(add_extension(sources, 'vxtf'), derived_list)
     derived_sources[alias] = derived_list
 
 translate_filter_processes = [
-        env.GenerateTFProcess(target=tf_proc, source='#/pynabp/conf.py')
+        env.GenerateTFProcess(target=tf_proc, source='#default.naconfig')
         for tf_proc in fixed_point_translate_filter_process_files()]
 
 # generate only target alias

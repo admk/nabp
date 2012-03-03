@@ -31,10 +31,11 @@ def angle_defines(precision):
     defines = {
             'tAngle': fixed,
             # backwards compatibility
-            'kAngleLength': fixed.width
+            'kAngleLength': fixed.width()
             }
-    defines.update(**{
-            'kAngle' + str(angle): fixed.bin_repr_of_value(angle)
+    defines.update({
+            'kAngle' + str(angle):
+            str(fixed.width()) + "'b" + fixed.bin_repr_of_value(angle)
             for angle in range(45, 136, 45)
             })
     return defines

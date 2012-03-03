@@ -3,19 +3,19 @@ from akpytemp import Template
 from akpytemp.template import code_gobble
 
 from pynabp.fixed_point_arith import FixedPoint
-from pynabp.conf import conf
+from pynabp.conf_gen import config
 
 translate_process_template = \
         r"""
         #!/usr/bin/env python
         import sys, os
+        pre_e = None
         try:
             sys.path.append(os.path.abspath('.'))
-            from pynabp.conf import conf
-            fixed = conf()['{# fixed #}']
-        except:
-            sys.stdout.write('!Preamble failed.\n')
-            sys.stdout.flush()
+            from pynabp.conf_gen import config
+            fixed = config['{# fixed #}']
+        except Exception as e:
+            pre_e = e
         while True:
             val_str = raw_input()
             try:
@@ -23,6 +23,8 @@ translate_process_template = \
                 val_str = str(fixed.value)
             except Exception as e:
                 val_str = '!' + str(e) + ': ' + val_str
+                if pre_e:
+                    val_str += '. ' + str(pre_e)
             sys.stdout.write(val_str + '\n')
             sys.stdout.flush()
         """
@@ -31,7 +33,7 @@ translate_process_template = code_gobble(
 
 
 def fixed_point_translate_filter_process_files():
-    for k, v in conf().iteritems():
+    for k, v in config.iteritems():
         if type(v) is FixedPoint:
             yield k + '.pytf'
 

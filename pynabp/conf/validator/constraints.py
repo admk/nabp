@@ -27,7 +27,7 @@ def time_unit(val):
     """Time unit constraint finds values of the form: 10ns
     """
     import re
-    return re.search(r'\d+(s|ms|us|ns|ps|fs)') is not None
+    return re.search(r'\d+(s|ms|us|ns|ps|fs)', val) is not None
 
 def function_arg_count(count):
     import inspect
@@ -49,10 +49,10 @@ class ConstraintsValidator(Validator):
     validation.
     """
     def __init__(self, config):
-        super(Validator, self).__init__(config)
+        super(ConstraintsValidator, self).__init__(config)
         self._constraints = {}
 
-    def add_constraints(self, **kwargs):
+    def add_constraints(self, dictionary=None, **kwargs):
         """Add constraints to check
 
         Data structure must be:
@@ -64,6 +64,8 @@ class ConstraintsValidator(Validator):
             constraint checking, the function returns True on satisfied
             constraint, returns False otherwise
         """
+        if dictionary:
+            self._constraints.update(dictionary)
         self._constraints.update(**kwargs)
 
 
@@ -100,7 +102,7 @@ class ConstraintsValidator(Validator):
         """
         val_none = self._nullable_constraint(key)
 
-        if not val and not val_none:
+        if val is None and not val_none:
             raise NullableValidateError(
                     'Not nullable key has a null value: (%s, %s)' %
                     (key, str(val)))
@@ -116,7 +118,7 @@ class ConstraintsValidator(Validator):
         if not val_constr_func:
             return
 
-        if val_constr_func is func:
+        if type(val_constr_func) is func:
             val_constr_func = [val_constr_func]
 
         for val_func in val_constr_func:

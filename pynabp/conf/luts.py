@@ -21,9 +21,9 @@ def shift_lut_defines(shift_accu_precision):
     return defines
 
 def map_lut_defines(conf):
-    defines = _map_accu_part_defines
-    defines.update(_map_accu_base_defines)
-    defines.update(_map_accu_init_defines)
+    defines = _map_accu_part_defines(conf)
+    defines.update(_map_accu_base_defines(conf))
+    defines.update(_map_accu_init_defines(conf))
     return defines
 
 def _map_accu_part_lookup(conf):
@@ -93,7 +93,7 @@ def _map_accu_init_defines(conf):
     """
     # range required for accu_init
     def accu_init_vals(angle):
-        part_val = _map_accu_part_lookup(angle)
+        part_val = _map_accu_part_lookup(conf)(angle)
         line_val = -conf['partition_scheme']['size'] * \
                 _map_accu_base_lookup(angle)
         return (part_val, part_val + line_val)

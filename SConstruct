@@ -1,3 +1,5 @@
+import os
+os.environ['NABP_CONFIG_PATH'] = os.path.abspath('default.naconfig')
 env = Environment()
 
 env.SConscript('sources.scons')

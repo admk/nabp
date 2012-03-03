@@ -1,4 +1,5 @@
 import os
+import math
 
 from pynabp.conf.partition import partition
 
@@ -8,33 +9,53 @@ from pynabp.conf.luts import shift_lut_defines, map_lut_defines
 
 
 # setup path for configuration file
-path = os.environ['NABP_CONF']
-if not path:
-    path = os.path.abspath('../default.naconfig')
+conf_env_var = 'NABP_CONFIG_PATH'
+conf_default_path = 'default.naconfig'
+
+if conf_env_var in os.environ:
+    path = os.environ[conf_env_var]
+else:
+    path = os.path.abspath(conf_default_path)
 
 # import configuration
-conf = import_conf(path)
+config = import_conf(path)
 
 # validation
-ValidatorCollate(conf).validate()
+ValidatorCollate(config).perform_validations()
 
-# derived configuration
-derived = \
-    {
-        # centers
-        'projection_line_center': center(conf['projection_line_size']),
-        'image_center': center(conf['image_size']),
-        # filter
-        'fir_coefs': filter_coefs(conf['fir_order'], conf['fir_function']),
-        # partitions
-        'partition_scheme': \
-                partition(conf['image_size'], conf['no_of_partitions']),
-        'kFilteredDataLength': \
-                conf['kDataLength'] + conf['kFilteredDataPrecision'],
-    }
-derived.update(angle_defines(conf['kAnglePrecision']))
-derived.update(shift_lut_defines(conf['kShiftAccuPrecision']))
-derived.update(map_lut_defines(conf))
+# derived configiguration
+def derive(config):
+    """Derive additional configiguration defines from a validated configiguration
+    dictionary.
+    """
+    if config['image_size'] is not None:
+        image_size = config['image_size']
+    else:
+        image_size = int(config['projection_line_size'] / math.sqrt(2))
 
-# update conf with derived configurations
-conf.update(derived)
+    derived = \
+        {
+            # null filling
+            'image_size': image_size,
+            # centers
+            'projection_line_center': center(config['projection_line_size']),
+            'image_center': center(image_size),
+            # filter
+            'fir_coefs': filter_coefs(config['fir_order'], config['fir_function']),
+            # partitions
+            'partition_scheme': \
+                    partition(image_size, config['no_of_processing_elements']),
+            'kFilteredDataLength': \
+                    config['kDataLength'] + config['kFilteredDataPrecision'],
+        }
+
+    config_n_derived = dict(config)
+    config_n_derived.update(derived)
+
+    derived.update(angle_defines(config['kAnglePrecision']))
+    derived.update(shift_lut_defines(config['kShiftAccuPrecision']))
+    derived.update(map_lut_defines(config_n_derived))
+    return derived
+
+# update config with derived configigurations
+config.update(derive(config))

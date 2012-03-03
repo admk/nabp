@@ -13,7 +13,7 @@ class RelationshipValidator(Validator):
                     'kMapAccuPartPrecision')
 
 
-class ValidatorCollate(Validator, ConstraintsValidator):
+class ValidatorCollate(RelationshipValidator, ConstraintsValidator):
     """Collate all validation classes into a unified one"""
 
     def __init__(self, config):
