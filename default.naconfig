@@ -73,13 +73,13 @@ config = \
 
         # The decimal places (in binary) of data after filtering.
         # Constraints:
-        #   Positive integers.
+        #   Natural integers.
         'kFilteredDataPrecision': 3,
 
         # The decimal places (in binary) of the angles' representation
         # precision.
         # Constraints:
-        #   Positive integers.
+        #   Natural integers.
         'kAnglePrecision': 0,
 
         # The decimal places (in binary) of shifter's accumulating
@@ -93,6 +93,7 @@ config = \
         # This is used to generate a LUT in which values are of this precision.
         # Constraints:
         #   Positive integers.
+        #   Greater than or equal to kMapAccuPartPrecision
         'kMapAccuPrecision': 8,
 
         # The decimal places (in binary) of mapper's accumulator's initial
@@ -100,6 +101,7 @@ config = \
         # This is used to generate a LUT in which values are of this precision.
         # Constraints:
         #   Positive integers.
+        #   Less than or equal to kMapAccuPrecision
         'kMapAccuPartPrecision': 4,
     }
 # vim: ft=python:
