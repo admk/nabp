@@ -1,9 +1,21 @@
-from validator.base import Validator
+from validator.base import Validator, ValidateError
 from validator.constraints import ConstraintsValidator, func, \
         natural, positive, odd, even, time_unit, function_arg_count
 
 
+class RelationshipValidator(Validator):
+    """Validate config relationships
+    """
+    def validate_map_accu_relationship(self, config):
+        if config['kMapAccuPrecision'] < config['kMapAccuPartPrecision']:
+            raise ValidateError(
+                    'kMapAccuPrecision must be greater or equal to '
+                    'kMapAccuPartPrecision')
+
+
 class ValidatorCollate(Validator, ConstraintsValidator):
+    """Collate all validation classes into a unified one"""
+
     def __init__(self, config):
         super(ValidatorCollate, self).__init__(config)
         constraints = {

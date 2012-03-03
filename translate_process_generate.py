@@ -2,6 +2,9 @@ import os
 from akpytemp import Template
 from akpytemp.template import code_gobble
 
+from pynabp.fixed_point_arith import FixedPoint
+from pynabp.conf import conf
+
 translate_process_template = \
         r"""
         #!/usr/bin/env python
@@ -25,6 +28,12 @@ translate_process_template = \
         """
 translate_process_template = code_gobble(
         translate_process_template, gobble_count=None, eat_empty_lines=True)
+
+
+def fixed_point_translate_filter_process_files():
+    for k, v in conf().iteritems():
+        if type(v) is FixedPoint:
+            yield k + '.pytf'
 
 def write_translate_process(target):
     target_key = os.path.splitext(target)[0]

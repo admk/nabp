@@ -2,8 +2,9 @@ import sys
 import itertools
 from akpytemp import Template
 from scons_utils import add_extension
-from translate_process_generate import write_translate_process
-from pynabp.conf import fixed_point_translate_filter_process_files
+from translate_process_generate import \
+        write_translate_process, fixed_point_translate_filter_process_files
+
 
 def generate_derived_sources(target, source, env):
     pynap_path = env['PYNABP_PATH']

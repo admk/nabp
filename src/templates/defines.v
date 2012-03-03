@@ -1,9 +1,8 @@
 {#
     include('_info.v')
 
-    from pynabp.conf import conf
+    from pynabp.conf import conf as c
     from pynabp.utils import bin_width_of_dec as bin_width, dec_repr
-    c = conf()
 
     def to_a(val):
         return dec_repr(val, c['kAngleLength'])
@@ -16,7 +15,7 @@
 
     __angle_defines = { k: v for k, v in c.iteritems() if 'kAngle' in k }
 #}
-`timescale 1ns/10ps
+`timescale 1ns/{# c['time_precision'] #}ps
 
 {% for key, val in __angle_defines.iteritems() %}
 `define {# key #} {# val #} {% end %}
@@ -31,7 +30,7 @@
 `define kPartitionSizeLength {#
             bin_width(c['partition_scheme']['size']) #}
 
-`define kDelayLength {# c['filter']['order'] / 2 #}
+`define kDelayLength {# c['fir_order'] / 2 #}
 
 `define kProjectionLineSize {# c['projection_line_size'] #}
 `define kSLength {# bin_width(c['projection_line_size']) #}

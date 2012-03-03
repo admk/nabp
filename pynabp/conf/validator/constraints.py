@@ -1,4 +1,4 @@
-from base import Validator
+from base import Validator, ValidateError
 
 
 # use a dummy lambda to get the function type
@@ -34,13 +34,13 @@ def function_arg_count(count):
     return lambda function: len(inspect.getargspec(function).args) == count
 
 
-class TypeValidateError(Exception):
+class TypeValidateError(ValidateError):
     """Type mismatch found"""
 
-class NullableValidateError(Exception):
+class NullableValidateError(ValidateError):
     """Cannot be None valued"""
 
-class ConstraintFunctionValidateError(Exception):
+class ConstraintFunctionValidateError(ValidateError):
     """Failed to validate with function"""
 
 
