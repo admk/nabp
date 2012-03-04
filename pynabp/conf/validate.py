@@ -1,23 +1,28 @@
 from validator.base import Validator, ValidateError
 from validator.constraints import ConstraintsValidator, func, \
         natural, positive, odd, even, time_unit, function_arg_count
+import partition
 
 
-class RelationshipValidator(Validator):
-    """Validate config relationships
-    """
+class RelationValidateError(ValidateError):
+    """A base validate error for RelationValidator"""
+
+
+class PreRelationValidator(Validator):
+    """Validate config relations"""
+
     def validate_map_accu_relationship(self, config):
         if config['kMapAccuPrecision'] < config['kMapAccuPartPrecision']:
-            raise ValidateError(
+            raise RelationValidateError(
                     'kMapAccuPrecision must be greater or equal to '
                     'kMapAccuPartPrecision')
 
 
-class ValidatorCollate(RelationshipValidator, ConstraintsValidator):
-    """Collate all validation classes into a unified one"""
+class PreConstraintsValidator(ConstraintsValidator):
+    """Validate config constraints"""
 
     def __init__(self, config):
-        super(ValidatorCollate, self).__init__(config)
+        super(PreConstraintsValidator, self).__init__(config)
         constraints = {
                     # key,               type,  None,   constraint functions
                     'debug':            (bool,  False,  None),
@@ -43,3 +48,27 @@ class ValidatorCollate(RelationshipValidator, ConstraintsValidator):
                                         (int,   False,  positive),
                 }
         self.add_constraints(constraints)
+
+
+class PostRelationValidator(Validator):
+    """Validate config relations"""
+
+    def validate_partition_scheme(self, config):
+        """Validate partition scheme by trying to partition
+
+        It performs checks for partitioning efficiency.
+        Possible FIXME: override config to give a sensible partition scheme?
+        """
+        try:
+            partition.validate(
+                    config['image_size'],
+                    config['partition_scheme'])
+        except ValueError as e:
+            raise RelationValidateError(str(e))
+
+
+class PreValidatorCollate(PreRelationValidator, PreConstraintsValidator):
+    """Collate all pre-deriviation validation classes into a unified one"""
+
+class PostValidatorCollate(PostRelationValidator):
+    """Collate all post-deriviation validation classes"""

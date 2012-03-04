@@ -1,40 +1,42 @@
 import math
 
 
-def _validate(partition_function):
+def validate(image_size, scheme):
+    """A general validator for partitioning algorithms"""
+
+    # check for partitioning efficiency
+    if scheme['no_of_partitions'] > image_size:
+        raise ValueError(
+                'no_of_partitions should not be greater than image size')
+
+    # check last tap for consistencies
+    last_tap = (scheme['no_of_partitions'] - 1) * scheme['size']
+    if last_tap != scheme['partitions'][-1]:
+        raise ValueError('Last tap and partitions disagree')
+
+    # check coverage for consistencies
+    wasted_pixels = int(last_tap + scheme['size'] - image_size)
+    if wasted_pixels < 0:
+        raise ValueError('Partitions does not cover the entire image size')
+
+    # check coverage efficiency
+    if wasted_pixels >= scheme['size']:
+        raise ValueError('Some partitions are not necessary.')
+
+
+def validate_decorate(partition_function):
     """Encapsulate a validator to use as a decorator"""
 
-    def validator(image_size, no_of_partitions):
-        """A general validator for partitioning algorithms"""
-
+    def validate_wrapper(image_size, no_of_partitions):
         # generate scheme with the partition function
         scheme = partition_function(image_size, no_of_partitions)
-
-        # check for partitioning efficiency
-        if scheme['no_of_partitions'] > image_size:
-            raise ValueError(
-                    'no_of_partitions should not be greater than image size')
-
-        # check last tap for consistencies
-        last_tap = (scheme['no_of_partitions'] - 1) * scheme['size']
-        if last_tap != scheme['partitions'][-1]:
-            raise ValueError('Last tap and partitions disagree')
-
-        # check coverage for consistencies
-        wasted_pixels = int(last_tap + scheme['size'] - image_size)
-        if wasted_pixels < 0:
-            raise ValueError('Partitions does not cover the entire image size')
-
-        # check coverage efficiency
-        if wasted_pixels >= scheme['size']:
-            raise ValueError('Some partitions are not necessary.')
-
+        # validation
+        validate(image_size, scheme)
         return scheme
 
-    return validator
+    return validate_wrapper
 
 
-@_validate
 def partition(image_size, no_of_partitions):
     """
     >>> partition(512, 3)
@@ -60,4 +62,3 @@ def partition(image_size, no_of_partitions):
 if __name__ == '__main__':
     import doctest
     doctest.testmod()
-    print partition(512, 3)
