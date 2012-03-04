@@ -27,7 +27,7 @@ def time_unit(val):
     """Time unit constraint finds values of the form: 10ns
     """
     import re
-    return re.search(r'\d+(s|ms|us|ns|ps|fs)', val) is not None
+    return re.search(r'^\d+(s|ms|us|ns|ps|fs)$', val) is not None
 
 def function_arg_count(count):
     import inspect
