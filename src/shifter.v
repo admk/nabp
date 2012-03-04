@@ -15,7 +15,8 @@
 
     if shift_cnt_init < fill_cnt_init:
         raise RuntimeError(
-                'Fill count should always be smaller or equal to shift count.')
+                'Fill count (%d) should always be smaller or equal to shift'
+                'count (%d).' % (fill_cnt_init, shift_cnt_init))
 
     accu_fixed = c['tShiftAccuBase']
     accu_init_str = accu_fixed.verilog_repr()

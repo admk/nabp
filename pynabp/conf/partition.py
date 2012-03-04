@@ -25,6 +25,10 @@ def _validate(partition_function):
         if wasted_pixels < 0:
             raise ValueError('Partitions does not cover the entire image size')
 
+        # check coverage efficiency
+        if wasted_pixels >= scheme['size']:
+            raise ValueError('Some partitions are not necessary.')
+
         return scheme
 
     return validator
@@ -40,8 +44,7 @@ def partition(image_size, no_of_partitions):
     >>> partition(512, 5)
     {'partitions': [0, 103, 206, 309, 412], 'no_of_partitions': 5, 'size': 103}
     """
-    partition_size = int(math.ceil(
-            image_size / float(no_of_partitions)))
+    partition_size = int(math.ceil(image_size / float(no_of_partitions)))
 
     partition_scheme = {
             'no_of_partitions': int(no_of_partitions),

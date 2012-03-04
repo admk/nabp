@@ -61,8 +61,10 @@ config = \
         # No of processing elements.
         # Constraints:
         #   The hardware resources available (will only know after place &
-        #   route), and no of processing elements should not be greater than
-        #   the width of the image.
+        #   route). Value should not be greater than the width of the image,
+        #   value should also be sensible enough to ensure no processing
+        #   elements are doing work for wasted pixels only (validator will
+        #   check for this).
         'no_of_processing_elements': 20,
 
         # The bit length of the data representation for a single projection
