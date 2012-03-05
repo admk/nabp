@@ -19,17 +19,23 @@ module NABPProcessingDataPathVerify
     input wire [`kPartitionSizeLength-1:0] tt_line_itr,
     input wire tt_verify_kick,
     // ram side
-    input wire [`kSLength-1:0] pv_s_val,
-    output reg [`kFilteredDataLength-1:0] pv_val,
+    {% for i in xrange(2) %}
+    input wire [`kSLength-1:0] pv{#i#}_s_val,
+    output reg [`kFilteredDataLength-1:0] pv{#i#}_val,
+    {% end %}
     // pe side
     input wire pe_en,
     input wire [`kFilteredDataLength*`kNoOfPartitions-1:0] pe_taps
 );
 
 always @(posedge clk)
+begin
     // a simple preliminary test with values exactly equals to the s_val
     // also used to determine if the s_val provided is correct
-    pv_val <= pv_s_val;
+    {% for i in xrange(2) %}
+    pv{#i#}_val <= pv{#i#}_s_val;
+    {% end %}
+end
 
 integer status;
 initial
