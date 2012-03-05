@@ -99,28 +99,24 @@ assign lb_shift_en_l = mp_shift_en;
 
 always @(posedge clk)
 begin:counters
-    if (state == fill_s)
-    begin
-        if (cnt != {# dec_repr(0, fill_cnt_width) #})
-            cnt <= cnt - 1;
-        else
-            cnt <= {# dec_repr(fill_cnt_init, fill_cnt_width) #};
-    end
-    else if (state == shift_s)
-    begin
-        if (cnt != {# dec_repr(0, shift_cnt_width) #})
-        begin
-            cnt <= cnt - 1;
-            accu <= accu_next;
-        end
-        else
+    case (state) // synopsys parallel_case full_case
+        fill_s:
+            if (cnt != {# dec_repr(0, fill_cnt_width) #})
+                cnt <= cnt - 1;
+        fill_done_s:
             cnt <= {# dec_repr(shift_cnt_init) #};
-    end
-    else
-    begin
-        cnt <= {# dec_repr(fill_cnt_init, fill_cnt_width) #};
-        accu <= {# accu_init_str #};
-    end
+        shift_s:
+            if (cnt != {# dec_repr(0, shift_cnt_width) #})
+            begin
+                cnt <= cnt - 1;
+                accu <= accu_next;
+            end
+        default:
+        begin
+            cnt <= {# dec_repr(fill_cnt_init) #};
+            accu <= {# accu_init_str #};
+        end
+    endcase
 end
 
 {# include('templates/state_decl(states).v', states=shifter_states()) #}
