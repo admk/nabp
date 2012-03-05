@@ -1,12 +1,12 @@
 [*]
 [*] GTKWave Analyzer v3.3.31 (w)1999-2012 BSI
-[*] Mon Mar  5 01:19:33 2012
+[*] Mon Mar  5 17:35:46 2012
 [*]
 [dumpfile] "/Users/admko/Documents/Sorcery/NABP/build/processing_test.v.lxt"
-[dumpfile_mtime] "Mon Mar  5 01:15:53 2012"
-[dumpfile_size] 706605
+[dumpfile_mtime] "Mon Mar  5 17:35:04 2012"
+[dumpfile_size] 645864
 [savefile] "/Users/admko/Documents/Sorcery/NABP/test/processing_test_wave.gtkw"
-[timestart] 120050000
+[timestart] 195230000
 [size] 1366 1011
 [pos] 293 96
 *-22.000000 129130000 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
@@ -43,7 +43,7 @@ NABPProcessingTest.uut.swb_next_itr_ack[0]
 NABPProcessingTest.uut.sw_sel[0]
 @800200
 -line itr
-@25
+@24
 NABPProcessingTest.uut.line_itr[3:0]
 @1000200
 -line itr
@@ -85,10 +85,10 @@ NABPProcessingTest.uut.pe_scan_direction[0]
 NABPProcessingTest.uut.pe_scan_mode[0]
 @1000200
 -pe
-@28
-NABPProcessingTest.data_path_verify.pe_en[0]
 @800200
 -validate
+@29
+NABPProcessingTest.data_path_verify.pe_en[0]
 @24
 NABPProcessingTest.data_path_verify.tt_angle[7:0]
 NABPProcessingTest.data_path_verify.tt_line_itr[3:0]
