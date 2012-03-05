@@ -36,6 +36,7 @@ initial
     @(status)
         if (status != 0)
             $finish_and_return(status);
+
 initial
 begin
     status = $pyeval("from math import cos, sin, radians");
@@ -45,7 +46,7 @@ begin
             "    x = x - {# c['image_center'] #}\n",
             "    y = y - {# c['image_center'] #}\n",
             "    s = -x * sin(a) + y * cos(a)\n",
-            "    return int(s + {# c['projection_line_center'] #})\n");
+            "    return int(s + {# c['projection_line_center'] #} + 0.5)\n");
 end
 
 reg [`kFilteredDataLength-1:0] tap_val_exp;
