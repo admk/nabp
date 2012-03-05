@@ -89,14 +89,14 @@ config = \
         # This is used to generate a LUT in which values are of this precision.
         # Constraints:
         #   Positive integers.
-        'kShiftAccuPrecision': 8,
+        'kShiftAccuPrecision': 12,
 
         # The decimal places (in binary) of mapper's accumulating multiplicand.
         # This is used to generate a LUT in which values are of this precision.
         # Constraints:
         #   Positive integers.
         #   Greater than or equal to kMapAccuPartPrecision
-        'kMapAccuPrecision': 8,
+        'kMapAccuPrecision': 12,
 
         # The decimal places (in binary) of mapper's accumulator's initial
         # value.
@@ -104,6 +104,6 @@ config = \
         # Constraints:
         #   Positive integers.
         #   Less than or equal to kMapAccuPrecision
-        'kMapAccuPartPrecision': 4,
+        'kMapAccuPartPrecision': 8,
     }
 # vim: ft=python:
