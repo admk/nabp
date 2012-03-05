@@ -17,19 +17,24 @@ module NABPProcessingDataPathVerify
     // host side
     input wire [`kAngleLength-1:0] tt_angle,
     input wire [`kPartitionSizeLength-1:0] tt_line_itr,
-    input wire tt_verify_kick,
     // ram side
-    input wire [`kSLength-1:0] pv_s_val,
-    output reg [`kFilteredDataLength-1:0] pv_val,
+    {% for i in xrange(2) %}
+    input wire [`kSLength-1:0] pv{#i#}_s_val,
+    output reg [`kFilteredDataLength-1:0] pv{#i#}_val,
+    {% end %}
     // pe side
     input wire pe_en,
     input wire [`kFilteredDataLength*`kNoOfPartitions-1:0] pe_taps
 );
 
 always @(posedge clk)
+begin
     // a simple preliminary test with values exactly equals to the s_val
     // also used to determine if the s_val provided is correct
-    pv_val <= pv_s_val;
+    {% for i in xrange(2) %}
+    pv{#i#}_val <= pv{#i#}_s_val;
+    {% end %}
+end
 
 integer status;
 initial
@@ -50,17 +55,21 @@ begin
 end
 
 reg [`kFilteredDataLength-1:0] tap_val_exp;
+real s_val_exp;
 task verify;
     input [`kFilteredDataLength-1:0] actual;
     input integer x;
     input integer y;
     integer diff;
     begin
-        tap_val_exp = $pyeval(
+        // FIXME: iverilog vpi does not like real values
+        s_val_exp = $pyeval(
                 "project(", tt_angle, ",", x, ",", y, ")");
+        tap_val_exp = s_val_exp;
         diff = tap_val_exp - actual;
-        $display("Tap %d, Expected %d, Acutal %d, Diff %d",
-                i, tap_val_exp, actual, diff);
+        if (diff < -1 || diff > 1)
+            $display("Line Itr %d, Scan Itr %d, Tap %d, Expected %d, Acutal %d, Diff %d",
+                     tt_line_itr, scan_itr, i, tap_val_exp, actual, diff);
     end
 endtask
 
@@ -78,7 +87,6 @@ assign tap_val[{#i#}] = pe_taps[
 reg scan_mode;
 always
 begin:pe_verify
-    @(posedge reset_n);
     @(posedge pe_en);
     if (tt_angle < `kAngle45 || tt_angle >= `kAngle135)
         scan_mode = {# scan_mode.x #};
@@ -100,7 +108,7 @@ begin:pe_verify
     while (scan_itr != scan_end)
     begin
         // verify output for all PEs
-        for (i = 0; i < 1; i = i + 1)
+        for (i = 0; i < `kNoOfPartitions; i = i + 1)
         begin
             line = tt_line_itr + i * `kPartitionSize;
             if (scan_mode == {# scan_mode.x #})

@@ -55,6 +55,11 @@ module NABPProcessingSwapControl
     output wire fr_next_angle,
     output wire signed [`kSLength-1:0] fr0_s_val,
     output wire signed [`kSLength-1:0] fr1_s_val
+    {% if c['debug'] %},
+    // debug signals
+    output reg [`kAngleLength-1:0] db_angle,
+    output reg [`kPartitionSizeLength-1:0] db_line_itr
+    {% end %}
 );
 
 {#
@@ -241,7 +246,13 @@ assign pe_scan_direction = (pe_angle < `kAngle90) ?
 always @(posedge clk)
     // updates angle for PE with the current swappable ready for shifting
     if ((state == fill_and_shift_s || state == fill_s) && swap_ack)
+    begin
         pe_angle <= fr_angle;
+        {% if c['debug'] %}
+        db_angle <= fr_angle;
+        db_line_itr <= line_itr;
+        {% end %}
+    end
 
 // lut vals
 wire {# c['tShiftAccuBase'].verilog_decl() #} sh_accu_base;

@@ -1,15 +1,15 @@
 [*]
 [*] GTKWave Analyzer v3.3.31 (w)1999-2012 BSI
-[*] Thu Mar  1 01:25:41 2012
+[*] Mon Mar  5 01:19:33 2012
 [*]
 [dumpfile] "/Users/admko/Documents/Sorcery/NABP/build/processing_test.v.lxt"
-[dumpfile_mtime] "Thu Mar  1 01:19:38 2012"
-[dumpfile_size] 742451
+[dumpfile_mtime] "Mon Mar  5 01:15:53 2012"
+[dumpfile_size] 706605
 [savefile] "/Users/admko/Documents/Sorcery/NABP/test/processing_test_wave.gtkw"
-[timestart] 0
+[timestart] 120050000
 [size] 1366 1011
 [pos] 293 96
-*-26.000000 0 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+*-22.000000 129130000 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
 [treeopen] NABPProcessingTest.
 [treeopen] NABPProcessingTest.uut.
 [treeopen] NABPProcessingTest.uut.sw0.
@@ -43,9 +43,11 @@ NABPProcessingTest.uut.swb_next_itr_ack[0]
 NABPProcessingTest.uut.sw_sel[0]
 @800200
 -line itr
+@25
+NABPProcessingTest.uut.line_itr[3:0]
 @1000200
 -line itr
-@800200
+@c00200
 -sw0
 @28
 NABPProcessingTest.uut.sw0_next_itr[0]
@@ -55,14 +57,9 @@ NABPProcessingTest.uut.sw0_swap_ack[0]
 @2024
 ^2 /Users/admko/Documents/Sorcery/NABP/test/../derived_src/processing_swappable_state_control.vxtf
 NABPProcessingTest.uut.sw0.state_control.state[2:0]
-@4028
-^>1 /Users/admko/Documents/Sorcery/NABP/derived_src/tMapAccuBase.pytf
-NABPProcessingTest.uut.sw0.mapper.mp_accu_base[9:0]
-^>2 /Users/admko/Documents/Sorcery/NABP/derived_src/tShiftAccuBase.pytf
-NABPProcessingTest.uut.sw0.shifter.sc_accu_base[8:0]
-@1000200
+@1401200
 -sw0
-@800200
+@c00200
 -sw1
 @28
 NABPProcessingTest.uut.sw1_next_itr[0]
@@ -72,14 +69,9 @@ NABPProcessingTest.uut.sw1_swap_ack[0]
 @2024
 ^2 /Users/admko/Documents/Sorcery/NABP/test/../derived_src/processing_swappable_state_control.vxtf
 NABPProcessingTest.uut.sw1.state_control.state[2:0]
-@4028
-^>1 /Users/admko/Documents/Sorcery/NABP/derived_src/tMapAccuBase.pytf
-NABPProcessingTest.uut.sw1.mapper.mp_accu_base[9:0]
-@4029
-^>2 /Users/admko/Documents/Sorcery/NABP/derived_src/tShiftAccuBase.pytf
-NABPProcessingTest.uut.sw1.shifter.sc_accu_base[8:0]
-@1000200
+@1401200
 -sw1
+@1000200
 -swap control
 @800200
 -pe
@@ -91,9 +83,18 @@ NABPProcessingTest.uut.pe_angle[7:0]
 @28
 NABPProcessingTest.uut.pe_scan_direction[0]
 NABPProcessingTest.uut.pe_scan_mode[0]
-@22
-NABPProcessingTest.uut.pe_taps[179:0]
 @1000200
 -pe
+@28
+NABPProcessingTest.data_path_verify.pe_en[0]
+@800200
+-validate
+@24
+NABPProcessingTest.data_path_verify.tt_angle[7:0]
+NABPProcessingTest.data_path_verify.tt_line_itr[3:0]
+NABPProcessingTest.data_path_verify.scan_itr[31:0]
+NABPProcessingTest.data_path_verify.tap_val0[10:0]
+@1000200
+-validate
 [pattern_trace] 1
 [pattern_trace] 0
