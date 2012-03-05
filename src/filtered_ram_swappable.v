@@ -91,11 +91,16 @@ assign pr0_s_val_m = (state == ready_s) ? pr0_s_val : write_itr;
 
 NABPDualPortRAM dual_port_ram
 (
+    // globals
     .clk(clk),
+    .clear(0), // no need to clear, always overwritten
+    // write enables
     .we_0(write_enable),
     .we_1(1'b0),
+    // addresses
     .addr_0(pr0_s_val_m),
     .addr_1(pr1_s_val),
+    // data
     .data_in_0(hs_val),
     .data_in_1({# to_v(0) #}),
     .data_out_0(pr0_val),
