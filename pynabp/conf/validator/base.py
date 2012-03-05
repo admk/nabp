@@ -22,12 +22,7 @@ class Validator(object):
         If failed validation method should raise an exception.
         """
         for name, method in self._validation_methods():
-            try:
-                print 'Validating with method ' + name
-                method(self.config)
-            except:
-                print 'Validation failed in method ' + name
-                raise
+            method(self.config)
 
     def _validation_methods(self):
         """Find all validation methods within the class

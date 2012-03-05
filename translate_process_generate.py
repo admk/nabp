@@ -9,22 +9,23 @@ translate_process_template = \
         r"""
         #!/usr/bin/env python
         import sys, os
-        pre_e = None
+
         try:
             sys.path.append(os.path.abspath('.'))
             from pynabp.conf_gen import config
             fixed = config['{# fixed #}']
         except Exception as e:
-            pre_e = e
+            pass
+
         while True:
             val_str = raw_input()
+
             try:
                 fixed.value = val_str
                 val_str = str(fixed.value)
             except Exception as e:
-                val_str = '!' + str(e) + ': ' + val_str
-                if pre_e:
-                    val_str += '. ' + str(pre_e)
+                val_str += '!' + str(e).replace('\n', ' ')
+
             sys.stdout.write(val_str + '\n')
             sys.stdout.flush()
         """
