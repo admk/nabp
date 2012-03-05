@@ -9,6 +9,14 @@ def validate(image_size, scheme):
         raise ValueError(
                 'no_of_partitions should not be greater than image size')
 
+    # check size uniformity
+    for i in xrange(scheme['no_of_partitions'] - 1):
+        size = abs(scheme['partitions'][i + 1] - scheme['partitions'][i])
+        if size != scheme['size']:
+            raise ValueError(
+                    'Partitions do not have the same sizes, This is needed '
+                    'for the implementation to work.')
+
     # check last tap for consistencies
     last_tap = (scheme['no_of_partitions'] - 1) * scheme['size']
     if last_tap != scheme['partitions'][-1]:
