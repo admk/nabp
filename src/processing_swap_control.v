@@ -46,7 +46,6 @@ module NABPProcessingSwapControl
     input wire signed [`kFilteredDataLength-1:0] fr1_val,
     // output to processing elements
     output wire pe_reset,
-    output wire pe_kick,
     output wire pe_en,
     output wire pe_scan_mode,
     output wire pe_scan_direction,
@@ -261,7 +260,6 @@ reg scan_direction;
 assign pe_taps = sw_sel ? sw0_pe_taps : sw1_pe_taps;
 assign pe_en = sw_sel ? sw0_pe_en : sw1_pe_en;
 assign pe_reset = swa_next_itr_ack;
-assign pe_kick = swap_ack;
 // decode angle to give PE control signals
 assign pe_scan_mode = (pe_angle < `kAngle45 || pe_angle >= `kAngle135) ?
                       {# scan_mode.x #} : {# scan_mode.y #};
