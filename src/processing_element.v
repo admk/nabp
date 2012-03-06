@@ -93,6 +93,34 @@ begin:write_back_sync
     write_val <= read_val + lb_val;
 end
 
+{#
+    # TODO refactor this to config derivation
+    no_angles = 180
+    accumulate_count = bin_width(no_angles) + kAnglePrecision
+#}
+
+NABPDualPortRAM
+#(
+    .pDataLength(`kFilteredDataLength + {# accumulate_count #}),
+    .pRAMSize({# 2 * scan_mode_pixels #}),
+    .pAddrLength(`kAddressLength)
+)
+pe_cache
+(
+    .clk(clk),
+    .clear(sw_reset),
+    // port 0 for writing
+    .we_0(write_en),
+    .addr_0(write_addr),
+    .data_in_0(write_val),
+    .data_out_0(),
+    // port 1 for reading
+    .we_1(0),
+    .addr_1(addr),
+    .data_in_1(0),
+    .data_out_1(read_val)
+);
+
 {% if c['debug'] %}
 integer file, err;
 reg [20*8:1] file_name;
