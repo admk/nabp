@@ -68,9 +68,9 @@ module NABPProcessingSwapControl
 #}
 
 // line iteration
-reg [`kPartitionSizeLength-1:0] line_itr;
+reg [`kPartitionSizeLength-1:0] line_cnt;
 wire has_next_line_itr;
-assign has_next_line_itr = (line_itr !=
+assign has_next_line_itr = (line_cnt !=
                             {# to_l(c['partition_scheme']['size'] - 1) #});
 always @(posedge clk)
 begin:line_itr_update
@@ -78,9 +78,9 @@ begin:line_itr_update
         state == angle_setup_1_s ||
         state == angle_setup_2_s ||
         state == angle_setup_3_s)
-        line_itr <= {# to_l(0) #};
+        line_cnt <= {# to_l(0) #};
     else if (swap_ack)
-        line_itr <= line_itr + {# to_l(1) #};
+        line_cnt <= line_cnt + {# to_l(1) #};
 end
 
 // accumulator value set up
