@@ -1,6 +1,6 @@
 {# include('templates/defines.v') #}
 // NABPProcessingElement
-//     10 Jan 2011
+//     10 Jan 2012
 // The processing element is a single unit with a cache to store value fed by
 // the line buffer to the correct pixel location. Each processing element works
 // with one tap of the line buffer.
@@ -94,7 +94,7 @@ begin:write_back_sync
 end
 
 {#
-    # TODO refactor this to config derivation
+    # TODO refactor this into config derivation after kAnglePrecision support
     no_angles = 180
     accumulate_count = bin_width(no_angles) + kAnglePrecision
 #}
