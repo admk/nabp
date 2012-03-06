@@ -26,7 +26,8 @@ class PreConstraintsValidator(ConstraintsValidator):
         constraints = {
                     # key,               type,  None,   constraint functions
                     'debug':            (bool,  False,  None),
-                    'clock_period':     (int,   False,  positive),
+                    'clock_period':     ((float, int),
+                                                False,  positive),
                     'time_precision':   (str,   False,  time_unit),
                     'device':           (str,   True,   None),
                     'projection_line_size':
@@ -40,6 +41,8 @@ class PreConstraintsValidator(ConstraintsValidator):
                     'kFilteredDataPrecision':
                                         (int,   False,  natural),
                     'kAnglePrecision':  (int,   False,  natural),
+                    'kAngleStepSize':   ((float, int),
+                                                True,   positive),
                     'kShiftAccuPrecision':
                                         (int,   False,  positive),
                     'kMapAccuPrecision':
