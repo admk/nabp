@@ -46,40 +46,24 @@ module NABPShifter
     output wire sw_pe_en
 );
 
-{#
-    var_delay_map = {
-            'sw_pe_en':      2, # sw_pe_en $\delta$ s_val=>val=>taps
-            'lb_shift_en':   1, # lb_shift_en $\delta$ s_val=>val
-            'sc_fill_done':  2, # sc_fill_done $\delta$ s_val=>val=>taps->done
-            'sc_shift_done': 2, # sc_shift_done $\delta$ s_val=>val=>taps->done
-            }
-    def var_name(base, delay):
-        return base + '_' + str(delay)
-#}
 // S̲i̲g̲n̲a̲l̲ ̲D̲e̲l̲a̲y̲s̲
 // Handled by this module rather than higher level modules
 // 2 cycles delay for output control signals to state control
 // 1 cycle to get value from the filtered RAM by the specified address;
 // 1 cycle to ensure the data is ready at the output of the line buffer.
-// Signals being delayed with number of delay cycles are -
-//      {# var_delay_map #}.
-{% for var, var_delay in var_delay_map.iteritems() %}
-    {% for delay in xrange(var_delay + 1) %}
-        // declaration
-        {% if delay == var_delay %}
-            wire {# var #}_l, {# var_name(var, delay) #};
-            assign {# var_name(var, delay) #} = {# var #}_l;
-        {% else %}
-            reg {# var_name(var, delay) #};
-        {% end %}
-        {% if delay > 0 %}
-            always @(posedge clk)
-                {# var_name(var, delay - 1) #} <= {# var_name(var, delay) #};
-        {% end %}
-    {% else %}
-        assign {# var #} = {# var_name(var, 0) #};
-    {% end %}
-{% end %}
+{#
+    var_delay_map = {
+            # sw_pe_en $\delta$ s_val=>val=>taps
+            'sw_pe_en':      ('', 2),
+            # lb_shift_en $\delta$ s_val=>val
+            'lb_shift_en':   ('', 1),
+            # sc_fill_done $\delta$ s_val=>val=>taps->done
+            'sc_fill_done':  ('', 2),
+            # sc_shift_done $\delta$ s_val=>val=>taps->done
+            'sc_shift_done': ('', 2),
+            }
+    include('templates/signal_delay(delay_map).v', delay_map=var_delay_map)
+#}
 
 // Line buffer - clear on start, simple as that
 assign lb_clear = sc_fill_kick;
