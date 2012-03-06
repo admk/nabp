@@ -52,7 +52,8 @@ def derive(config):
     config_n_derived = dict(config)
     config_n_derived.update(derived)
 
-    derived.update(angle_defines(config['kAnglePrecision']))
+    derived.update(angle_defines(
+                config['kAnglePrecision'], config['angle_step_size']))
     derived.update(shift_lut_defines(config['kShiftAccuPrecision']))
     derived.update(map_lut_defines(config_n_derived))
     return derived

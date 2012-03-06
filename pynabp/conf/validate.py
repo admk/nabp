@@ -37,12 +37,12 @@ class PreConstraintsValidator(ConstraintsValidator):
                     'fir_function':     (func,  True,   function_arg_count(1)),
                     'no_of_processing_elements':
                                         (int,   False,  positive),
+                    'angle_step_size':  ((float, int),
+                                                True,   positive),
                     'kDataLength':      (int,   False,  positive),
                     'kFilteredDataPrecision':
                                         (int,   False,  natural),
                     'kAnglePrecision':  (int,   False,  natural),
-                    'kAngleStepSize':   ((float, int),
-                                                True,   positive),
                     'kShiftAccuPrecision':
                                         (int,   False,  positive),
                     'kMapAccuPrecision':
