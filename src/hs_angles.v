@@ -16,7 +16,9 @@ module hs_angles
     output wire hs_has_next_angle
 );
 
-assign hs_has_next_angle = (hs_angle < {# to_a(80) #});
+parameter [`kAngleLength-1:0] hs_angle_step = 30;
+
+assign hs_has_next_angle = (hs_angle < ({# to_a(180) #} - hs_angle_step));
 assign hs_next_angle_ack = hs_has_next_angle && hs_next_angle;
 
 always @(posedge clk)
@@ -26,7 +28,7 @@ begin:hs_angle_iterate
     else
     begin
         if (hs_next_angle && hs_has_next_angle)
-            hs_angle = hs_angle + {# to_a(20) #};
+            hs_angle = hs_angle + hs_angle_step;
     end
 end
 
