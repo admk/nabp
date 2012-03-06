@@ -232,8 +232,20 @@ begin:mealy_next_state
     endcase
 end
 
+// delay signals for PEs
+wire [`kAngleLength-1:0] fr_angle_d;
+wire [`kPartitionSizeLength-1:0] line_cnt_d;
+{#
+    var_delay_map = {
+        'fr_angle_d': ('[`kAngleLength-1:0]', 3),
+        'line_cnt_d': ('[`kPartitionSizeLength-1:0]', 2),
+    }
+    include('templates/signal_delay(delay_map).v', delay_map=var_delay_map)
+#}
+assign line_cnt_d_l = line_cnt;
+assign fr_angle_d_l = fr_angle;
 // decode angle and generate pe control outputs
-reg [{# c['kAngleLength'] #}-1:0] pe_angle;
+reg [`kAngleLength-1:0] pe_angle;
 // PE signals
 // multiplexers & demultiplexers - always give the output using pe_taps
 assign pe_taps = sw_sel ? sw0_pe_taps : sw1_pe_taps;
