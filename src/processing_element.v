@@ -135,6 +135,7 @@ begin
         begin
             line_pos = base_addr / {# c['image_size'] #};
             scan_pos = base_addr - {# c['image_size'] #} * line_pos;
+            line_pos = line_pos + pe_tap_offset;
             if (sw_scan_mode == {# scan_mode.x #})
             begin
                 im_x = scan_pos;
