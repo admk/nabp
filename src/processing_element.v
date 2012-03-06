@@ -60,7 +60,7 @@ parameter [`kImageSizeLength-1:0] pe_tap_offset = 'bz;
 
 wire [`kAddressLength-1:0] addr;
 reg [`kAddressLength-2:0] base_addr;
-assign addr = {scan_mode, base_addr};
+assign addr = {sw_scan_mode, base_addr};
 
 always @(posedge clk)
 begin:base_addr_counter
@@ -105,13 +105,14 @@ begin
     always @(posedge clk)
         if (pe_en)
         begin
-            scan_pos = {# to_i(partition_size) #} * scan_sec + scan_itr;
-            line_pos = pe_tap + line_itr;
+            line_pos = base_addr / {# c['image_size'] #};
+            scan_pos = base_addr - {# c['image_size'] #} * line_pos;
             if (sw_scan_mode == {# scan_mode.x #})
             begin
                 im_x = scan_pos;
                 im_y = line_pos;
-            end else
+            end
+            else
             begin
                 im_x = line_pos;
                 im_y = scan_pos;
