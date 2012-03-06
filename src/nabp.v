@@ -26,10 +26,10 @@ module NABP
     // global signals
     input wire clk,
     input wire reset_n,
-    // TODO inputs from Sinogram RAM
-    // TODO inputs from Image RAM
-    // TODO outputs to Sinogram RAM
-    // TODO outputs to Image RAM
+    // inputs from sinogram
+    // TODO inputs from image RAM
+    // outputs to sinogram
+    // TODO outputs to image RAM
 );
 
 wire [`kAngleLength-1:0] hs_angle;
@@ -79,7 +79,7 @@ NABPFilteredRAMSwapControl filtered_ram_swap_control
 );
 
 wire pe_reset, pe_en, pe_scan_mode, pe_scan_direction;
-// TODO pe_taps unpacking
+wire [`kFilteredDataLength*`kNoOfPartitions-1:0] pe_taps;
 NABPProcessingSwapControl processing_swap_control
 (
     // global signals
@@ -93,7 +93,6 @@ NABPProcessingSwapControl processing_swap_control
     .fr1_val(pr1_val),
     // output to processing elements
     .pe_reset(pe_reset),
-    .pe_kick(),
     .pe_en(pe_en),
     .pe_scan_mode(pe_scan_mode),
     .pe_scan_direction(pe_scan_direction),
@@ -104,7 +103,10 @@ NABPProcessingSwapControl processing_swap_control
     .fr1_s_val(pr1_s_val)
 );
 
-{% for i in xrange(c['no_of_processing_elements']) %}
+wire [`kFilteredDataLength-1:0] pe_tap_val[`kNoOfPartitions-1:0];
+{% for i in xrange(c['partition_scheme']['no_of_partitions']) %}
+assign pe_tap_val[{#i#}] = pe_taps[
+        `kFilteredDataLength*{#i+1#}-1:`kFilteredDataLength*{#i#}];
 NABPProcessingElement 
 #(
     .pe_id({#i#}),
@@ -117,7 +119,7 @@ processing_element
     .sw_en(pe_en),
     .sw_scan_mode(pe_scan_mode),
     .sw_scan_direction(pe_scan_direction),
-    .lb_val()
+    .lb_val(pe_tap_val[{#i#}])
 );
 {% end %}
 
