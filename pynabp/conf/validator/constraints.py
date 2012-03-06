@@ -118,9 +118,6 @@ class ConstraintsValidator(Validator):
         if not val_constr_func:
             return
 
-        if type(val_constr_func) is func:
-            val_constr_func = [val_constr_func]
-
         for val_func in val_constr_func:
             if not val_func(val):
                 raise ConstraintFunctionValidateError(
@@ -139,4 +136,10 @@ class ConstraintsValidator(Validator):
     def _function_constraint(self, key):
         """Return the cosntraint functions on the value for a corresponding key
         """
-        return self._constraints[key][2]
+
+        constr = self._constraints[key][2]
+
+        if type(constr) is func:
+            constr = [constr]
+
+        return constr
