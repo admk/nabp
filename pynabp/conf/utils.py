@@ -21,22 +21,31 @@ def filter_coefs(order, function):
     else:
         return ramp_filter(order)
 
-def angle_defines(precision):
+def angle_defines(precision, angle_step_size):
     if precision != 0:
         raise NotImplementedError(
                 'Current verilog implementation does not support angle '
                 'precisions')
 
     fixed = FixedPoint(bin_width_of_dec(180), precision)
+
+    if angle_step_size is None:
+        angle_step_size = fixed.precision()
+    angle_step = fixed.verilog_repr(angle_step_size)
+
     defines = {
             'tAngle': fixed,
+            'kAngleStep': angle_step,
             # backwards compatibility
-            'kAngleLength': fixed.width()
+            'kAngleLength': fixed.width(),
             }
+
+    # mode switch angles
     defines.update({
             'kAngle' + str(angle):
             str(fixed.width()) + "'b" + fixed.bin_repr_of_value(angle)
             for angle in range(45, 136, 45)
             })
+
     return defines
 
