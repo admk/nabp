@@ -1,6 +1,6 @@
 # This is the default configuration file for the architecture.
 # Parameters are specified in this file, then checked for correctness in
-# pynabp/conf.py.
+# pynabp/conf_gen.py.
 
 config = \
     {
@@ -15,7 +15,7 @@ config = \
         # Constraints:
         #   Positive values. Precisions will be limited by the precision of
         #   simulation timing.
-        'clock_period': 20,
+        'clock_period': 20.0,
 
         # Simulation timing precision.
         # The precision various simulator will try to conform (and often fails
@@ -65,6 +65,19 @@ config = \
         #   elements are doing work for wasted pixels only (validator will
         #   check for this).
         'no_of_processing_elements': 20,
+
+        # The angle step size.
+        # This determines the difference of angle values between two projection
+        # lines in a sinogram where the angles are evenly distributed. If it is
+        # not given, then the angle step size is derived from kAnglePrecision.
+        # The sinogram data must conform to this step size constraint, that is,
+        # the data address for sinogram $g(\theta, s)$ is given by
+        #       $p\theta+s$,
+        # where $p$ is the projection line size, $\theta$ is the angle value
+        # and $s$ is the projection offset.
+        # Constraints:
+        #   Positive integers.
+        'angle_step_size': None,
 
         # The bit length of the data representation for a single projection
         # data point.

@@ -87,12 +87,12 @@ class ConstraintsValidator(Validator):
         if not val:
             return
 
-        val_type = self._type_constraint(key)
+        val_types = self._type_constraint(key)
 
-        if type(val) is not val_type:
+        if not isinstance(val, val_types):
             raise TypeValidateError(
                     'Type mismatch, expected %s, found %s' %
-                    (val_type, str(type(val))))
+                    (val_types, str(type(val))))
 
     def _null_check(self, key, val):
         """Perform null check for key/value pair
@@ -129,7 +129,12 @@ class ConstraintsValidator(Validator):
 
     def _type_constraint(self, key):
         """Return the type cosntraint on the value for a corresponding key"""
-        return self._constraints[key][0]
+        val_types = self._constraints[key][0]
+
+        if not isinstance(val_types, (tuple, list)):
+            val_types = (val_types)
+
+        return val_types
 
     def _nullable_constraint(self, key):
         """Return the nullable cosntraint on the value for a corresponding key
