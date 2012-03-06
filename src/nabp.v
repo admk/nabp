@@ -78,6 +78,30 @@ NABPFilteredRAMSwapControl filtered_ram_swap_control
     .pr1_val(pr1_val)
 );
 
-// TODO declaration of modules
+NABPProcessingSwapControl processing_swap_control
+(
+    // global signals
+    .clk(clk),
+    .reset_n(reset_n),
+    // inputs from filtered RAM swap control
+    .fr_angle(pr_angle),
+    .fr_has_next_angle(pr_has_next_angle),
+    .fr_next_angle_ack(pr_next_angle_ack),
+    .fr0_val(pr0_val),
+    .fr1_val(pr1_val),
+    // output to processing elements
+    .pe_reset(),
+    .pe_kick(),
+    .pe_en(),
+    .pe_scan_mode(),
+    .pe_scan_direction(),
+    .pe_taps(),
+    // output to RAM
+    .fr_next_angle(pr_next_angle),
+    .fr0_s_val(pr0_s_val),
+    .fr1_s_val(pr1_s_val)
+);
+
+// TODO processing elements
 
 endmodule
