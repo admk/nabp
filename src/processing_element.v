@@ -48,24 +48,15 @@ module NABPProcessingElement
     input wire clk,
     // inputs from swap control
     input wire sw_reset,
-    input wire sw_kick,
     input wire sw_en,
     input wire sw_scan_mode,
     input wire sw_scan_direction,
     // input from line buffer
     input wire signed [`kFilteredDataLength-1:0] lb_val,
-    // inputs from cache control
-    input wire signed [`kFilteredDataLength-1:0] cc_read_val,
-    // outputs to cache control
-    output reg unsigned [`kNoOfPartitonsLength-1:0] cc_sel,
-    output wire [`kAddressLength-1:0] cc_read_addr,
-    output reg cc_write_en,
-    output reg [`kAddressLength-1:0] cc_write_addr,
-    output reg signed [`kFilteredDataLength-1:0] cc_write_val
 );
 
-parameter [`kNoOfPartitonsLength-1:0] pe_id = 'bz;
-parameter [`kImageSizeLength-1:0] pe_tap = 'bz;
+parameter integer pe_id = 'bz;
+parameter [`kImageSizeLength-1:0] pe_tap_offset = 'bz;
 
 wire [`kAddressLength-1:0] addr;
 reg [`kAddressLength-2:0] base_addr;
@@ -96,27 +87,25 @@ begin:base_addr_counter
 end
 
 always @(posedge clk)
-begin:cc_write
-    cc_write_en <= sw_en;
-    cc_write_addr <= cc_read_addr;
-    cc_write_val <= cc_read_val + lb_val;
+begin:write_back_sync
+    write_en <= sw_en;
+    write_addr <= addr;
+    write_val <= read_val + lb_val;
 end
 
 {% if c['debug'] %}
 integer file, err;
 reg [20*8:1] file_name;
-reg unsigned [`kImageSizeLength-1:0] im_x, im_y, scan_pos, line_pos;
+reg [`kImageSizeLength-1:0] im_x, im_y, scan_pos, line_pos;
 initial
 begin
     $sprintf(file_name, "pe_update_%d.csv", pe_id);
     file = $fopen(file_name, "w");
     $fwrite(file, "Time, X, Y, Value");
     always @(posedge clk)
-        if (cc_write_en)
+        if (pe_en)
         begin
-            scan_pos = {#
-                    dec_repr(partition_size, bin_width(c['image_size']))
-                #} * scan_sec + scan_itr;
+            scan_pos = {# to_i(partition_size) #} * scan_sec + scan_itr;
             line_pos = pe_tap + line_itr;
             if (sw_scan_mode == {# scan_mode.x #})
             begin
