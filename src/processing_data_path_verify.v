@@ -27,6 +27,8 @@ module NABPProcessingDataPathVerify
     input wire [`kFilteredDataLength*`kNoOfPartitions-1:0] pe_taps
 );
 
+parameter pSDifferenceTolerance = 3;
+
 always @(posedge clk)
 begin
     // a simple preliminary test with values exactly equals to the s_val
@@ -67,7 +69,7 @@ task verify;
                 "project(", tt_angle, ",", x, ",", y, ")");
         tap_val_exp = s_val_exp;
         diff = tap_val_exp - actual;
-        if (diff < -1 || diff > 1)
+        if (diff < -pSDifferenceTolerance || diff > pSDifferenceTolerance)
             $display("Line Itr %d, Scan Itr %d, Tap %d, Expected %d, Acutal %d, Diff %d",
                      tt_line_itr, scan_itr, i, tap_val_exp, actual, diff);
     end
