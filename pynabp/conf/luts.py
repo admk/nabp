@@ -27,7 +27,8 @@ def map_lut_defines(conf):
     return defines
 
 def _map_accu_part_lookup(conf):
-    last_pe = conf['partition_scheme']['partitions'][-1]
+    pe_last = conf['partition_scheme']['partitions'][-1]
+    pe_size = conf['partition_scheme']['size']
     i_size = conf['image_size']
     i_center = conf['image_center']
     p_center = conf['projection_line_center']
@@ -36,13 +37,13 @@ def _map_accu_part_lookup(conf):
         sin_val = math.sin(math.radians(angle))
         cos_val = math.cos(math.radians(angle))
         if (0 <= angle and angle < 45):
-            val = last_pe * cos_val
+            val = pe_last * cos_val
         elif (45 <= angle and angle < 90):
-            val = - last_pe * sin_val
+            val = - pe_last * sin_val
         elif (90 <= angle and angle < 135):
-            val = - last_pe * sin_val + (i_size - 1) * cos_val
+            val = - (pe_last + pe_size) * sin_val + (i_size - 1) * cos_val
         elif (135 <= angle and angle < 180):
-            val = last_pe * cos_val - (i_size - 1) * sin_val
+            val = (pe_last + pe_size) * cos_val - (i_size - 1) * sin_val
         else:
             raise RuntimeError('Invalid angle encountered')
         return val + i_center * sin_val - i_center * cos_val + p_center

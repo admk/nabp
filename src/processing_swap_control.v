@@ -83,6 +83,12 @@ begin:line_itr_update
         line_cnt <= line_cnt + {# to_l(1) #};
 end
 
+// mapper mp_accu_init ascending or descending
+// reverse the line order for reverse scan direction, simplifies PE
+wire mp_accu_init_step_direction;
+assign mp_accu_init_step_direction = (fr_angle < `kAngle90) ?
+                                     {# scan_direction.forward #} :
+                                     {# scan_direction.reverse #};
 // accumulator value set up
 // V̲a̲l̲u̲e̲ ̲T̲i̲m̲i̲n̲g̲ ̲D̲i̲a̲g̲r̲a̲m̲
 //
@@ -107,7 +113,10 @@ begin:accu_setup
     else if (swap_ack)
         // accumulate on swb_next_itr, which is the only swappable that wants
         // new values
-        mp_accu_init <= mp_accu_init - mp_accu_base;
+        if (mp_accu_init_step_direction == {# scan_direction.forward #})
+            mp_accu_init <= mp_accu_init - mp_accu_base;
+        else if (mp_accu_init_step_direction == {# scan_direction.reverse #})
+            mp_accu_init <= mp_accu_init + mp_accu_base;
 end
 
 // inputs from swappables
@@ -248,6 +257,7 @@ assign fr_angle_d_l = fr_angle;
 reg [`kAngleLength-1:0] pe_angle;
 // PE signals
 // multiplexers & demultiplexers - always give the output using pe_taps
+reg scan_direction;
 assign pe_taps = sw_sel ? sw0_pe_taps : sw1_pe_taps;
 assign pe_en = sw_sel ? sw0_pe_en : sw1_pe_en;
 assign pe_reset = swa_next_itr_ack;
@@ -255,17 +265,20 @@ assign pe_kick = swap_ack;
 // decode angle to give PE control signals
 assign pe_scan_mode = (pe_angle < `kAngle45 || pe_angle >= `kAngle135) ?
                       {# scan_mode.x #} : {# scan_mode.y #};
-assign pe_scan_direction = (pe_angle < `kAngle90) ?
-                           {# scan_direction.forward #} :
-                           {# scan_direction.reverse #};
+assign pe_scan_direction = scan_direction;
 always @(posedge clk)
     // updates angle for PE with the current swappable ready for shifting
-    if ((state == fill_and_shift_s || state == fill_s) && swap_ack)
+    if (swap_ack)
     begin
-        pe_angle <= fr_angle;
+        scan_direction <= mp_accu_init_step_direction;
+        pe_angle <= fr_angle_d;
         {% if c['debug'] %}
-        db_angle <= fr_angle;
-        db_line_itr <= line_itr;
+        db_angle <= fr_angle_d;
+        if (mp_accu_init_step_direction == {# scan_direction.forward #})
+            db_line_itr <= line_cnt_d;
+        else if (mp_accu_init_step_direction == {# scan_direction.reverse #})
+            db_line_itr <= {# to_l(c['partition_scheme']['size'] - 1) #} -
+                           line_cnt_d;
         {% end %}
     end
 
