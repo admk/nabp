@@ -10,6 +10,8 @@
         return dec_repr(val, bin_width(c['projection_line_size']))
     def to_l(val):
         return dec_repr(val, bin_width(c['partition_scheme']['size']))
+    def to_i(val):
+        return dec_repr(val, bin_width(c['image_size']))
     def to_v(val):
         return dec_repr(val, c['kFilteredDataLength'])
 
