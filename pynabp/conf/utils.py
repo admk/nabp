@@ -36,6 +36,7 @@ def angle_defines(precision, angle_step_size):
     defines = {
             'tAngle': fixed,
             'kAngleStep': angle_step,
+            'kNoOfAngles': int(180.0 / angle_step_size),
             # backwards compatibility
             'kAngleLength': fixed.width(),
             }
