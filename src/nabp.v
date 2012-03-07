@@ -8,7 +8,7 @@
 //  |       Sinogram RAM       |
 //    ̅ ̅ ̅ ̅ ̅ ̅ ̅ ̅ ̅ ̅ ̅ ̅ ̅|̅ ̅ ̅ ̅ ̅ ̅ ̅ ̅ ̅ ̅ ̅ ̅ ̅
 //   _____________v̲____________
-//  | ̲ ̲ ̲ ̲S̲i̲n̲o̲g̲r̲a̲m̲ ̲A̲d̲d̲r̲e̲s̲s̲e̲r̲ ̲ ̲ ̲ ̲|
+//  | ̲ ̲ ̲ ̲S̲i̲n̲o̲g̲r̲a̲m̲ ̲A̲d̲d̲r̲e̲s̲s̲e̲r̲ ̲ ̲ ̲ ̲| <- TODO rebinning
 //  | Filtered RAM Swap Control|
 //    ̅ ̅ ̅ ̅ ̅ ̅ ̅ ̅ ̅ ̅ ̅ ̅ ̅|̅ ̅ ̅ ̅ ̅ ̅ ̅ ̅ ̅ ̅ ̅ ̅ ̅
 //   _____________v̲____________
@@ -46,9 +46,13 @@ NABPSinogramAddresser sinogram_addresser
     // global signals
     .clk(clk),
     .reset_n(reset_n),
+    // inputs from host
+    .hs_kick(kick),
     // inputs from filtered RAM
     .fr_s_val(fr_sa_s_val),
     .fr_next_angle(fr_sa_next_angle),
+    // outputs to host
+    .hs_done(done),
     // outputs to filtered RAM
     .fr_angle(sa_fr_angle),
     .fr_has_next_angle(sa_fr_has_next_angle),
@@ -59,7 +63,7 @@ NABPSinogramAddresser sinogram_addresser
 
 wire [`kFilteredDataLength-1:0] fl_fr_val;
 // TODO filtering
-NABPFilterSkeleton filter
+NABPFilter filter
 (
     .clk(clk),
     .enable(1'd1),

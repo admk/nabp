@@ -72,3 +72,9 @@ class filtered_ram_swap_control_states(enum):
         self.fill_and_work = None
         self.work = None
         super(filtered_ram_swap_control_states, self).__init__()
+
+class sinogram_addresser_states(enum):
+    def __init__(self):
+        self.ready = None
+        self.work = None
+        super(sinogram_addresser_states, self).__init__()
