@@ -39,8 +39,7 @@
 
 `define kImageSizeLength {# bin_width(c['image_size']) #}
 
-`define kAngleStep {# c['kAngleStep'] #}
-`define kNoOfAngles {# c['no_of_angles'] #}
-`define kNoOfAnglesLength {# bin_width(c['no_of_angles']) #}
+`define kNoOfAngles {# c['kNoOfAngles'] #}
+`define kNoOfAnglesLength {# bin_width(c['kNoOfAngles']) #}
 `define kSinogramAddressLength {#
-            bin_width(c['no_of_angles'] * c['projection_line_size'] - 1) #}
+            bin_width(c['kNoOfAngles'] * c['projection_line_size'] - 1) #}
