@@ -51,6 +51,26 @@ module NABPShifter
 // 2 cycles delay for output control signals to state control
 // 1 cycle to get value from the filtered RAM by the specified address;
 // 1 cycle to ensure the data is ready at the output of the line buffer.
+// T̲i̲m̲i̲n̲g̲ ̲D̲i̲a̲g̲r̲a̲m̲
+//
+//          clk _| ̅|_| ̅|_| ̅|_| ̅|_| ̅|       _| ̅|_| ̅|_| ̅|_| ̅|_| ̅|_
+//
+//   shift_kick _/ ̅ ̅ ̅\______________       _____________________
+//                   ↘
+//   shift_done ______↓̲_____________       _________/ ̅ ̅ ̅\_______
+//                    ↓                               ↑
+//        s_val _̅_̅_̅_̅_̅X_̅↘̲̅_̅X_̅_̅_̅X_̅_̅_̅X_̅_̅       _̅X_̅_̅_̅X_̅_̅_̅_̅_̅↑̲̅_̅_̅_̅_̅_̅_̅_̅_̅_̅
+//                      ↘                             ↑
+//          val _̅_̅_̅_̅_̅_̅_̅_̅_̅X_̅_̅_̅X_̅_̅_̅X_̅_̅  ...  _̅X_̅_̅_̅X_̅_̅_̅X_̅↑̲̅_̅_̅_̅_̅_̅_̅_̅_̅_̅
+//                        ↓↘                          ↑
+//     shift_en _________/̲/̲̅/̲̅↓̲̅/̲̅/̲̅/̲̅/̲̅/̲̅/̲̅/̲̅       /̲̅/̲̅/̲̅/̲̅/̲̅/̲̅/̲̅/̲̅/̲̅\̲_↑̲_________
+//                           ↘                        ↑
+//        pe_en _____________/↘̅ ̅ ̅ ̅ ̅ ̅        ̅ ̅ ̅ ̅ ̅ ̅ ̅ ̅ ̅ ̅ ̅↑̅ ̅\_______
+//                            ↓                       ↑
+//      pe_taps _̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅X_̅_̅_̅X_̅_̅       _̅X_̅_̅_̅X_̅_̅_̅X↗̲̅_̅_̅X_̅_̅_̅_̅_̅_̅_̅
+//
+//                           |--------------------------| cycles = shift count
+//                   |--------------------------|         cycles = shift count
 {#
     var_delay_map = {
             # sw_pe_en $\delta$ s_val=>val=>taps
