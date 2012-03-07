@@ -1,8 +1,11 @@
-from skimage.transform import radon, iradon
-
-from pynabp.utils import bin_width_of_dec
+from pynabp.utils import bin_width_of_dec, dec_repr, dec2bin
 from pynabp.fixed_point_arith import FixedPoint
 from pynabp.conf.ramp_filter import ramp_filter
+
+from skimage.transform import radon
+from pynabp.phantom import phantom
+
+import numpy
 
 
 def import_conf(path):
@@ -56,7 +59,25 @@ def angle_defines(precision, angle_step_size):
     return defines
 
 
-def sinogram(image_size, projection_size,
-        angle_precision, angle_step_size):
-    pass
+def sinogram(
+        image_size, projection_line_size, angle_step_size, no_of_angles):
+    # phantom to be projection size / sqrt(2)
+    ph = phantom(int(projection_line_size / numpy.sqrt(2)))
 
+    # produce projections by radon transform (skimage.transform.radon
+    # resize radon transformed sinogram to projection line size, i.e. multiply
+    # by sqrt(2))
+    # FIXME: this is bad, because the sinogram RAM could be offsetted
+    sg = radon(ph, numpy.arange(0, 180, angle_step_size))
+
+    # prepare sg as contents of the RAM
+    a_len = bin_width_of_dec(no_of_angles)
+    s_len = bin_width_of_dec(projection_line_size)
+    addr_len = a_len + s_len
+    sg_ram = {
+            str(addr_len) + '\'b' + dec2bin(a, a_len) + dec2bin(s, s_len):
+            dec_repr(sg[s, a])
+            for a in xrange(sg.shape(1))
+            for s in xrange(sg.shape(0))}
+
+    return sg_ram
