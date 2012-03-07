@@ -2,13 +2,15 @@
 # Parameters are specified in this file, then checked for correctness in
 # pynabp/conf_gen.py.
 
+debug = True
+
 config = \
     {
         # Run the architecture in debug mode.
         # This yields unsynthesisable statements for testing purposes.
         # Constraints:
         #   True / False
-        'debug': True,
+        'debug': debug,
 
         # Simulation clock period.
         # The clock period used for simulation, in nanoseconds.
@@ -77,7 +79,7 @@ config = \
         # and $s$ is the projection offset.
         # Constraints:
         #   Positive integers.
-        'angle_step_size': None,
+        'angle_step_size': None if not debug else 30,
 
         # The bit length of the data representation for a single projection
         # data point.

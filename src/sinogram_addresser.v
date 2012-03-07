@@ -35,7 +35,10 @@ module NABPSinogramAddresser
             states=sinogram_addresser_states())
 #}
 
-// mealy outputs
+// m̲e̲a̲l̲y̲ ̲o̲u̲t̲p̲u̲t̲s̲
+// it is fine the hs_done signal does not wait for processing modules and PEs
+// to finish their current iteration - the filtered RAM swappable simply
+// stalls and wait for the next_angle signal from the processing swappable.
 assign hs_done = (!fr_has_next_angle && fr_next_angle);
 
 always @(posedge clk)

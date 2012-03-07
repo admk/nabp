@@ -100,8 +100,7 @@ always @(posedge clk)
 assign swap_curr = hs_has_next_angle ?
                    hs_next_angle_ack : (fill_done && pr_next_angle);
 assign hs_next_angle = reset_n &&
-                       ((state == ready_s) ||
-                       (hs_has_next_angle && fill_done && pr_next_angle));
+                       ((state == ready_s) || (fill_done && pr_next_angle));
 assign fill_kick = swap && (next_state != work_s);
 assign pr_next_angle_ack = (state != ready_s) && swap;
 
