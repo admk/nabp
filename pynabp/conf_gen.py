@@ -4,7 +4,8 @@ import math
 from pynabp.conf.validate import PreValidatorCollate, PostValidatorCollate
 from pynabp.conf.partition import partition
 from pynabp.conf.utils import import_conf, center, filter_coefs, angle_defines
-from pynabp.conf.luts import shift_lut_defines, map_lut_defines
+from pynabp.conf.luts import shift_lut_defines, map_lut_defines, \
+        sinogram_defines
 
 
 # setup path for configuration file
@@ -24,7 +25,7 @@ PreValidatorCollate(config).perform_validations()
 
 # derived configiguration
 def derive(config):
-    """Derive additional configiguration defines from a validated configiguration
+    """Derive additional configuration defines from a validated configuration
     dictionary.
     """
     if config['image_size'] is not None:
@@ -56,6 +57,13 @@ def derive(config):
                 config['kAnglePrecision'], config['angle_step_size']))
     derived.update(shift_lut_defines(config['kShiftAccuPrecision']))
     derived.update(map_lut_defines(config_n_derived))
+
+    # debug mode configurations
+    if config['debug']:
+        derived.update(sinogram_defines(
+                    config['image_size'], config['projection_line_size'],
+                    config['angle_step_size'], config['no_of_angles']))
+
     return derived
 
 # update config with derived configigurations
