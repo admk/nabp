@@ -20,6 +20,8 @@
 //   _____________v̲____________
 //  |         Image RAM        |
 //    ̅ ̅ ̅ ̅ ̅ ̅ ̅ ̅ ̅ ̅ ̅ ̅ ̅ ̅ ̅ ̅ ̅ ̅ ̅ ̅ ̅ ̅ ̅ ̅ ̅ ̅
+// S̲i̲n̲o̲g̲r̲a̲m̲ ̲R̲A̲M̲ ̲f̲o̲r̲m̲a̲t̲
+// TODO write proper description
 
 module NABP
 (
