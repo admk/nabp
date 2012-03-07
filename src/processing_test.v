@@ -50,7 +50,6 @@ NABPProcessingSwapControl uut
     .fr1_val(fr1_val),
     // output to processing elements
     .pe_reset(),
-    .pe_kick(),
     .pe_en(pe_en),
     .pe_scan_mode(),
     .pe_scan_direction(),
