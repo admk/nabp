@@ -1,4 +1,4 @@
-from pynabp.utils import bin_width_of_dec, dec_repr, dec2bin
+from pynabp.utils import bin_width_of_dec, dec_repr
 from pynabp.fixed_point_arith import FixedPoint
 from pynabp.conf.ramp_filter import ramp_filter
 
@@ -71,11 +71,10 @@ def sinogram(
     sg = radon(ph, numpy.arange(0, 180, angle_step_size))
 
     # prepare sg as contents of the RAM
-    a_len = bin_width_of_dec(no_of_angles)
-    s_len = bin_width_of_dec(projection_line_size)
-    addr_len = a_len + s_len
+    addr_len = bin_width_of_dec(no_of_angles) + \
+            bin_width_of_dec(projection_line_size)
     sg_ram = {
-            str(addr_len) + '\'b' + dec2bin(a, a_len) + dec2bin(s, s_len):
+            dec_repr(a * projection_line_size + s, addr_len):
             dec_repr(sg[s, a])
             for a in xrange(sg.shape(1))
             for s in xrange(sg.shape(0))}
