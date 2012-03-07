@@ -1,10 +1,9 @@
 import os
 import math
 
-from pynabp.conf.partition import partition
-
-from pynabp.conf.utils import import_conf, center, filter_coefs, angle_defines
 from pynabp.conf.validate import PreValidatorCollate, PostValidatorCollate
+from pynabp.conf.partition import partition
+from pynabp.conf.utils import import_conf, center, filter_coefs, angle_defines
 from pynabp.conf.luts import shift_lut_defines, map_lut_defines
 
 
@@ -41,11 +40,12 @@ def derive(config):
             'projection_line_center': center(config['projection_line_size']),
             'image_center': center(image_size),
             # filter
-            'fir_coefs': filter_coefs(config['fir_order'], config['fir_function']),
+            'fir_coefs':
+                    filter_coefs(config['fir_order'], config['fir_function']),
             # partitions
-            'partition_scheme': \
+            'partition_scheme':
                     partition(image_size, config['no_of_processing_elements']),
-            'kFilteredDataLength': \
+            'kFilteredDataLength':
                     config['kDataLength'] + config['kFilteredDataPrecision'],
         }
 

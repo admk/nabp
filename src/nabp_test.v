@@ -5,6 +5,32 @@
 
 module NABPTest();
 
+{#
+    include('templates/global_signal_generate.v')
+    include('templates/dump_wave.v')
+    include('templates/data_test_vals.v')
+
+    if not c['debug']:
+        raise RuntimeError('Must be in debug mode to perform this test.')
+#}
+
+reg kick;
+wire done;
+
+// sinogram RAM
+
+// control signals
+always
+begin:kick_done_handler
+    kick = 0;
+    @(posedge reset_n);
+    @(posedge clk);
+    kick = 1;
+    @(posedge clk);
+    kick = 0;
+    @(posedge done);
+end
+
 // unit under test
 NABP nabp_uut
 (
