@@ -49,6 +49,15 @@ class FixedPoint(object):
         """
         return 1 / float(2 ** self.fractional_width)
 
+    def possible_values_list(self):
+        i, max_val = self.range()
+        l = []
+        while i < max_val:
+            l.append(i)
+            i += self.precision()
+        l.append(i)
+        return l
+
     def verilog_decl(self):
         """
         >>> FixedPoint(4, 4, True).verilog_decl()

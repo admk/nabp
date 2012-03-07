@@ -1,7 +1,9 @@
+from skimage.transform import radon, iradon
+
 from pynabp.utils import bin_width_of_dec
 from pynabp.fixed_point_arith import FixedPoint
-
 from pynabp.conf.ramp_filter import ramp_filter
+
 
 def import_conf(path):
     """Import a configuration file from path
@@ -12,14 +14,17 @@ def import_conf(path):
     execfile(path, globs)
     return globs['config']
 
+
 def center(val):
     return int((val - 1) / 2)
+
 
 def filter_coefs(order, function):
     if callable(function):
         return function(order)
     else:
         return ramp_filter(order)
+
 
 def angle_defines(precision, angle_step_size):
     if precision != 0:
@@ -49,4 +54,9 @@ def angle_defines(precision, angle_step_size):
             })
 
     return defines
+
+
+def sinogram(image_size, projection_size,
+        angle_precision, angle_step_size):
+    pass
 
