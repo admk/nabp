@@ -49,6 +49,7 @@ sources = {
             ingredients['processing'] +
             ingredients['nabp'] +
             Split("""
+                processing_swap_control.v
                 nabp_test.v
                 """),
     }
