@@ -137,7 +137,7 @@ NABPProcessingElement
     .pe_id({#i#}),
     .pe_tap_offset({# c['partition_scheme']['partitions'][i] #})
 )
-processing_element
+processing_element_{#i#}
 (
     .clk(clk),
     .sw_reset(pe_reset),
