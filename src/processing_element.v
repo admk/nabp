@@ -93,15 +93,9 @@ begin:write_back_sync
     write_val <= read_val + lb_val;
 end
 
-{#
-    # TODO refactor this into config derivation after kAnglePrecision support
-    no_angles = 180
-    accumulate_count = bin_width(no_angles) + kAnglePrecision
-#}
-
 NABPDualPortRAM
 #(
-    .pDataLength(`kFilteredDataLength + {# accumulate_count #}),
+    .pDataLength(`kFilteredDataLength + {# bin_width(c['kNoOfAngles']) #}),
     .pRAMSize({# 2 * scan_mode_pixels #}),
     .pAddrLength(`kAddressLength)
 )

@@ -62,7 +62,7 @@ def derive(config):
     if config['debug']:
         derived.update(sinogram_defines(
                     config['image_size'], config['projection_line_size'],
-                    config['angle_step_size'], config['no_of_angles']))
+                    config['angle_step_size'], derived['kNoOfAngles']))
 
     return derived
 

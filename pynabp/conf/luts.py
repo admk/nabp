@@ -144,7 +144,7 @@ def sinogram_defines(
     sg_ram = {
             dec_repr(a * projection_line_size + s, addr_len):
             dec_repr(sg[s, a])
-            for a in xrange(sg.shape(1))
-            for s in xrange(sg.shape(0))}
+            for a in xrange(sg.shape[1])
+            for s in xrange(sg.shape[0])}
 
     return sg_ram
