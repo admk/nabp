@@ -25,13 +25,13 @@ hs_angles angles_generate
 );
 
 wire [`kSLength-1:0] hs_s_val;
-wire [`kFilteredDataLength-1:0] filter_out, filter_in;
+wire [`kFilteredDataLength-1:0] filter_out;
+wire [`kDataLength-1:0] filter_in;
 assign filter_in = data_test_vals(hs_s_val, hs_angle);
-// shift register to model filtering
-shift_register sr_filter_model
+NABPFilter filter
 (
     .clk(clk),
-    .enable(1'd1), 
+    .enable(1'd1),
     .clear(hs_next_angle),
     .val_in(filter_in),
     .val_out(filter_out)

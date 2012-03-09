@@ -88,7 +88,7 @@ config = \
         # data point.
         # Constraints:
         #   Positive integers.
-        'kDataLength': 8,
+        'kDataLength': 10,
 
         # The decimal places (in binary) of data after filtering appended.
         # Constraints:

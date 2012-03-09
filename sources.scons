@@ -51,6 +51,7 @@ sources = {
             ingredients['filtered_ram'] +
             Split("""
                 filtered_ram_test.v
+                filter.v
                 """),
         'pg_test':
             ingredients['processing'] +
