@@ -1,11 +1,11 @@
 import os
 import math
 
-from pynabp.conf.partition import partition
-
-from pynabp.conf.utils import import_conf, center, filter_coefs, angle_defines
 from pynabp.conf.validate import PreValidatorCollate, PostValidatorCollate
-from pynabp.conf.luts import shift_lut_defines, map_lut_defines
+from pynabp.conf.partition import partition
+from pynabp.conf.utils import import_conf, center, filter_coefs, angle_defines
+from pynabp.conf.luts import shift_lut_defines, map_lut_defines, \
+        sinogram_defines
 
 
 # setup path for configuration file
@@ -25,7 +25,7 @@ PreValidatorCollate(config).perform_validations()
 
 # derived configiguration
 def derive(config):
-    """Derive additional configiguration defines from a validated configiguration
+    """Derive additional configuration defines from a validated configuration
     dictionary.
     """
     # image size
@@ -44,11 +44,12 @@ def derive(config):
             'projection_line_center': center(config['projection_line_size']),
             'image_center': center(image_size),
             # filter
-            'fir_coefs': filter_coefs(config['fir_order'], config['fir_function']),
+            'fir_coefs':
+                    filter_coefs(config['fir_order'], config['fir_function']),
             # partitions
-            'partition_scheme': \
+            'partition_scheme':
                     partition(image_size, config['no_of_processing_elements']),
-            'kFilteredDataLength': \
+            'kFilteredDataLength':
                     config['kDataLength'] + config['kFilteredDataPrecision'],
         }
 
@@ -59,6 +60,14 @@ def derive(config):
                 config['kAnglePrecision'], config['angle_step_size']))
     derived.update(shift_lut_defines(config['kShiftAccuPrecision']))
     derived.update(map_lut_defines(config_n_derived))
+
+    # debug mode configurations
+    if config['debug']:
+        derived.update(sinogram_defines(
+                    config['image_size'], config['projection_line_size'],
+                    config['angle_step_size'], derived['kNoOfAngles'],
+                    config['kDataLength']))
+
     return derived
 
 # update config with derived configigurations

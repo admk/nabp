@@ -7,7 +7,7 @@
     from pynabp.enums import sinogram_addresser_states
     def to_sg_addr(val):
         return dec_repr(
-                val, c['no_of_angles'] * c['projection_line_size'] - 1)
+                val, c['kNoOfAngles'] * c['projection_line_size'] - 1)
 #}
 
 module NABPSinogramAddresser
@@ -79,7 +79,7 @@ begin:fr_angle_iterate
     end
     else if (fr_next_angle && fr_has_next_angle)
     begin
-        fr_angle <= fr_angle + fr_angle_step;
+        fr_angle <= fr_angle + `kAngleStep;
         sg_base_addr <= sg_base_addr +
                 {# to_sg_addr(c['projection_line_size']) #};
     end

@@ -6,9 +6,15 @@
 // with one tap of the line buffer.
 //
 // S̲c̲h̲e̲m̲a̲t̲i̲c̲
+//  
 //   ____________
+//  |  Filtered  |
+//  |  RAM Swap  |
+//  |   Control  |
+//    ̅ ̅ ̅ ̅ ̅|̅ ̅ ̅ ̅ ̅ ̅ ̅
+//   _____v̲______
 //  | Processing |
-//  | Swap     _ |    ____
+//  |    Swap  _ |    ____
 //  | Control | ||̶ ̶ ̶>| PE |--*
 //  |         |L||    _̅_̅_̅_̅   |
 //  |         |i||̶ ̶ ̶>| PE |--*
@@ -52,7 +58,7 @@ module NABPProcessingElement
     input wire sw_scan_mode,
     input wire sw_scan_direction,
     // input from line buffer
-    input wire signed [`kFilteredDataLength-1:0] lb_val,
+    input wire signed [`kFilteredDataLength-1:0] lb_val
 );
 
 parameter integer pe_id = 'bz;
@@ -86,6 +92,11 @@ begin:base_addr_counter
     end
 end
 
+reg write_en;
+reg [`kAddressLength-1:0] write_addr;
+reg [`kCacheDataLength-1:0] write_val;
+wire [`kCacheDataLength-1:0] read_val;
+
 always @(posedge clk)
 begin:write_back_sync
     write_en <= sw_en;
@@ -93,15 +104,9 @@ begin:write_back_sync
     write_val <= read_val + lb_val;
 end
 
-{#
-    # TODO refactor this into config derivation after kAnglePrecision support
-    no_angles = 180
-    accumulate_count = bin_width(no_angles) + kAnglePrecision
-#}
-
 NABPDualPortRAM
 #(
-    .pDataLength(`kFilteredDataLength + {# accumulate_count #}),
+    .pDataLength(`kCacheDataLength),
     .pRAMSize({# 2 * scan_mode_pixels #}),
     .pAddrLength(`kAddressLength)
 )
@@ -130,26 +135,27 @@ begin
     $sprintf(file_name, "pe_update_%d.csv", pe_id);
     file = $fopen(file_name, "w");
     $fwrite(file, "Time, X, Y, Value");
-    always @(posedge clk)
-        if (pe_en)
-        begin
-            line_pos = base_addr / {# c['image_size'] #};
-            scan_pos = base_addr - {# c['image_size'] #} * line_pos;
-            line_pos = line_pos + pe_tap_offset;
-            if (sw_scan_mode == {# scan_mode.x #})
-            begin
-                im_x = scan_pos;
-                im_y = line_pos;
-            end
-            else
-            begin
-                im_x = line_pos;
-                im_y = scan_pos;
-            end
-            $fwrite(file, "%g, %d, %d, %d\n", $time, im_x, im_y, cc_write_val);
-            err = $fflush(file);
-        end
 end
+
+always @(posedge clk)
+    if (sw_en)
+    begin
+        line_pos = base_addr / {# c['image_size'] #};
+        scan_pos = base_addr - {# c['image_size'] #} * line_pos;
+        line_pos = line_pos + pe_tap_offset;
+        if (sw_scan_mode == {# scan_mode.x #})
+        begin
+            im_x = scan_pos;
+            im_y = line_pos;
+        end
+        else
+        begin
+            im_x = line_pos;
+            im_y = scan_pos;
+        end
+        $fwrite(file, "%g, %d, %d, %d\n", $time, im_x, im_y, write_val);
+        err = $fflush(file);
+    end
 {% end %}
 
 endmodule

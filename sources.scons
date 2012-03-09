@@ -20,7 +20,11 @@ ingredients = {
             line_buffer.v
             processing_swappable_state_control.v
             processing_swappable.v
-            processing_data_path_verify.v
+            """),
+        'nabp': Split("""
+            nabp.v
+            sinogram_addresser.v
+            processing_element.v
             """),
     }
 
@@ -47,17 +51,30 @@ sources = {
             ingredients['filtered_ram'] +
             Split("""
                 filtered_ram_test.v
+                filter.v
                 """),
         'pg_test':
             ingredients['processing'] +
             Split("""
+                processing_data_path_verify.v
                 processing_swappable_test.v
                 """),
         'pw_test':
             ingredients['processing'] +
             Split("""
+                processing_data_path_verify.v
                 processing_swap_control.v
                 processing_test.v
+                """),
+        'nabp_test':
+            ingredients['filtered_ram'] +
+            ingredients['processing'] +
+            ingredients['nabp'] +
+            Split("""
+                processing_swap_control.v
+                sinogram_data_lut.v
+                nabp_test.v
+                filter.v
                 """),
     }
 
