@@ -52,9 +52,9 @@ def _map_accu_part_lookup(conf):
         elif (45 <= angle and angle < 90):
             val = - pe_last * sin_val
         elif (90 <= angle and angle < 135):
-            val = - (pe_last + pe_size) * sin_val + (i_size - 1) * cos_val
+            val = - (pe_last + pe_size - 1) * sin_val + (i_size - 1) * cos_val
         elif (135 <= angle and angle < 180):
-            val = (pe_last + pe_size) * cos_val - (i_size - 1) * sin_val
+            val = (pe_last + pe_size - 1) * cos_val - (i_size - 1) * sin_val
         else:
             raise RuntimeError('Invalid angle encountered')
         return val + i_center * sin_val - i_center * cos_val + p_center

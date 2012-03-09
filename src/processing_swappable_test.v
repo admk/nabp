@@ -18,7 +18,7 @@ wire [`kFilteredDataLength-1:0] fr_val;
 // a simple preliminary test for 45 degrees
 initial
 begin:hs_angle_update
-    hs_angle = {# to_a(90) #};
+    hs_angle = {# to_a(30) #};
 end
 
 // controls
@@ -62,7 +62,11 @@ assign line_itr = (hs_angle < `kAngle90) ? 0 :
         {# to_l(c['partition_scheme']['size'] - 1) #};
 
 // data path verifier
-NABPProcessingDataPathVerify data_path_verify
+NABPProcessingDataPathVerify
+#(
+    .pSDifferenceTolerance(0)
+)
+data_path_verify
 (
     .clk(clk),
     .reset_n(reset_n),
