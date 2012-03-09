@@ -11,6 +11,18 @@ class RelationValidateError(ValidateError):
 class PreRelationValidator(Validator):
     """Validate config relations"""
 
+    SUPPORTED_DEVICES = []
+
+    def validate_device(self, config):
+        if config['debug']:
+            return
+        if not config['device'] or config['device'] == 'simulator':
+            raise RelationValidateError(
+                    'Release build device is not specified.')
+        if config['device'] not in self.SUPPORTED_DEVICES:
+            raise RelationValidateError(
+                    'Unrecognised device %s.' % config['device'])
+
     def validate_map_accu_relationship(self, config):
         if config['kMapAccuPrecision'] < config['kMapAccuPartPrecision']:
             raise RelationValidateError(

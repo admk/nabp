@@ -28,6 +28,7 @@ def derive(config):
     """Derive additional configuration defines from a validated configuration
     dictionary.
     """
+    # image size
     if config['image_size'] is not None:
         image_size = config['image_size']
     else:
@@ -35,6 +36,8 @@ def derive(config):
 
     derived = \
         {
+            # device
+            'device': config['device'] if config['device'] else 'simulator',
             # null filling
             'image_size': image_size,
             # centers
