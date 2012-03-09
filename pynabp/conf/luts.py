@@ -2,11 +2,17 @@ import math
 import numpy
 from itertools import chain
 
-from skimage.transform import radon
-
 from pynabp.utils import bin_width_of_dec_vals, bin_width_of_dec, dec_repr
 from pynabp.fixed_point_arith import FixedPoint
 from pynabp.phantom import phantom
+
+try:
+    from skimage.transform import radon
+except:
+    raise RuntimeError(
+            "scons breaks skimage and scipy by module name mangling between "
+            "pickle and cPickle. Workaround: set the environment variable:\n"
+            "    export SCONS_HORRIBLE_REGRESSION_TEST_HACK=0")
 
 
 def shift_lut_defines(shift_accu_precision):
