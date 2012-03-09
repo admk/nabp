@@ -1,20 +1,7 @@
-{# include('templates/info.v') #}
+{# include('templates/defines.v') #}
 // NABPProcessingSwappableTest
 //     13 Feb 2012
 // This test bench tests the functionality of NABPProcessingSwappable
-
-{#
-    from pynabp.conf import conf
-    from pynabp.utils import bin_width_of_dec, dec_repr
-    no_pes = conf()['partition_scheme']['no_of_partitions']
-    filtered_data_len = conf()['kFilteredDataLength']
-    a_len = conf()['kAngleLength']
-    s_val_len = bin_width_of_dec(conf()['projection_line_size'])
-#}
-`define kNoOfPartitions {# no_pes #}
-`define kAngleLength {# a_len #}
-`define kSLength {# s_val_len #}
-`define kFilteredDataLength {# filtered_data_len #}
 
 module NABPProcessingSwappableTest();
 
@@ -22,16 +9,16 @@ module NABPProcessingSwappableTest();
 {# include('templates/dump_wave.v') #}
 
 reg [`kAngleLength-1:0] hs_angle;
-wire {# conf()['tShiftAccuBase'].verilog_decl() #} sw_sh_accu_base;
-wire {# conf()['tMapAccuInit'].verilog_decl() #} sw_mp_accu_init;
-wire {# conf()['tMapAccuBase'].verilog_decl() #} sw_mp_accu_base;
+wire {# c['tShiftAccuBase'].verilog_decl() #} sw_sh_accu_base;
+wire {# c['tMapAccuInit'].verilog_decl() #} sw_mp_accu_init;
+wire {# c['tMapAccuBase'].verilog_decl() #} sw_mp_accu_base;
 wire [`kSLength-1:0] fr_s_val;
 wire [`kFilteredDataLength-1:0] fr_val;
 
 // a simple preliminary test for 45 degrees
 initial
 begin:hs_angle_update
-    hs_angle = {# dec_repr(30, a_len) #};
+    hs_angle = {# to_a(30) #};
 end
 
 // controls
@@ -77,15 +64,16 @@ NABPProcessingDataPathVerify data_path_verify
     .reset_n(reset_n),
     .tt_angle(hs_angle),
     .tt_line_itr(0),
-    .tt_verify_kick(sw_swap_ack),
-    .pv_s_val(fr_s_val),
-    .pv_val(fr_val),
+    .pv0_s_val(fr_s_val),
+    .pv1_s_val(0),
+    .pv0_val(fr_val),
+    .pv1_val(),
     .pe_en(sw_pe_en),
     .pe_taps(pe_taps)
 );
 
 // look-up tables
-wire {# conf()['tMapAccuPart'].verilog_decl() #} sw_mp_accu_part;
+wire {# c['tMapAccuPart'].verilog_decl() #} sw_mp_accu_part;
 assign sw_mp_accu_init = sw_mp_accu_part; // implicit sign extension
 NABPMapperLUT mapper_lut
 (

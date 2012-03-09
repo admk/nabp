@@ -1,19 +1,9 @@
-{# include('templates/info.v') #}
+{# include('templates/defines.v') #}
 // line_buffer
 //     15 Feb 2012
 // The line buffer implementation for simulation purposes
 
-{#
-    from pynabp.enums import state_control_states
-    from pynabp.conf import conf
-    from pynabp.utils import bin_width_of_dec
-
-    p_line_size = conf()['projection_line_size']
-    s_val_len = bin_width_of_dec(p_line_size)
-    data_len = conf()['kFilteredDataLength']
-    no_pes = conf()['partition_scheme']['no_of_partitions']
-    delay_len = conf()['partition_scheme']['size']
-#}
+{# delay_len = c['partition_scheme']['size'] #}
 
 module line_buffer
 (
@@ -21,11 +11,11 @@ module line_buffer
     shift_in, taps
 );
 
-parameter pNoTaps = {# no_pes - 1 #};
+parameter pNoTaps = {# c['partition_scheme']['no_of_partitions'] - 1 #};
 parameter pTapsWidth = {# delay_len #};
-parameter pPtrLength = {# bin_width_of_dec(delay_len) #};
+parameter pPtrLength = {# bin_width(delay_len) #};
 
-parameter pDataLength = {# data_len #};
+parameter pDataLength = {# c['kFilteredDataLength'] #};
 
 input wire clk, clear, enable;
 input wire [pDataLength-1:0] shift_in;

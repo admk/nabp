@@ -1,5 +1,7 @@
-from scons_utils import flatten
+from pynabp.conf_gen import config
+from scons_utils import flatten, device_path
 
+# building blocks for targets
 ingredients = {
         'common': Split("""
             shift_register.v
@@ -15,33 +17,75 @@ ingredients = {
             mapper_lut.v
             shifter.v
             shifter_lut.v
-            state_control.v
             line_buffer.v
+            processing_swappable_state_control.v
             processing_swappable.v
-            processing_data_path_verify.v
+            """),
+        'nabp': Split("""
+            nabp.v
+            sinogram_addresser.v
+            processing_element.v
             """),
     }
+
+# If the source file is target specific, it will look up the folder
+#     src/devices/{{ device name }}/
+# for the source.
+#
+# If such source file does not exist, then it finds the variant in the folder
+#     src/devices/generic/
+#
+# device targeting source code specifier list
+device_specific = Split("""
+        mapper_lut.v
+        shifter_lut.v
+        line_buffer.v
+        shift_register.v
+        dual_port_ram.v
+        filter.v
+        """)
+
+# targets
 sources = {
         'fr_test':
             ingredients['filtered_ram'] +
             Split("""
                 filtered_ram_test.v
+                filter.v
                 """),
         'pg_test':
             ingredients['processing'] +
             Split("""
+                processing_data_path_verify.v
                 processing_swappable_test.v
                 """),
         'pw_test':
             ingredients['processing'] +
             Split("""
+                processing_data_path_verify.v
                 processing_swap_control.v
                 processing_test.v
                 """),
+        'nabp_test':
+            ingredients['filtered_ram'] +
+            ingredients['processing'] +
+            ingredients['nabp'] +
+            Split("""
+                processing_swap_control.v
+                sinogram_data_lut.v
+                nabp_test.v
+                filter.v
+                """),
     }
 
+Import('SOURCE_DIR')
+
 for target in sources.iterkeys():
-    sources[target] += ingredients['common']
+    sources[target] = device_path(
+            config['device'],
+            device_specific,
+            sources[target] + ingredients['common'],
+            SOURCE_DIR)
 
 sources['all'] = flatten(sources)
 

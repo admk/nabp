@@ -1,4 +1,4 @@
-{# include('templates/info.v') #}
+{# include('templates/defines.v') #}
 // NABPMapper
 //     3 Jan 2012
 // Provides addresses of the mapped projection line for line buffer
@@ -6,19 +6,15 @@
 // TODO reduce look-up table size by using symmetry
 
 {# 
-    from pynabp.conf import conf
     from pynabp.enums import mapper_states
-    from pynabp.utils import xfrange, dec_repr
-    from pynabp.fixed_point_arith import FixedPoint
+    from pynabp.utils import xfrange
 
-    a_len = conf()['kAngleLength']
-    accu_part_fixed = conf()['tLUTMapAccuPart']
-    accu_base_fixed = conf()['tMapAccuBase']
-    mp_accu_part_fixed = conf()['tMapAccuPart']
+    accu_part_fixed = c['tLUTMapAccuPart']
+    accu_base_fixed = c['tMapAccuBase']
+    mp_accu_part_fixed = c['tMapAccuPart']
     mp_accu_part_shift = mp_accu_part_fixed.fractional_width - \
             accu_part_fixed.fractional_width
 #}
-`define kAngleLength {# a_len #}
 
 module NABPMapperLUT
 (
@@ -40,13 +36,12 @@ always @(posedge clk)
 begin
     {# set_eat_blanklines(True) #}
     case (mp_angle)
-        {% for idx, angle in enumerate(
-                xfrange(0, 180, conf()['projection_angle_step'])) %}
-        {# dec_repr(angle, a_len) #}:
+        {% for idx, angle in enumerate(xrange(0, 180)) %}
+        {# dec_repr(angle, c['kAngleLength']) #}:
         begin
             {#
-                accu_part_val = conf()['lutMapAccuPart'][idx]
-                accu_base_val = conf()['lutMapAccuBase'][idx]
+                accu_part_val = c['lutMapAccuPart'][idx]
+                accu_base_val = c['lutMapAccuBase'][idx]
             #}
             // {# accu_part_val #}
             accu_part <= {# accu_part_fixed.verilog_repr(accu_part_val) #};

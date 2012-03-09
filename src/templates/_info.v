@@ -1,6 +1,6 @@
 // vim:ft=verilog:fileencoding=utf-8
-// Source: {# parent.name() #}
-// Folder: {# parent.dir() #}
+// Source: {# parent().parent().name() #}
+// Folder: {# parent().parent().dir() #}
 // Author: Xitong Gao
 // Generated on: {# from datetime import datetime #}{# datetime.now() #}
 // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -8,4 +8,3 @@
 // The source code is best viewed when typesetted with minted package
 // using $\LaTeX$.
 // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-`timescale 1ns/10ps

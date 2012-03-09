@@ -1,144 +1,95 @@
 [*]
-[*] GTKWave Analyzer v3.3.32 (w)1999-2012 BSI
-[*] Sat Feb 25 03:40:28 2012
+[*] GTKWave Analyzer v3.3.31 (w)1999-2012 BSI
+[*] Sun Mar  4 23:59:39 2012
 [*]
 [dumpfile] "/Users/admko/Documents/Sorcery/NABP/build/processing_swappable_test.v.lxt"
-[dumpfile_mtime] "Sat Feb 25 03:28:48 2012"
-[dumpfile_size] 25193
+[dumpfile_mtime] "Sun Mar  4 22:58:24 2012"
+[dumpfile_size] 30648
 [savefile] "/Users/admko/Documents/Sorcery/NABP/test/processing_swappable_test_wave.gtkw"
-[timestart] 0
-[size] 1366 720
+[timestart] 4817400
+[size] 1920 1152
 [pos] 0 44
-*-17.000000 100200 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+*-17.000000 5141100 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
 [treeopen] NABPProcessingSwappableTest.
 [treeopen] NABPProcessingSwappableTest.uut.
 [treeopen] NABPProcessingSwappableTest.uut.pe_line_buff.gen_taps_inst[18].
 [sst_width] 198
 [signals_width] 256
 [sst_expanded] 1
-[sst_vpaned_height] 278
+[sst_vpaned_height] 481
 @28
 NABPProcessingSwappableTest.clk[0]
 NABPProcessingSwappableTest.reset[0]
-@c00200
+@800200
 -host
 @28
 NABPProcessingSwappableTest.sw_next_itr_ack[0]
 NABPProcessingSwappableTest.sw_swap_ack[0]
-@1401200
+@1000200
 -host
-@c00200
+@800200
 -state control
 @28
 NABPProcessingSwappableTest.sw_next_itr[0]
 NABPProcessingSwappableTest.sw_swap[0]
-@2024
-^1 /Users/admko/Documents/Sorcery/NABP/derived_src/state_control.vxtf
+@24
 NABPProcessingSwappableTest.uut.state_control.state[2:0]
 @28
 NABPProcessingSwappableTest.uut.state_control.sh_fill_kick[0]
 NABPProcessingSwappableTest.uut.state_control.sh_shift_kick[0]
 NABPProcessingSwappableTest.sw_pe_en[0]
-@1401200
+@1000200
 -state control
 @800200
 -shifter
 @28
-NABPProcessingSwappableTest.uut.state_control.sh_fill_done[0]
 NABPProcessingSwappableTest.uut.state_control.sh_shift_done[0]
-@c04028
-^>3 /Users/admko/Documents/Sorcery/NABP/derived_src/tShiftAccuBase.pytf
-NABPProcessingSwappableTest.uut.state_control.sh_accu_base[8:0]
-@28
-(0)NABPProcessingSwappableTest.uut.state_control.sh_accu_base[8:0]
-(1)NABPProcessingSwappableTest.uut.state_control.sh_accu_base[8:0]
-(2)NABPProcessingSwappableTest.uut.state_control.sh_accu_base[8:0]
-(3)NABPProcessingSwappableTest.uut.state_control.sh_accu_base[8:0]
-(4)NABPProcessingSwappableTest.uut.state_control.sh_accu_base[8:0]
-(5)NABPProcessingSwappableTest.uut.state_control.sh_accu_base[8:0]
-(6)NABPProcessingSwappableTest.uut.state_control.sh_accu_base[8:0]
-(7)NABPProcessingSwappableTest.uut.state_control.sh_accu_base[8:0]
-(8)NABPProcessingSwappableTest.uut.state_control.sh_accu_base[8:0]
-@1401208
--group_end
-@4028
-^>4 /Users/admko/Documents/Sorcery/NABP/derived_src/tShiftAccuBase.pytf
-NABPProcessingSwappableTest.uut.shifter.accu[8:0]
-@24
-NABPProcessingSwappableTest.uut.shifter.cnt[8:0]
+NABPProcessingSwappableTest.uut.state_control.sh_fill_done[0]
 @2024
-^2 /Users/admko/Documents/Sorcery/NABP/derived_src/shifter.vxtf
+^1 /Users/admko/Documents/Sorcery/NABP/test/../derived_src/shifter.vxtf
 NABPProcessingSwappableTest.uut.shifter.state[2:0]
+@24
+NABPProcessingSwappableTest.uut.shifter.cnt[7:0]
+@4028
+^>1 /Users/admko/Documents/Sorcery/NABP/test/../derived_src/tShiftAccuBase.pytf
+NABPProcessingSwappableTest.uut.shifter.sc_accu_base[12:0]
+^>1 /Users/admko/Documents/Sorcery/NABP/test/../derived_src/tShiftAccuBase.pytf
+NABPProcessingSwappableTest.uut.shifter.accu[12:0]
 @1000200
 -shifter
 @800200
 -mapper
 @28
-NABPProcessingSwappableTest.uut.shifter.mp_shift_en[0]
-NABPProcessingSwappableTest.uut.shifter.mp_kick[0]
-NABPProcessingSwappableTest.uut.shifter.mp_done[0]
-@2025
-^3 /Users/admko/Documents/Sorcery/NABP/derived_src/mapper.vxtf
+NABPProcessingSwappableTest.uut.mapper.sh_shift_en[0]
+@2024
+^2 /Users/admko/Documents/Sorcery/NABP/test/../derived_src/mapper.vxtf
 NABPProcessingSwappableTest.uut.mapper.state[1:0]
 @4028
-^>5 /Users/admko/Documents/Sorcery/NABP/derived_src/tMapAccu.pytf
-NABPProcessingSwappableTest.uut.mapper.accu[17:0]
-^>2 /Users/admko/Documents/Sorcery/NABP/derived_src/tMapAccuInit.pytf
-NABPProcessingSwappableTest.uut.state_control.mp_accu_init[17:0]
-@c04028
-^>1 /Users/admko/Documents/Sorcery/NABP/derived_src/tMapAccuBase.pytf
-NABPProcessingSwappableTest.uut.state_control.mp_accu_base[9:0]
-@28
-(0)NABPProcessingSwappableTest.uut.state_control.mp_accu_base[9:0]
-(1)NABPProcessingSwappableTest.uut.state_control.mp_accu_base[9:0]
-(2)NABPProcessingSwappableTest.uut.state_control.mp_accu_base[9:0]
-(3)NABPProcessingSwappableTest.uut.state_control.mp_accu_base[9:0]
-(4)NABPProcessingSwappableTest.uut.state_control.mp_accu_base[9:0]
-(5)NABPProcessingSwappableTest.uut.state_control.mp_accu_base[9:0]
-(6)NABPProcessingSwappableTest.uut.state_control.mp_accu_base[9:0]
-(7)NABPProcessingSwappableTest.uut.state_control.mp_accu_base[9:0]
-(8)NABPProcessingSwappableTest.uut.state_control.mp_accu_base[9:0]
-(9)NABPProcessingSwappableTest.uut.state_control.mp_accu_base[9:0]
-@1401208
--group_end
-@80024
-NABPProcessingSwappableTest.fr_s_val[8:0]
-NABPProcessingSwappableTest.fr_val[8:0]
+^>2 /Users/admko/Documents/Sorcery/NABP/test/../derived_src/tMapAccuBase.pytf
+NABPProcessingSwappableTest.uut.mapper.mp_accu_base[13:0]
+^>3 /Users/admko/Documents/Sorcery/NABP/test/../derived_src/tMapAccuInit.pytf
+NABPProcessingSwappableTest.uut.mapper.mp_accu_init[21:0]
+@4029
+^>4 /Users/admko/Documents/Sorcery/NABP/test/../derived_src/tMapAccu.pytf
+NABPProcessingSwappableTest.uut.mapper.accu[21:0]
+@24
+NABPProcessingSwappableTest.uut.mapper.fr_s_val[8:0]
+NABPProcessingSwappableTest.fr_val[10:0]
 @1000200
 -mapper
 @800200
--line buffer
-@88024
-+{last tap} NABPProcessingSwappableTest.uut.pe_line_buff.gen_taps_inst[18].tap_sr.val_out[8:0]
-@28
-NABPProcessingSwappableTest.uut.pe_line_buff.enable[0]
-@80022
-NABPProcessingSwappableTest.pe_taps[179:0]
-@28
-NABPProcessingSwappableTest.uut.pe_line_buff.clear[0]
-@1000200
--line buffer
-@800200
--data path verify
+-validate
 @28
 NABPProcessingSwappableTest.data_path_verify.pe_en[0]
 @24
-NABPProcessingSwappableTest.data_path_verify.tap_val0[8:0]
-NABPProcessingSwappableTest.data_path_verify.tap_val_exp[8:0]
-@1000200
--data path verify
-@c00200
--misc
+NABPProcessingSwappableTest.data_path_verify.tap_val0[10:0]
+NABPProcessingSwappableTest.data_path_verify.tap_val_exp[10:0]
+NABPProcessingSwappableTest.data_path_verify.scan_itr[31:0]
+@22
+NABPProcessingSwappableTest.data_path_verify.tt_line_itr[3:0]
 @24
-NABPProcessingSwappableTest.hs_angle[7:0]
-@4028
-^>2 /Users/admko/Documents/Sorcery/NABP/derived_src/tMapAccuInit.pytf
-NABPProcessingSwappableTest.sw_mp_accu_init[17:0]
-^>1 /Users/admko/Documents/Sorcery/NABP/derived_src/tMapAccuBase.pytf
-NABPProcessingSwappableTest.sw_mp_accu_base[9:0]
-^>4 /Users/admko/Documents/Sorcery/NABP/derived_src/tShiftAccuBase.pytf
-NABPProcessingSwappableTest.sw_sh_accu_base[8:0]
-@1401200
--misc
+NABPProcessingSwappableTest.data_path_verify.tt_angle[7:0]
+@1000200
+-validate
 [pattern_trace] 1
 [pattern_trace] 0

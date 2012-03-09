@@ -1,30 +1,27 @@
-{# include('templates/info.v') #}
+{# include('templates/defines.v') #}
 // NABPShifter
 //     1 Jan 2012
 // Controls NABPFilterMapper by providing fm_shift_enable
 {#
-    from pynabp.conf import conf
     from pynabp.enums import shifter_states
-    from pynabp.utils import bin_width_of_dec, dec_repr
-    from pynabp.fixed_point_arith import FixedPoint
 
     # fill count varies from the position of the last PE tap to 0
-    fill_cnt_init = conf()['partition_scheme']['partitions'][-1]
-    fill_cnt_width = bin_width_of_dec(fill_cnt_init)
+    fill_cnt_init = c['partition_scheme']['partitions'][-1]
+    fill_cnt_width = bin_width(fill_cnt_init)
 
     # shift count varies from the position of the last pixel to 0
-    shift_cnt_init = conf()['image_size'] - 1
-    shift_cnt_width = bin_width_of_dec(shift_cnt_init)
+    shift_cnt_init = c['image_size'] - 1
+    shift_cnt_width = bin_width(shift_cnt_init)
 
     if shift_cnt_init < fill_cnt_init:
         raise RuntimeError(
-                'Fill count should always be smaller or equal to shift count.')
+                'Fill count (%d) should always be smaller or equal to shift'
+                'count (%d).' % (fill_cnt_init, shift_cnt_init))
 
-    accu_fixed = conf()['tShiftAccuBase']
+    accu_fixed = c['tShiftAccuBase']
     accu_init_str = accu_fixed.verilog_repr()
     accu_floor_slice = accu_fixed.verilog_floor_slice()
 #}
-`define kAngleLength {# conf()['kAngleLength'] #}
 
 module NABPShifter
 (
@@ -49,40 +46,44 @@ module NABPShifter
     output wire sw_pe_en
 );
 
-{#
-    var_delay_map = {
-            'sw_pe_en':      2, # sw_pe_en $\delta$ s_val=>val=>taps
-            'lb_shift_en':   1, # lb_shift_en $\delta$ s_val=>val
-            'sc_fill_done':  2, # sc_fill_done $\delta$ s_val=>val=>taps->done
-            'sc_shift_done': 2, # sc_shift_done $\delta$ s_val=>val=>taps->done
-            }
-    def var_name(base, delay):
-        return base + '_' + str(delay)
-#}
 // S̲i̲g̲n̲a̲l̲ ̲D̲e̲l̲a̲y̲s̲
 // Handled by this module rather than higher level modules
 // 2 cycles delay for output control signals to state control
 // 1 cycle to get value from the filtered RAM by the specified address;
 // 1 cycle to ensure the data is ready at the output of the line buffer.
-// Signals being delayed with number of delay cycles are -
-//      {# var_delay_map #}.
-{% for var, var_delay in var_delay_map.iteritems() %}
-    {% for delay in xrange(var_delay + 1) %}
-        // declaration
-        {% if delay == var_delay %}
-            wire {# var #}_l, {# var_name(var, delay) #};
-            assign {# var_name(var, delay) #} = {# var #}_l;
-        {% else %}
-            reg {# var_name(var, delay) #};
-        {% end %}
-        {% if delay > 0 %}
-            always @(posedge clk)
-                {# var_name(var, delay - 1) #} <= {# var_name(var, delay) #};
-        {% end %}
-    {% else %}
-        assign {# var #} = {# var_name(var, 0) #};
-    {% end %}
-{% end %}
+// T̲i̲m̲i̲n̲g̲ ̲D̲i̲a̲g̲r̲a̲m̲
+//
+//          clk _| ̅|_| ̅|_| ̅|_| ̅|_| ̅|       _| ̅|_| ̅|_| ̅|_| ̅|_| ̅|_
+//
+//   shift_kick _/ ̅ ̅ ̅\______________       _____________________
+//                   ↘
+//   shift_done ______↓̲_____________       _________/ ̅ ̅ ̅\_______
+//                    ↓                               ↑
+//        s_val _̅_̅_̅_̅_̅X_̅↘̲̅_̅X_̅_̅_̅X_̅_̅_̅X_̅_̅       _̅X_̅_̅_̅X_̅_̅_̅_̅_̅↑̲̅_̅_̅_̅_̅_̅_̅_̅_̅_̅
+//                      ↘                             ↑
+//          val _̅_̅_̅_̅_̅_̅_̅_̅_̅X_̅_̅_̅X_̅_̅_̅X_̅_̅  ...  _̅X_̅_̅_̅X_̅_̅_̅X_̅↑̲̅_̅_̅_̅_̅_̅_̅_̅_̅_̅
+//                        ↓↘                          ↑
+//     shift_en _________/̲/̲̅/̲̅↓̲̅/̲̅/̲̅/̲̅/̲̅/̲̅/̲̅/̲̅       /̲̅/̲̅/̲̅/̲̅/̲̅/̲̅/̲̅/̲̅/̲̅\̲_↑̲_________
+//                           ↘                        ↑
+//        pe_en _____________/↘̅ ̅ ̅ ̅ ̅ ̅        ̅ ̅ ̅ ̅ ̅ ̅ ̅ ̅ ̅ ̅ ̅↑̅ ̅\_______
+//                            ↓                       ↑
+//      pe_taps _̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅X_̅_̅_̅X_̅_̅       _̅X_̅_̅_̅X_̅_̅_̅X↗̲̅_̅_̅X_̅_̅_̅_̅_̅_̅_̅
+//
+//                           |--------------------------| cycles = shift count
+//                   |--------------------------|         cycles = shift count
+{#
+    var_delay_map = {
+            # sw_pe_en $\delta$ s_val=>val=>taps
+            'sw_pe_en':      ('', 2),
+            # lb_shift_en $\delta$ s_val=>val
+            'lb_shift_en':   ('', 1),
+            # sc_fill_done $\delta$ s_val=>val=>taps->done
+            'sc_fill_done':  ('', 2),
+            # sc_shift_done $\delta$ s_val=>val=>taps->done
+            'sc_shift_done': ('', 2),
+            }
+    include('templates/signal_delay(delay_map).v', delay_map=var_delay_map)
+#}
 
 // Line buffer - clear on start, simple as that
 assign lb_clear = sc_fill_kick;
@@ -102,28 +103,24 @@ assign lb_shift_en_l = mp_shift_en;
 
 always @(posedge clk)
 begin:counters
-    if (state == fill_s)
-    begin
-        if (cnt != {# dec_repr(0, fill_cnt_width) #})
-            cnt <= cnt - 1;
-        else
-            cnt <= {# dec_repr(fill_cnt_init, fill_cnt_width) #};
-    end
-    else if (state == shift_s)
-    begin
-        if (cnt != {# dec_repr(0, shift_cnt_width) #})
-        begin
-            cnt <= cnt - 1;
-            accu <= accu_next;
-        end
-        else
+    case (state) // synopsys parallel_case full_case
+        fill_s:
+            if (cnt != {# dec_repr(0, fill_cnt_width) #})
+                cnt <= cnt - 1;
+        fill_done_s:
             cnt <= {# dec_repr(shift_cnt_init) #};
-    end
-    else
-    begin
-        cnt <= {# dec_repr(fill_cnt_init, fill_cnt_width) #};
-        accu <= {# accu_init_str #};
-    end
+        shift_s:
+            if (cnt != {# dec_repr(0, shift_cnt_width) #})
+            begin
+                cnt <= cnt - 1;
+                accu <= accu_next;
+            end
+        default:
+        begin
+            cnt <= {# dec_repr(fill_cnt_init) #};
+            accu <= {# accu_init_str #};
+        end
+    endcase
 end
 
 {# include('templates/state_decl(states).v', states=shifter_states()) #}

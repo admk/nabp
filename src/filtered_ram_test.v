@@ -1,32 +1,15 @@
-{# include('templates/info.v') #}
+{# include('templates/defines.v') #}
 // NABPFilteredRAMTest
 //     9 Feb 2012
 // Tests functionality of the NABPFilteredRAMSwapControl
-{#
-    from pynabp.conf import conf
-    from pynabp.utils import bin_width_of_dec, dec_repr
-    data_len = conf()['kDataLength']
-    filtered_data_len = conf()['kFilteredDataLength']
-    a_len = conf()['kAngleLength']
-    s_val_len = bin_width_of_dec(conf()['projection_line_size'])
-
-    def to_s(val):
-        return dec_repr(val, s_val_len)
-    def to_v(val):
-        return dec_repr(val, filtered_data_len)
-#}
-`define kAngleLength {# a_len #}
-`define kSLength {# s_val_len #}
-`define kDataLength {# data_len #}
-`define kFilteredDataLength {# filtered_data_len #}
-`define kDelayLength {# conf()['filter']['order'] / 2 #}
 
 module NABPFilteredRAMTest();
 
-{# include('templates/global_signal_generate.v') #}
-{# include('templates/dump_wave.v') #}
-
-{# include('templates/data_test_vals.v') #}
+{#
+    include('templates/global_signal_generate.v')
+    include('templates/dump_wave.v')
+    include('templates/data_test_vals.v')
+#}
 
 // angle value generator
 wire hs_next_angle, hs_next_angle_ack, hs_has_next_angle;
@@ -42,13 +25,13 @@ hs_angles angles_generate
 );
 
 wire [`kSLength-1:0] hs_s_val;
-wire [`kFilteredDataLength-1:0] filter_out, filter_in;
+wire [`kFilteredDataLength-1:0] filter_out;
+wire [`kDataLength-1:0] filter_in;
 assign filter_in = data_test_vals(hs_s_val, hs_angle);
-// shift register to model filtering
-shift_register sr_filter_model
+NABPFilter filter
 (
     .clk(clk),
-    .enable(1'd1), 
+    .enable(1'd1),
     .clear(hs_next_angle),
     .val_in(filter_in),
     .val_out(filter_out)
@@ -75,7 +58,7 @@ begin:pr_verification
             @(posedge clk);
             pr_next_angle = 0;
             pr_s_val = 0;
-            while (pr_s_val < {# to_s(conf()['projection_line_size']) #})
+            while (pr_s_val < {# to_s(c['projection_line_size']) #})
             begin
                 @(posedge clk);
                 pr_val_ori = data_test_vals(pr_s_val, pr_angle);
@@ -115,7 +98,7 @@ NABPFilteredRAMSwapControl filtered_ram_swap_control_uut
     .hs_val(filter_out),
     // inputs from processing swappables
     .pr0_s_val(pr_s_val),
-    .pr1_s_val(/* not used */),
+    .pr1_s_val(0 /* not used */),
     .pr_next_angle(pr_next_angle),
     // outputs to host RAM
     .hs_s_val(hs_s_val),

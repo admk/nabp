@@ -1,4 +1,4 @@
-{# include('templates/info.v') #}
+{# include('templates/defines.v') #}
 // NABPFilteredRAMSwapControl
 //     5 Feb 2012
 // Controls the swapping between filtered RAM swappables
@@ -18,20 +18,9 @@
 // FIR is not in NABPFilteredRAMSwapControl to make early testing easier. 
 // Possible TODO: refactor FIR to be a part of NABPFilteredRAMSwapControl.
 {#
-    from pynabp.conf import conf
-    from pynabp.utils import bin_width_of_dec
     from pynabp.enums import filtered_ram_swap_control_states
-    data_len = conf()['kDataLength']
-    filtered_data_len = conf()['kFilteredDataLength']
-    a_len = conf()['kAngleLength']
-    s_val_len = bin_width_of_dec(conf()['projection_line_size'])
-
     swap_list = range(2)
 #}
-`define kAngleLength {# a_len #}
-`define kSLength {# s_val_len #}
-`define kDataLength {# data_len #}
-`define kFilteredDataLength {# filtered_data_len #}
 
 module NABPFilteredRAMSwapControl
 (
@@ -53,6 +42,7 @@ module NABPFilteredRAMSwapControl
     output wire hs_next_angle,
     // outputs to processing swappables
     output reg [`kAngleLength-1:0] pr_angle,
+    output reg pr_has_next_angle,
     output wire pr_next_angle_ack,
     output wire signed [`kFilteredDataLength-1:0] pr0_val,
     output wire signed [`kFilteredDataLength-1:0] pr1_val
@@ -101,14 +91,16 @@ end
 // angle update
 always @(posedge clk)
     if (pr_next_angle_ack)
+    begin
         pr_angle <= hs_angle;
+        pr_has_next_angle <= hs_has_next_angle;
+    end
 
 // mealy outputs
 assign swap_curr = hs_has_next_angle ?
                    hs_next_angle_ack : (fill_done && pr_next_angle);
 assign hs_next_angle = reset_n &&
-                       ((state == ready_s) ||
-                       (hs_has_next_angle && fill_done && pr_next_angle));
+                       ((state == ready_s) || (fill_done && pr_next_angle));
 assign fill_kick = swap && (next_state != work_s);
 assign pr_next_angle_ack = (state != ready_s) && swap;
 

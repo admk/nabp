@@ -1,17 +1,7 @@
-{# include('templates/info.v') #}
+{# include('templates/defines.v') #}
 // hs_angles
 //     25 Feb 2012
 // This module generates angles for testing
-{#
-    from pynabp.conf import conf
-    from pynabp.utils import dec_repr
-
-    a_len = conf()['kAngleLength']
-
-    def to_a(val):
-        return dec_repr(val, a_len)
-#}
-`define kAngleLength {# a_len #}
 
 module hs_angles
 (
@@ -26,17 +16,19 @@ module hs_angles
     output wire hs_has_next_angle
 );
 
-assign hs_has_next_angle = (hs_angle < {# to_a(80) #});
+parameter [`kAngleLength-1:0] hs_angle_step = `kAngleStep;
+
+assign hs_has_next_angle = (hs_angle < ({# to_a(180) #} - hs_angle_step));
 assign hs_next_angle_ack = hs_has_next_angle && hs_next_angle;
 
 always @(posedge clk)
 begin:hs_angle_iterate
     if (!reset_n)
-        hs_angle = {# to_a(0) #};
+        hs_angle <= {# to_a(0) #};
     else
     begin
         if (hs_next_angle && hs_has_next_angle)
-            hs_angle = hs_angle + {# to_a(20) #};
+            hs_angle <= hs_angle + hs_angle_step;
     end
 end
 
