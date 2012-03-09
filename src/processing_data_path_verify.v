@@ -110,7 +110,7 @@ begin:pe_verify
         scan_end = 0;
         scan_base = -1;
     end
-    $display("Angle: %d", tt_angle);
+    $display("Angle: %d, Line Itr: %d", tt_angle, tt_line_itr);
     px_cnt = 0;
     verify_cnt = 0;
     while (scan_itr != scan_end)
