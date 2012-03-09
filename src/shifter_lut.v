@@ -4,9 +4,6 @@
 // Provides NABPShifter the look-up values of $\tan\theta$ and $\cot\theta$
 // TODO reduce look-up table size by using symmetry
 {#
-    from pynabp.utils import xfrange
-    from math import tan, radians
-
     lookup = c['lutShiftAccuBaseFunc']
 #}
 
