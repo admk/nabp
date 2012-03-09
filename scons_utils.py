@@ -33,9 +33,9 @@ def device_path(
     def device_path_mapper(src):
         if src not in device_specific_file_list:
             return src
-        device_src = os.path.join(device_name, src)
+        device_src = os.path.join('device', device_name, src)
         if os.path.isfile(os.path.join(source_dir, device_src)):
             return device_src
-        return os.path.join('generic', src)
+        return os.path.join('device', 'generic', src)
 
     return map(device_path_mapper, source_file_list)
