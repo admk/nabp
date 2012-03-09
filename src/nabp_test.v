@@ -17,8 +17,6 @@ module NABPTest();
 reg kick;
 wire done;
 
-// sinogram RAM
-
 // control signals
 always
 begin:kick_done_handler
@@ -45,6 +43,18 @@ NABP nabp_uut
     .done(done),
     // outputs to sinogram
     .sg_addr(sg_addr)
+);
+
+// sinogram RAM
+NABPSinogramDataLUT sinogram_lut
+(
+    // global signals
+    .clk(clk),
+    .reset_n(reset_n),
+    // inputs from nabp
+    .sg_addr(sg_addr),
+    // outputs to nabp
+    .sg_val(sg_val)
 );
 
 endmodule
