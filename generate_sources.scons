@@ -6,16 +6,21 @@ from translate_process_generate import \
         write_translate_process, fixed_point_translate_filter_process_files
 
 
+Import('SOURCE_DIR')
+
 def generate_derived_sources(target, source, env):
     pynap_path = env['PYNABP_PATH']
     if not (pynap_path in sys.path):
         sys.path.append(pynap_path)
     for tgt, src in itertools.izip(target, source):
-        Template(path=str(src)).save(str(tgt), **env.__dict__)
+        t = Template(path=str(src), include_path=SOURCE_DIR)
+        t.save(str(tgt), **env.__dict__)
     return 0
+
 
 def generate_translate_filter_processes(target, source, env):
     write_translate_process(str(target[0]))
+
 
 env = Environment(PYNABP_PATH=Dir('#').abspath)
 Import('sources')
