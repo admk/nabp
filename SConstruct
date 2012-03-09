@@ -2,10 +2,13 @@ import os
 os.environ['NABP_CONFIG_PATH'] = os.path.abspath('default.naconfig')
 env = Environment()
 
+SOURCE_DIR = 'src'
+Export('SOURCE_DIR')
+
 env.SConscript('sources.scons')
 env.SConscript(
         'generate_sources.scons',
-        variant_dir='derived_src', src_dir='src',
+        variant_dir='derived_src', src_dir=SOURCE_DIR,
         duplicate=0)
 env.SConscript(
         'compile.scons',
