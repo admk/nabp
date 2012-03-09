@@ -62,7 +62,11 @@ assign line_itr = (hs_angle < `kAngle90) ? 0 :
         {# to_l(c['partition_scheme']['size'] - 1) #};
 
 // data path verifier
-NABPProcessingDataPathVerify data_path_verify
+NABPProcessingDataPathVerify
+#(
+    .pSDifferenceTolerance(0)
+)
+data_path_verify
 (
     .clk(clk),
     .reset_n(reset_n),

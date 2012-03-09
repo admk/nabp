@@ -107,7 +107,8 @@ reg signed [`kFilteredDataLength-1:0] pe_tap0;
 wire [(`kNoOfPartitions-1)*`kFilteredDataLength-1:0] pe_shift_taps;
 
 always @(posedge clk)
-    pe_tap0 <= fr_val;
+    if (sh_lb_shift_en)
+        pe_tap0 <= fr_val;
 
 assign pe_taps = {pe_shift_taps, pe_tap0};
 
