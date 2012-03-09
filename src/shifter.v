@@ -117,7 +117,12 @@ begin:counters
         default:
         begin
             cnt <= {# dec_repr(fill_cnt_init) #};
-            accu <= {# accu_init_str #};
+            // initialise accu with half of sc_accu_base. this is to deal
+            // with aliasing effects caused by the shifting behaviour.
+            // this is because shifting should happen when the accumulated
+            // value gets across the pixel boundary rather than the next
+            // pixel center.
+            accu <= sc_accu_base >> 1;
         end
     endcase
 end
