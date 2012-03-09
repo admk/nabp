@@ -87,7 +87,7 @@ config = \
         #   Positive integers.
         'kDataLength': 8,
 
-        # The decimal places (in binary) of data after filtering.
+        # The decimal places (in binary) of data after filtering appended.
         # Constraints:
         #   Natural integers.
         'kFilteredDataPrecision': 3,

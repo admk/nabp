@@ -128,23 +128,33 @@ def _map_accu_init_defines(conf):
 
 
 def sinogram_defines(
-        image_size, projection_line_size, angle_step_size, no_of_angles):
+        image_size, projection_line_size, angle_step_size, no_of_angles,
+        data_length):
     # phantom to be projection size / sqrt(2)
     ph = phantom(int(projection_line_size / numpy.sqrt(2)))
 
     # produce projections by radon transform (skimage.transform.radon
     # resize radon transformed sinogram to projection line size, i.e. multiply
     # by sqrt(2))
-    # FIXME: this is bad, because the sinogram RAM could be offsetted
+    # FIXME: this is bad, because the sinogram RAM could be offsetted slightly
     sg = radon(ph, numpy.arange(0, 180, angle_step_size))
+
+    # auto determine the data value representation
+    int_width = bin_width_of_dec(numpy.max(sg))
+    frac_width = data_length - int_width
+    sg_fixed_point = FixedPoint(int_width, frac_width, False)
 
     # prepare sg as contents of the RAM
     addr_len = bin_width_of_dec(no_of_angles) + \
             bin_width_of_dec(projection_line_size)
     sg_ram = {
             dec_repr(a * projection_line_size + s, addr_len):
-            dec_repr(sg[s, a])
+            sg_fixed_point.verilog_repr(sg[s, a])
             for a in xrange(sg.shape[1])
             for s in xrange(sg.shape[0])}
 
-    return sg_ram
+    defines = {
+            'lutSinogram': sg_ram,
+            'tSinogram': sg_fixed_point,
+            }
+    return defines

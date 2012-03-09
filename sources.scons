@@ -50,6 +50,7 @@ sources = {
             ingredients['nabp'] +
             Split("""
                 processing_swap_control.v
+                sinogram_data_lut.v
                 nabp_test.v
                 """),
     }
