@@ -18,15 +18,16 @@ reg kick;
 wire done;
 
 // control signals
-always
+initial
 begin:kick_done_handler
-    kick = 0;
     @(posedge reset_n);
+    kick = 0;
     @(posedge clk);
     kick = 1;
     @(posedge clk);
     kick = 0;
     @(posedge done);
+    $finish;
 end
 
 // unit under test
