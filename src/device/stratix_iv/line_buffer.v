@@ -1,0 +1,54 @@
+{# include('templates/defines.v') #}
+// line_buffer
+//     9 Mar 2012
+// The line buffer implementation for Straix IV
+
+module line_buffer
+(
+    clk, clear, enable,
+    shift_in, taps
+);
+
+parameter pNoTaps = `kNoOfPartitions;
+parameter pTapsWidth = `kPartitionSize;
+parameter pPtrLength = {# bin_width(c['partition_scheme']['size']) #};
+
+parameter pDataLength = `kFilteredDataLength;
+
+input wire clk, clear, enable;
+input wire [pDataLength-1:0] shift_in;
+output wire [pDataLength*pNoTaps-1:0] taps;
+
+reg clear_r;
+reg signed [`kFilteredDataLength-1:0] tap_b1;
+wire [pDataLength*(pNoTaps-1)-1:0] taps_tp;
+
+always @(posedge clk)
+    clear_r <= clear;
+
+always @(posedge clk)
+    if (enable)
+        tap_b1 <= shift_in;
+
+assign taps = {taps_tp, tap_b1};
+
+altshift_taps
+#(
+    .intended_device_family("{# c['device'] #}"),
+    .number_of_taps(`kNoOfPartitions - 1),
+    .power_up_state("CLEARED"),
+    .taps_distance({# c['partition_scheme']['size'] #}),
+    .width(`kFilteredDataLength),
+    .lpm_type("altshift_taps"),
+    .lpm_hint("unused")
+)
+pe_line_buff
+(
+    .aclr(clear_r),
+    .clken(enable),
+    .clock(clk),
+    .shiftin(tap_b1),
+    .taps(taps_tp)
+);
+
+endmodule
