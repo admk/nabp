@@ -27,9 +27,12 @@ config = \
         'time_precision': '10ps',
 
         # The targeted device.
-        # Reserved for future purposes.
+        # This setting will have no effect and defaults to 'simulator' if the
+        # debug mode toggle is set. There are parts of the architecture that
+        # cannot be generic, such as the filter module.
         # Constraints:
-        #   A string specifying a valid device.
+        #   A string specifying a valid device. The device string must be valid
+        #   for release builds.
         'device': None,
 
         # How wide the projection line is.
