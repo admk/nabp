@@ -28,13 +28,22 @@ def derive(config):
     """Derive additional configiguration defines from a validated configiguration
     dictionary.
     """
+    # image size
     if config['image_size'] is not None:
         image_size = config['image_size']
     else:
         image_size = int(config['projection_line_size'] / math.sqrt(2))
 
+    # device setting
+    if config['debug']:
+        device = 'simulator'
+    else:
+        device = config['device']
+
     derived = \
         {
+            # device
+            'device': device,
             # null filling
             'image_size': image_size,
             # centers
