@@ -11,8 +11,7 @@ module line_buffer
 
 parameter pNoTaps = `kNoOfPartitions;
 parameter pTapsWidth = `kPartitionSize;
-parameter pPtrLength = {# bin_width(c['partition_scheme']['size']) #};
-
+parameter pPtrLength = 0; // dummy parameter to mute compilation error
 parameter pDataLength = `kFilteredDataLength;
 
 input wire clk, clear, enable;
@@ -35,10 +34,10 @@ assign taps = {taps_tp, tap_b1};
 altshift_taps
 #(
     .intended_device_family("{# c['device'] #}"),
-    .number_of_taps(`kNoOfPartitions - 1),
+    .number_of_taps(pNoTaps-1),
     .power_up_state("CLEARED"),
-    .taps_distance({# c['partition_scheme']['size'] #}),
-    .width(`kFilteredDataLength),
+    .taps_distance(pTapsWidth),
+    .width(pDataLength),
     .lpm_type("altshift_taps"),
     .lpm_hint("unused")
 )
