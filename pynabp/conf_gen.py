@@ -34,16 +34,10 @@ def derive(config):
     else:
         image_size = int(config['projection_line_size'] / math.sqrt(2))
 
-    # device setting
-    if config['debug']:
-        device = 'simulator'
-    else:
-        device = config['device']
-
     derived = \
         {
             # device
-            'device': device,
+            'device': config['device'] if config['device'] else 'simulator',
             # null filling
             'image_size': image_size,
             # centers
