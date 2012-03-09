@@ -64,7 +64,6 @@ NABPSinogramAddresser sinogram_addresser
 );
 
 wire [`kFilteredDataLength-1:0] fl_fr_val;
-// TODO filtering
 NABPFilter filter
 (
     .clk(clk),
@@ -75,7 +74,7 @@ NABPFilter filter
 );
 
 wire [`kAngleLength-1:0] pr_angle;
-wire pr_next_angle, pr_next_angle_ack;
+wire pr_next_angle, pr_next_angle_ack, pr_has_next_angle;
 wire [`kSLength-1:0] pr0_s_val, pr1_s_val;
 wire [`kFilteredDataLength-1:0] pr0_val, pr1_val;
 NABPFilteredRAMSwapControl filtered_ram_swap_control
@@ -98,6 +97,7 @@ NABPFilteredRAMSwapControl filtered_ram_swap_control
     .hs_next_angle(fr_sa_next_angle),
     // outputs to processing swappables
     .pr_angle(pr_angle),
+    .pr_has_next_angle(pr_has_next_angle),
     .pr_next_angle_ack(pr_next_angle_ack),
     .pr0_val(pr0_val),
     .pr1_val(pr1_val)

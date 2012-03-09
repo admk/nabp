@@ -30,6 +30,9 @@ begin:kick_done_handler
     $finish;
 end
 
+wire [`kDataLength-1:0] sg_val;
+wire [`kSinogramAddressLength-1:0] sg_addr;
+
 // unit under test
 NABP nabp_uut
 (

@@ -24,6 +24,8 @@
 
 `define kDataLength {# c['kDataLength'] #}
 `define kFilteredDataLength {# c['kFilteredDataLength'] #}
+`define kCacheDataLength {#
+            c['kFilteredDataLength'] + bin_width(c['kNoOfAngles']) #}
 
 `define kNoOfPartitions {# c['partition_scheme']['no_of_partitions'] #}
 `define kNoOfPartitonsLength {#

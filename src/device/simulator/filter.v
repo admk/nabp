@@ -5,8 +5,8 @@ module NABPFilter
     // global signals
     input wire clk,
     // filter control
-    input wire clear,
     input wire enable,
+    input wire clear,
     // filter data
     input wire [`kDataLength-1:0] val_in,
     output wire [`kFilteredDataLength-1:0] val_out

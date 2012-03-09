@@ -92,6 +92,11 @@ begin:base_addr_counter
     end
 end
 
+reg write_en;
+reg [`kAddressLength-1:0] write_addr;
+reg [`kCacheDataLength-1:0] write_val;
+wire [`kCacheDataLength-1:0] read_val;
+
 always @(posedge clk)
 begin:write_back_sync
     write_en <= sw_en;
@@ -101,7 +106,7 @@ end
 
 NABPDualPortRAM
 #(
-    .pDataLength(`kFilteredDataLength + {# bin_width(c['kNoOfAngles']) #}),
+    .pDataLength(`kCacheDataLength),
     .pRAMSize({# 2 * scan_mode_pixels #}),
     .pAddrLength(`kAddressLength)
 )
@@ -133,7 +138,7 @@ begin
 end
 
 always @(posedge clk)
-    if (pe_en)
+    if (sw_en)
     begin
         line_pos = base_addr / {# c['image_size'] #};
         scan_pos = base_addr - {# c['image_size'] #} * line_pos;
@@ -148,7 +153,7 @@ always @(posedge clk)
             im_x = line_pos;
             im_y = scan_pos;
         end
-        $fwrite(file, "%g, %d, %d, %d\n", $time, im_x, im_y, cc_write_val);
+        $fwrite(file, "%g, %d, %d, %d\n", $time, im_x, im_y, write_val);
         err = $fflush(file);
     end
 {% end %}
