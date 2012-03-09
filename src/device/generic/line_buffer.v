@@ -26,7 +26,7 @@ always @(posedge clk)
     if (enable)
         tap_b1 <= shift_in;
 
-assign taps = {taps, tap_b1};
+assign taps = {taps_tp, tap_b1};
 
 wire [pDataLength-1:0] gen_taps[pNoTaps-2:0];
 
@@ -34,7 +34,7 @@ genvar i;
 generate
     for (i = 0; i < pNoTaps - 1; i = i + 1)
     begin:gen_taps_inst
-        assign taps[pDataLength*(i+1)-1:pDataLength*i] = gen_taps[i];
+        assign taps_tp[pDataLength*(i+1)-1:pDataLength*i] = gen_taps[i];
         shift_register
         #(
             .pDelayLength(pTapsWidth),
