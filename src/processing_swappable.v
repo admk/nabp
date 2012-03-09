@@ -103,18 +103,9 @@ NABPMapper mapper
     .fr_s_val(fr_s_val)
 );
 
-reg signed [`kFilteredDataLength-1:0] pe_tap0;
-wire [(`kNoOfPartitions-1)*`kFilteredDataLength-1:0] pe_shift_taps;
-
-always @(posedge clk)
-    pe_tap0 <= fr_val;
-
-assign pe_taps = {pe_shift_taps, pe_tap0};
-
-{% if c['debug'] %}
 line_buffer
 #(
-    .pNoTaps({# c['partition_scheme']['no_of_partitions'] - 1 #}),
+    .pNoTaps({# c['partition_scheme']['no_of_partitions'] #}),
     .pTapsWidth({# c['partition_scheme']['size'] #}),
     .pPtrLength({# bin_width(c['partition_scheme']['size']) #}),
     .pDataLength(`kFilteredDataLength)
@@ -124,29 +115,8 @@ pe_line_buff
     .clk(clk),
     .clear(sh_lb_clear),
     .enable(sh_lb_shift_en),
-    .shift_in(pe_tap0),
-    .taps(pe_shift_taps)
+    .shift_in(fr_val),
+    .taps(pe_taps)
 );
-{% else %}
-altshift_taps
-#(
-    .intended_device_family("{# c['device'] #}"),
-    .number_of_taps(`kNoOfPartitions - 1),
-    .power_up_state("CLEARED"),
-    .taps_distance({# c['partition_scheme']['size'] #}),
-    .width(`kFilteredDataLength),
-    .lpm_type("altshift_taps"),
-    .lpm_hint("unused")
-)
-pe_line_buff
-(
-    // FIXME aclr too early?
-    .aclr(sh_lb_clear),
-    .clken(sh_lb_shift_en),
-    .clock(clk),
-    .shiftin(pe_tap0),
-    .taps(pe_shift_taps)
-);
-{% end %}
 
 endmodule
