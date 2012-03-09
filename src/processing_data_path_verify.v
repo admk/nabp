@@ -58,7 +58,7 @@ end
 
 reg [`kFilteredDataLength-1:0] tap_val_exp;
 real s_val_exp;
-task verify;
+function integer verify;
     input [`kFilteredDataLength-1:0] actual;
     input integer x;
     input integer y;
@@ -69,15 +69,19 @@ task verify;
                 "project(", tt_angle, ",", x, ",", y, ")");
         tap_val_exp = s_val_exp;
         diff = tap_val_exp - actual;
+        verify = 1;
         if (diff < -pSDifferenceTolerance || diff > pSDifferenceTolerance)
+        begin
             $display("Line Itr %d, Scan Itr %d, Tap %d, Expected %d, Acutal %d, Diff %d",
                      tt_line_itr, scan_itr, i, tap_val_exp, actual, diff);
+            verify = 0;
+        end
     end
-endtask
+endfunction
 
 integer scan_itr, scan_end, scan_base;
-integer line, x, y, angle, i;
-integer tap_val_diff;
+integer line, x, y, angle, i, v, verify_cnt, px_cnt;
+real accuracy;
 wire [`kFilteredDataLength-1:0] tap_val[`kNoOfPartitions-1:0];
 wire [`kFilteredDataLength-1:0] tap_val0;
 assign tap_val0 = pe_taps[`kFilteredDataLength-1:0];
@@ -107,6 +111,8 @@ begin:pe_verify
         scan_base = -1;
     end
     $display("Angle: %d", tt_angle);
+    px_cnt = 0;
+    verify_cnt = 0;
     while (scan_itr != scan_end)
     begin
         // verify output for all PEs
@@ -123,13 +129,19 @@ begin:pe_verify
                 x = line;
                 y = scan_itr;
             end
-            verify(tap_val[i], x, y);
+            v = verify(tap_val[i], x, y);
+            if (v)
+                verify_cnt = verify_cnt + 1;
+            px_cnt = px_cnt + 1;
         end
         // next scan iteration
         @(posedge clk);
         if (pe_en)
             scan_itr = scan_itr + scan_base;
     end
+    accuracy = 100 * $itor(verify_cnt) / px_cnt;
+    $display("Verified %d, Total pixels %d, Accuracy %.2f%%",
+            verify_cnt, px_cnt, accuracy);
 end
 
 endmodule
