@@ -108,6 +108,8 @@ def _map_accu_init_defines(conf):
         part_val = _map_accu_part_lookup(conf)(angle)
         line_val = -conf['partition_scheme']['size'] * \
                 _map_accu_base_lookup(angle)
+        if angle >= 90:
+            line_val = -line_val
         return (part_val, part_val + line_val)
     def accu_init_range():
         accu_init_range_list = map(accu_init_vals, xrange(0, 180))
