@@ -57,13 +57,17 @@ NABPProcessingSwappable uut
     .pe_taps(pe_taps)
 );
 
+wire [`kPartitionSizeLength-1:0] line_itr;
+assign line_itr = (hs_angle < `kAngle90) ? 0 :
+        {# to_l(c['partition_scheme']['size'] - 1) #};
+
 // data path verifier
 NABPProcessingDataPathVerify data_path_verify
 (
     .clk(clk),
     .reset_n(reset_n),
     .tt_angle(hs_angle),
-    .tt_line_itr(0),
+    .tt_line_itr(line_itr),
     .pv0_s_val(fr_s_val),
     .pv1_s_val(0),
     .pv0_val(fr_val),
