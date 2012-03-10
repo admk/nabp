@@ -1,7 +1,7 @@
 import sys
 import itertools
 from akpytemp import Template
-from scons_utils import add_extension
+from scons_utils import add_extension, pynabp_sources
 from translate_process_generate import \
         write_translate_process, fixed_point_translate_filter_process_files
 
@@ -43,6 +43,7 @@ for alias, sources in sources.iteritems():
                         target=add_extension(src, 'vx'),
                         source=src), sources)
     Depends(derived_list, '#default.naconfig')
+    Depends(derived_list, pynabp_sources(Dir('#pynabp').abspath))
     SideEffect(add_extension(sources, 'vxtf'), derived_list)
     derived_sources[alias] = derived_list
 
