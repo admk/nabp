@@ -64,7 +64,11 @@ NABPProcessingSwapControl uut
 );
 
 // data path verifier
-NABPProcessingDataPathVerify data_path_verify
+NABPProcessingDataPathVerify
+#(
+    .pVerbose(0)
+)
+data_path_verify
 (
     // globals
     .clk(clk),
