@@ -27,7 +27,8 @@ module NABPProcessingDataPathVerify
     input wire [`kFilteredDataLength*`kNoOfPartitions-1:0] pe_taps
 );
 
-parameter pSDifferenceTolerance = 3;
+parameter pSDifferenceTolerance = 0;
+parameter pVerbose = 1;
 
 always @(posedge clk)
 begin
@@ -72,8 +73,10 @@ function integer verify;
         verify = 1;
         if (diff < -pSDifferenceTolerance || diff > pSDifferenceTolerance)
         begin
-            $display("Line Itr %d, Scan Itr %d, Tap %d, Expected %d, Acutal %d, Diff %d",
-                     tt_line_itr, scan_itr, i, tap_val_exp, actual, diff);
+            if (pVerbose)
+                $display(
+    "Line Itr %d, Scan Itr %d, Tap %d, Expected %d, Acutal %d, Diff %d",
+                        tt_line_itr, scan_itr, i, tap_val_exp, actual, diff);
             verify = 0;
         end
     end
