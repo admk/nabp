@@ -18,7 +18,7 @@ wire [`kFilteredDataLength-1:0] fr_val;
 // a simple preliminary test for 45 degrees
 initial
 begin:hs_angle_update
-    hs_angle = {# to_a(30) #};
+    hs_angle = {# to_a(90) #};
 end
 
 // controls
@@ -64,7 +64,8 @@ assign line_itr = (hs_angle < `kAngle90) ? 0 :
 // data path verifier
 NABPProcessingDataPathVerify
 #(
-    .pSDifferenceTolerance(0)
+    .pSDifferenceTolerance(0),
+    .pVerbose(1)
 )
 data_path_verify
 (
