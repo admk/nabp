@@ -39,3 +39,11 @@ def device_path(
         return os.path.join('device', 'generic', src)
 
     return map(device_path_mapper, source_file_list)
+
+def pynabp_sources(path):
+    import fnmatch
+    pynabp_sources = []
+    for root, _, names in os.walk(path):
+        for name in fnmatch.filter(names, '*.py'):
+            pynabp_sources.append(os.path.join(root, name))
+    return pynabp_sources

@@ -63,7 +63,7 @@ module NABPShifter
 //                      ↘                             ↑
 //          val _̅_̅_̅_̅_̅_̅_̅_̅_̅X_̅_̅_̅X_̅_̅_̅X_̅_̅  ...  _̅X_̅_̅_̅X_̅_̅_̅X_̅↑̲̅_̅_̅_̅_̅_̅_̅_̅_̅_̅
 //                        ↓↘                          ↑
-//     shift_en _________/̲/̲̅/̲̅↓̲̅/̲̅/̲̅/̲̅/̲̅/̲̅/̲̅/̲̅       /̲̅/̲̅/̲̅/̲̅/̲̅/̲̅/̲̅/̲̅/̲̅\̲_↑̲_________
+//  lb_shift_en _________/̲/̲̅/̲̅↓̲̅/̲̅/̲̅/̲̅/̲̅/̲̅/̲̅/̲̅       /̲̅/̲̅/̲̅/̲̅/̲̅/̲̅/̲̅/̲̅/̲̅\̲_↑̲_________
 //                           ↘                        ↑
 //        pe_en _____________/↘̅ ̅ ̅ ̅ ̅ ̅        ̅ ̅ ̅ ̅ ̅ ̅ ̅ ̅ ̅ ̅ ̅↑̅ ̅\_______
 //                            ↓                       ↑
@@ -94,8 +94,7 @@ reg {# accu_fixed.verilog_decl() #} accu;
 
 assign accu_next = accu + sc_accu_base;
 // it is ok to let it overflow, we only need to observe integer boundaries
-assign mp_shift_en = (state == fill_s && next_state == fill_s) ||
-                     (state == shift_s &&
+assign mp_shift_en = (state == fill_s) || (state == shift_s &&
                       accu_next{# accu_floor_slice #} !=
                       accu{# accu_floor_slice #});
 // lb_shift_en is exactly 2-cycle delayed mp_shift_en
@@ -118,7 +117,12 @@ begin:counters
         default:
         begin
             cnt <= {# dec_repr(fill_cnt_init) #};
-            accu <= {# accu_init_str #};
+            // initialise accu with half of sc_accu_base. this is to deal
+            // with aliasing effects caused by the shifting behaviour.
+            // this is because shifting should happen when the accumulated
+            // value gets across the pixel boundary rather than the next
+            // pixel center.
+            accu <= sc_accu_base >> 1;
         end
     endcase
 end

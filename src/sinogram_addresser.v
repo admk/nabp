@@ -30,6 +30,8 @@ module NABPSinogramAddresser
     output wire [`kSinogramAddressLength-1:0] sg_addr
 );
 
+parameter [`kAngleLength-1:0] hs_angle_step = `kAngleStep;
+
 {#
     include('templates/state_decl(states).v',
             states=sinogram_addresser_states())
@@ -63,7 +65,7 @@ begin:mealy_next_state
 end
 
 assign fr_has_next_angle = (state == work_s) &&
-                           (fr_angle < ({# to_a(180) #} - `kAngleStep));
+                           (fr_angle < ({# to_a(180) #} - hs_angle_step));
 assign fr_next_angle_ack = (state == work_s) &&
                            (fr_has_next_angle && fr_next_angle);
 
@@ -79,7 +81,7 @@ begin:fr_angle_iterate
     end
     else if (fr_next_angle && fr_has_next_angle)
     begin
-        fr_angle <= fr_angle + `kAngleStep;
+        fr_angle <= fr_angle + hs_angle_step;
         sg_base_addr <= sg_base_addr +
                 {# to_sg_addr(c['projection_line_size']) #};
     end

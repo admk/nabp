@@ -3,31 +3,38 @@
 //     15 Feb 2012
 // The line buffer implementation for simulation purposes
 
-{# delay_len = c['partition_scheme']['size'] #}
-
 module line_buffer
 (
     clk, clear, enable,
     shift_in, taps
 );
 
-parameter pNoTaps = {# c['partition_scheme']['no_of_partitions'] - 1 #};
-parameter pTapsWidth = {# delay_len #};
-parameter pPtrLength = {# bin_width(delay_len) #};
+parameter pNoTaps = `kNoOfPartitions;
+parameter pTapsWidth = `kPartitionSize;
+parameter pPtrLength = {# bin_width(c['partition_scheme']['size']) #};
 
-parameter pDataLength = {# c['kFilteredDataLength'] #};
+parameter pDataLength = `kFilteredDataLength;
 
 input wire clk, clear, enable;
 input wire [pDataLength-1:0] shift_in;
 output wire [pDataLength*pNoTaps-1:0] taps;
 
-wire [pDataLength-1:0] gen_taps[pNoTaps-1:0];
+reg signed [`kFilteredDataLength-1:0] tap_b1;
+wire [pDataLength*(pNoTaps-1)-1:0] taps_tp;
+
+always @(posedge clk)
+    if (enable)
+        tap_b1 <= shift_in;
+
+assign taps = {taps_tp, tap_b1};
+
+wire [pDataLength-1:0] gen_taps[pNoTaps-2:0];
 
 genvar i;
 generate
-for (i = 0; i < pNoTaps; i = i + 1)
+    for (i = 0; i < pNoTaps - 1; i = i + 1)
     begin:gen_taps_inst
-        assign taps[pDataLength*(i+1)-1:pDataLength*i] = gen_taps[i];
+        assign taps_tp[pDataLength*(i+1)-1:pDataLength*i] = gen_taps[i];
         shift_register
         #(
             .pDelayLength(pTapsWidth),
@@ -39,7 +46,7 @@ for (i = 0; i < pNoTaps; i = i + 1)
             .clk(clk),
             .enable(enable),
             .clear(clear),
-            .val_in((i == 0) ?  shift_in : gen_taps[i-1]),
+            .val_in((i == 0) ? tap_b1 : gen_taps[i-1]),
             .val_out(gen_taps[i])
         );
     end

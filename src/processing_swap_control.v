@@ -56,8 +56,8 @@ module NABPProcessingSwapControl
     output wire signed [`kSLength-1:0] fr1_s_val
     {% if c['debug'] %},
     // debug signals
-    output reg [`kAngleLength-1:0] db_angle,
-    output reg [`kPartitionSizeLength-1:0] db_line_itr
+    output wire [`kAngleLength-1:0] db_angle,
+    output wire [`kPartitionSizeLength-1:0] db_line_itr
     {% end %}
 );
 
@@ -240,45 +240,58 @@ begin:mealy_next_state
     endcase
 end
 
+reg [`kAngleLength-1:0] pe_angle;
+
+{% if c['debug'] %}
+    // debug signals
+    reg [`kPartitionSizeLength-1:0] db_line_cnt;
+    wire [`kPartitionSizeLength-1:0] line_cnt_d;
+
+    // line_cnt signal delay for debug
+    {# 
+        include('templates/signal_delay(delay_map).v',
+                delay_map={'line_cnt_d': ('[`kPartitionSizeLength-1:0]', 2)})
+    #}
+    assign line_cnt_d_l = line_cnt;
+
+    always @(posedge clk)
+        if (swap_ack)
+            db_line_cnt <= line_cnt_d;
+
+    // wiring
+    assign db_line_itr = (pe_angle < `kAngle90) ?  db_line_cnt :
+                        {# to_l(c['partition_scheme']['size'] - 1) #} - 
+                        db_line_cnt;
+    assign db_angle = pe_angle;
+{% end %}
+
 // delay signals for PEs
 wire [`kAngleLength-1:0] fr_angle_d;
-wire [`kPartitionSizeLength-1:0] line_cnt_d;
 {#
     var_delay_map = {
         'fr_angle_d': ('[`kAngleLength-1:0]', 3),
-        'line_cnt_d': ('[`kPartitionSizeLength-1:0]', 2),
     }
     include('templates/signal_delay(delay_map).v', delay_map=var_delay_map)
 #}
-assign line_cnt_d_l = line_cnt;
 assign fr_angle_d_l = fr_angle;
+
 // decode angle and generate pe control outputs
-reg [`kAngleLength-1:0] pe_angle;
-// PE signals
-// multiplexers & demultiplexers - always give the output using pe_taps
-reg scan_direction;
-assign pe_taps = sw_sel ? sw0_pe_taps : sw1_pe_taps;
-assign pe_en = sw_sel ? sw0_pe_en : sw1_pe_en;
-assign pe_reset = swa_next_itr_ack;
-// decode angle to give PE control signals
-assign pe_scan_mode = (pe_angle < `kAngle45 || pe_angle >= `kAngle135) ?
-                      {# scan_mode.x #} : {# scan_mode.y #};
-assign pe_scan_direction = scan_direction;
 always @(posedge clk)
     // updates angle for PE with the current swappable ready for shifting
     if (swap_ack)
-    begin
-        scan_direction <= mp_accu_init_step_direction;
         pe_angle <= fr_angle_d;
-        {% if c['debug'] %}
-        db_angle <= fr_angle_d;
-        if (mp_accu_init_step_direction == {# scan_direction.forward #})
-            db_line_itr <= line_cnt_d;
-        else if (mp_accu_init_step_direction == {# scan_direction.reverse #})
-            db_line_itr <= {# to_l(c['partition_scheme']['size'] - 1) #} -
-                           line_cnt_d;
-        {% end %}
-    end
+
+// PE signals
+// multiplexers & demultiplexers - always give the output using pe_taps
+assign pe_taps = sw_sel ? sw0_pe_taps : sw1_pe_taps;
+assign pe_en = sw_sel ? sw0_pe_en : sw1_pe_en;
+assign pe_reset = swa_next_itr_ack; // FIXME pe_reset does not mean this
+// decode angle to give PE control signals
+assign pe_scan_mode = (pe_angle < `kAngle45 || pe_angle >= `kAngle135) ?
+                      {# scan_mode.x #} : {# scan_mode.y #};
+assign pe_scan_direction = (pe_angle < `kAngle90) ?
+                           {# scan_direction.forward #} :
+                           {# scan_direction.reverse #};
 
 // lut vals
 wire {# c['tShiftAccuBase'].verilog_decl() #} sh_accu_base;

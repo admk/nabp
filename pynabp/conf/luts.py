@@ -2,11 +2,17 @@ import math
 import numpy
 from itertools import chain
 
-from skimage.transform import radon
-
 from pynabp.utils import bin_width_of_dec_vals, bin_width_of_dec, dec_repr
 from pynabp.fixed_point_arith import FixedPoint
 from pynabp.phantom import phantom
+
+try:
+    from skimage.transform import radon
+except:
+    raise RuntimeError(
+            "scons breaks skimage and scipy by module name mangling between "
+            "pickle and cPickle. Workaround: set the environment variable:\n"
+            "    export SCONS_HORRIBLE_REGRESSION_TEST_HACK=0")
 
 
 def shift_lut_defines(shift_accu_precision):
@@ -46,9 +52,9 @@ def _map_accu_part_lookup(conf):
         elif (45 <= angle and angle < 90):
             val = - pe_last * sin_val
         elif (90 <= angle and angle < 135):
-            val = - (pe_last + pe_size) * sin_val + (i_size - 1) * cos_val
+            val = - (pe_last + pe_size - 1) * sin_val + (i_size - 1) * cos_val
         elif (135 <= angle and angle < 180):
-            val = (pe_last + pe_size) * cos_val - (i_size - 1) * sin_val
+            val = (pe_last + pe_size - 1) * cos_val - (i_size - 1) * sin_val
         else:
             raise RuntimeError('Invalid angle encountered')
         return val + i_center * sin_val - i_center * cos_val + p_center
@@ -102,6 +108,8 @@ def _map_accu_init_defines(conf):
         part_val = _map_accu_part_lookup(conf)(angle)
         line_val = -conf['partition_scheme']['size'] * \
                 _map_accu_base_lookup(angle)
+        if angle >= 90:
+            line_val = -line_val
         return (part_val, part_val + line_val)
     def accu_init_range():
         accu_init_range_list = map(accu_init_vals, xrange(0, 180))
