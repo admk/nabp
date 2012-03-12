@@ -74,6 +74,16 @@ wire [`kAddressLength-1:0] addr;
 reg [`kAddressLength-2:0] base_addr;
 assign addr = {sw_scan_mode, base_addr};
 
+wire done;
+assign done = // PE must be working
+              (state == work_s) &&
+              // and base_addr reaches the end...
+              ((sw_scan_direction == {# scan_direction.forward #}) ?
+               // in the forward direction
+               (base_addr == {# to_base_addr(scan_mode_pixels - 1) #}) :
+               // or in the backward direction
+               (base_addr == base_addr == {# to_base_addr(0) #}));
+
 always @(posedge clk)
 begin:base_addr_counter
     if (state == ready_s)
@@ -83,18 +93,12 @@ begin:base_addr_counter
         else if (sw_scan_direction == {# scan_direction.reverse #})
             base_addr <= {# to_base_addr(scan_mode_pixels - 1) #};
     end
-    else if (sw_en)
+    else if (state == work_s)
     begin
         if (sw_scan_direction == {# scan_direction.forward #})
-            if (base_addr == {# to_base_addr(scan_mode_pixels - 1) #})
-                base_addr <= {# to_base_addr(0) #};
-            else
-                base_addr <= base_addr + {# to_base_addr(1) #};
+            base_addr <= base_addr + {# to_base_addr(1) #};
         else if (sw_scan_direction == {# scan_direction.reverse #})
-            if (base_addr == {# to_base_addr(0) #})
-                base_addr <= {# to_base_addr(scan_mode_pixels - 1) #};
-            else
-                base_addr <= base_addr - {# to_base_addr(1) #};
+            base_addr <= base_addr - {# to_base_addr(1) #};
     end
 end
 
@@ -123,10 +127,10 @@ begin:mealy_next_state
     next_state <= state;
     case (state) // synopsys parallel_case full_case
         ready_s:
-            if (sw_en)
+            if (sw_kick)
                 next_state <= work_s;
         work_s:
-            if (!sw_en)
+            if (done)
                 next_state <= ready_s;
         domino_s:
             $display("Domino state: not implemented");
