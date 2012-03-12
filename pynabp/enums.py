@@ -8,6 +8,12 @@ class scan_direction(enum):
     forward = '0'
     reverse = '1'
 
+class processing_element_states(enum):
+    def __init__(self):
+        self.ready = None
+        self.work = None
+        self.domino = None
+
 class processing_state_control_states(enum):
     def __init__(self):
         self.ready = None

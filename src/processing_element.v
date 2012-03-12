@@ -35,7 +35,8 @@
 //     $\log_2{2il}=\log_2{il}+1$,
 // where $i$ is the image size, and $l$ is the line iteration
 {#
-    from pynabp.enums import scan_mode, scan_direction
+    from pynabp.enums import scan_mode, scan_direction, \
+            processing_element_states
 
     scan_mode_pixels = c['partition_scheme']['size'] * c['image_size']
 
@@ -64,13 +65,18 @@ module NABPProcessingElement
 parameter integer pe_id = 'bz;
 parameter [`kImageSizeLength-1:0] pe_tap_offset = 'bz;
 
+{#
+    include('templates/state_decl(states).v',
+            states=processing_element_states())
+#}
+
 wire [`kAddressLength-1:0] addr;
 reg [`kAddressLength-2:0] base_addr;
 assign addr = {sw_scan_mode, base_addr};
 
 always @(posedge clk)
 begin:base_addr_counter
-    if (sw_reset)
+    if (state == ready_s)
     begin
         if (sw_scan_direction == {# scan_direction.forward #})
             base_addr <= {# to_base_addr(0) #};
@@ -102,6 +108,29 @@ begin:write_back_sync
     write_en <= sw_en;
     write_addr <= addr;
     write_val <= read_val + lb_val;
+end
+
+always @(posedge clk)
+begin:transition
+    if (!reset_n)
+        state <= ready_s;
+    else
+        state <= next_state;
+end
+
+always @(*)
+begin:mealy_next_state
+    next_state <= state;
+    case (state) // synopsys parallel_case full_case
+        ready_s:
+            if (sw_en)
+                next_state <= work_s;
+        work_s:
+            if (!sw_en)
+                next_state <= ready_s;
+        domino_s:
+            $display("Domino state: not implemented");
+    endcase
 end
 
 NABPDualPortRAM
