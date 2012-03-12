@@ -64,8 +64,7 @@ begin:mealy_next_state
     endcase
 end
 
-assign fr_has_next_angle = (state == work_s) &&
-                           (fr_angle < ({# to_a(180) #} - hs_angle_step));
+assign fr_has_next_angle = (fr_angle < ({# to_a(180) #} - hs_angle_step));
 assign fr_next_angle_ack = (state == work_s) &&
                            (fr_has_next_angle && fr_next_angle);
 
@@ -74,7 +73,7 @@ assign sg_addr = sg_base_addr + fr_s_val;
 
 always @(posedge clk)
 begin:fr_angle_iterate
-    if (!reset_n)
+    if (!reset_n || state == ready_s)
     begin
         fr_angle <= {# to_a(0) #};
         sg_base_addr <= {# to_sg_addr(0) #};

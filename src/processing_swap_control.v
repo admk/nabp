@@ -73,7 +73,8 @@ assign has_next_line_itr = (line_cnt !=
                             {# to_l(c['partition_scheme']['size'] - 1) #});
 always @(posedge clk)
 begin:line_itr_update
-    if (state == setup_1_s || state == setup_2_s || state == setup_3_s ||
+    if (state == ready_s ||
+        state == setup_1_s || state == setup_2_s || state == setup_3_s ||
         state == angle_setup_1_s ||
         state == angle_setup_2_s ||
         state == angle_setup_3_s)
