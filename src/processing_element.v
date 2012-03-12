@@ -127,15 +127,8 @@ pe_cache
 );
 
 {% if c['debug'] %}
-integer file, err;
-reg [20*8:1] file_name;
+integer err;
 reg [`kImageSizeLength-1:0] im_x, im_y, scan_pos, line_pos;
-initial
-begin
-    $sprintf(file_name, "pe_update_%d.csv", pe_id);
-    file = $fopen(file_name, "w");
-    $fwrite(file, "Time, X, Y, Value");
-end
 
 always @(posedge clk)
     if (sw_en)
@@ -153,8 +146,7 @@ always @(posedge clk)
             im_x = line_pos;
             im_y = scan_pos;
         end
-        $fwrite(file, "%g, %d, %d, %d\n", $time, im_x, im_y, write_val);
-        err = $fflush(file);
+        err = $pyeval("test.update(", im_x, ",", im_y, ",", write_val, ")");
     end
 {% end %}
 

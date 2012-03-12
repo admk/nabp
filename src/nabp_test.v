@@ -14,6 +14,17 @@ module NABPTest();
         raise RuntimeError('Must be in debug mode to perform this test.')
 #}
 
+integer err;
+initial
+begin
+    err = $pyeval("import os");
+    err = $pyeval("path = os.getcwd()");
+    err = $pyeval("import sys");
+    err = $pyeval("sys.path.append(path)");
+    err = $pyeval("from pynabp import test");
+    err = $pyeval("test.init(", {# c['image_size'] #}, ")");
+end
+
 reg kick;
 wire done;
 
@@ -27,6 +38,7 @@ begin:kick_done_handler
     @(posedge clk);
     kick = 0;
     @(posedge done);
+    err = $pyeval("test.finish()");
     $finish;
 end
 
