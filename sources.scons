@@ -5,7 +5,6 @@ from scons_utils import flatten, device_path
 ingredients = {
         'common': Split("""
             shift_register.v
-            hs_angles.v
             """),
         'filtered_ram': Split("""
             dual_port_ram.v
@@ -50,18 +49,21 @@ sources = {
         'filtered_ram_test':
             ingredients['filtered_ram'] +
             Split("""
+                hs_angles.v
                 filtered_ram_test.v
                 filter.v
                 """),
         'processing_swappable_test':
             ingredients['processing'] +
             Split("""
+                hs_angles.v
                 processing_data_path_verify.v
                 processing_swappable_test.v
                 """),
         'processing_test':
             ingredients['processing'] +
             Split("""
+                hs_angles.v
                 processing_data_path_verify.v
                 processing_swap_control.v
                 processing_test.v
