@@ -1,0 +1,22 @@
+#!/bin/sh
+
+exit_on_fail()
+{
+    if [ ! $? -eq 0 ]; then
+        exit -1
+    fi
+}
+
+NABP_TARGET=$1
+VPI_MODULE_PATH=vpi_pyeval/build/vpi_pyeval
+VPI_MODULE=pyeval
+
+# build target
+scons $NABP_TARGET
+exit_on_fail
+
+vvp -M $VPI_MODULE_PATH -m $VPI_MODULE "build/$NABP_TARGET.vvp" -lxt2
+exit_on_fail
+
+gtkwave -o build/$NABP_TARGET.v.lxt wave/$NABP_TARGET\_wave.gtkw &
+exit

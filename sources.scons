@@ -47,19 +47,19 @@ device_specific = Split("""
 
 # targets
 sources = {
-        'fr_test':
+        'filtered_ram_test':
             ingredients['filtered_ram'] +
             Split("""
                 filtered_ram_test.v
                 filter.v
                 """),
-        'pg_test':
+        'processing_swappable_test':
             ingredients['processing'] +
             Split("""
                 processing_data_path_verify.v
                 processing_swappable_test.v
                 """),
-        'pw_test':
+        'processing_test':
             ingredients['processing'] +
             Split("""
                 processing_data_path_verify.v
