@@ -70,17 +70,20 @@ assign fr_next_angle_ack = (state == work_s) &&
 
 reg [`kSinogramAddressLength-1:0] sg_base_addr;
 assign sg_addr = sg_base_addr + fr_s_val;
+reg [`kAngleLength-1:0] fr_angle_l;
 
 always @(posedge clk)
 begin:fr_angle_iterate
     if (!reset_n || state == ready_s)
     begin
         fr_angle <= {# to_a(0) #};
+        fr_angle_l <= {# to_a(0) #};
         sg_base_addr <= {# to_sg_addr(0) #};
     end
     else if (fr_next_angle && fr_has_next_angle)
     begin
-        fr_angle <= fr_angle + hs_angle_step;
+        fr_angle <= fr_angle_l;
+        fr_angle_l <= fr_angle_l + hs_angle_step;
         sg_base_addr <= sg_base_addr +
                 {# to_sg_addr(c['projection_line_size']) #};
     end
