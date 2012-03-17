@@ -86,6 +86,9 @@ begin:fr_angle_iterate
         fr_angle_l <= fr_angle_l + hs_angle_step;
         sg_base_addr <= sg_base_addr +
                 {# to_sg_addr(c['projection_line_size']) #};
+        {% if c['debug'] %}
+            $display("angle: %d", fr_angle);
+        {% end %}
     end
 end
 

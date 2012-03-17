@@ -16,5 +16,5 @@ def update(x, y, val):
 
 def finish():
     global _test_results
-    with open('build/results.pcl', 'w') as results_file:
+    with open('build/results.pkl', 'w') as results_file:
         pickle.dump(_test_results, results_file)
