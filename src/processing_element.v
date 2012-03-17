@@ -44,6 +44,8 @@
     base_addr_len = bin_width(scan_mode_pixels - 1)
     addr_len = 1 + base_addr_len
 
+    cache_size = 2 ** addr_len
+
     def to_base_addr(val):
         return dec_repr(val, base_addr_len)
 #}
@@ -155,7 +157,7 @@ end
 NABPDualPortRAM
 #(
     .pDataLength(`kCacheDataLength),
-    .pRAMSize({# 2 * scan_mode_pixels #}),
+    .pRAMSize({# cache_size #}),
     .pAddrLength(`kAddressLength)
 )
 pe_cache
