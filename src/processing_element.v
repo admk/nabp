@@ -161,7 +161,7 @@ NABPDualPortRAM
 pe_cache
 (
     .clk(clk),
-    .clear(0), // TODO clear after domino complete
+    .clear(!reset_n), // TODO clear after domino complete
     // port 0 for writing
     .we_0(write_en),
     .addr_0(write_addr),
