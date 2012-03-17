@@ -53,9 +53,10 @@ module NABPProcessingElement
 (
     // global signals
     input wire clk,
+    input wire reset_n,
     // inputs from swap control
-    input wire sw_reset,
-    input wire sw_en,
+    input wire sw_kick,
+    input wire sw_domino,
     input wire sw_scan_mode,
     input wire sw_scan_direction,
     // input from line buffer
@@ -86,7 +87,7 @@ assign done = // PE must be working
 
 always @(posedge clk)
 begin:base_addr_counter
-    if (state == ready_s)
+    if (state == setup_s)
     begin
         if (sw_scan_direction == {# scan_direction.forward #})
             base_addr <= {# to_base_addr(0) #};
@@ -109,7 +110,7 @@ wire [`kCacheDataLength-1:0] read_val;
 
 always @(posedge clk)
 begin:write_back_sync
-    write_en <= sw_en;
+    write_en <= (state == work_s);
     write_addr <= addr;
     write_val <= read_val + lb_val;
 end
@@ -128,7 +129,11 @@ begin:mealy_next_state
     case (state) // synopsys parallel_case full_case
         ready_s:
             if (sw_kick)
-                next_state <= work_s;
+                next_state <= setup_s;
+            else if (sw_domino)
+                next_state <= domino_s;
+        setup_s:
+            next_state <= work_s;
         work_s:
             if (done)
                 next_state <= ready_s;
@@ -146,7 +151,7 @@ NABPDualPortRAM
 pe_cache
 (
     .clk(clk),
-    .clear(sw_reset),
+    .clear(0), // TODO clear after domino complete
     // port 0 for writing
     .we_0(write_en),
     .addr_0(write_addr),
@@ -164,7 +169,7 @@ integer err;
 reg [`kImageSizeLength-1:0] im_x, im_y, scan_pos, line_pos;
 
 always @(posedge clk)
-    if (sw_en)
+    if (state == work_s)
     begin
         line_pos = base_addr / {# c['image_size'] #};
         scan_pos = base_addr - {# c['image_size'] #} * line_pos;

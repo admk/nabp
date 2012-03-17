@@ -9,8 +9,8 @@
 // ------------------------------
 // inputs                                      outputs
 //         /|          _____          |\
-// 0 --/--| |-/-[a]-/-| FSM |-/-[a]-/-| |--/-- 0
-// 1 --/--| |-/-[b]-/-|_____|-/-[b]-/-| |--/-- 1
+// 0  ̶ ̶/̶ ̶ ̶| | ̶/̶ ̶[a] ̶/̶ ̶| FSM | ̶/̶ ̶[a] ̶/̶ ̶| | ̶ ̶/̶ ̶ ̶ 0
+// 1  ̶ ̶/̶ ̶ ̶| | ̶/̶ ̶[b] ̶/̶ ̶|_____| ̶/̶ ̶[b] ̶/̶ ̶| | ̶ ̶/̶ ̶ ̶ 1
 //         \|                         |/
 //         |                           |
 // sw_sel -*---------------------------*
@@ -45,8 +45,7 @@ module NABPProcessingSwapControl
     input wire signed [`kFilteredDataLength-1:0] fr0_val,
     input wire signed [`kFilteredDataLength-1:0] fr1_val,
     // output to processing elements
-    output wire pe_reset,
-    output wire pe_en,
+    output wire pe_kick,
     output wire pe_scan_mode,
     output wire pe_scan_direction,
     output wire [`kFilteredDataLength*`kNoOfPartitions-1:0] pe_taps,
@@ -122,7 +121,7 @@ end
 // inputs from swappables
 wire sw0_swap, sw1_swap;
 wire sw0_next_itr, sw1_next_itr;
-wire sw0_pe_en, sw1_pe_en;
+wire sw0_pe_kick, sw1_pe_kick;
 // outputs to swappables
 //   sw_sel - selects swappable
 reg sw_sel;
@@ -285,8 +284,7 @@ always @(posedge clk)
 // PE signals
 // multiplexers & demultiplexers - always give the output using pe_taps
 assign pe_taps = sw_sel ? sw0_pe_taps : sw1_pe_taps;
-assign pe_en = sw_sel ? sw0_pe_en : sw1_pe_en;
-assign pe_reset = swa_next_itr_ack; // FIXME pe_reset does not mean this
+assign pe_kick = sw_sel ? sw0_pe_kick : sw1_pe_kick;
 // decode angle to give PE control signals
 assign pe_scan_mode = (pe_angle < `kAngle45 || pe_angle >= `kAngle135) ?
                       {# scan_mode.x #} : {# scan_mode.y #};
@@ -326,7 +324,7 @@ NABPProcessingSwappable sw{#i#}
     // outputs to swap control
     .sw_swap(sw{#i#}_swap),
     .sw_next_itr(sw{#i#}_next_itr),
-    .sw_pe_en(sw{#i#}_pe_en),
+    .sw_pe_kick(sw{#i#}_pe_kick),
     // outputs to Filtered RAM
     .fr_s_val(fr{#i#}_s_val),
     // outputs to PEs

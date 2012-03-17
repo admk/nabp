@@ -43,7 +43,7 @@ module NABPShifter
     output wire lb_clear,
     output wire lb_shift_en,
     // outputs to PEs
-    output wire sw_pe_en
+    output wire sw_pe_kick
 );
 
 // S̲i̲g̲n̲a̲l̲ ̲D̲e̲l̲a̲y̲s̲
@@ -63,9 +63,9 @@ module NABPShifter
 //                      ↘                             ↑
 //          val _̅_̅_̅_̅_̅_̅_̅_̅_̅X_̅_̅_̅X_̅_̅_̅X_̅_̅  ...  _̅X_̅_̅_̅X_̅_̅_̅X_̅↑̲̅_̅_̅_̅_̅_̅_̅_̅_̅_̅
 //                        ↓↘                          ↑
-//  lb_shift_en _________/̲/̲̅/̲̅↓̲̅/̲̅/̲̅/̲̅/̲̅/̲̅/̲̅/̲̅       /̲̅/̲̅/̲̅/̲̅/̲̅/̲̅/̲̅/̲̅/̲̅\̲_↑̲_________
-//                           ↘                        ↑
-//        pe_en _____________/↘̅ ̅ ̅ ̅ ̅ ̅        ̅ ̅ ̅ ̅ ̅ ̅ ̅ ̅ ̅ ̅ ̅↑̅ ̅\_______
+//  lb_shift_en _________/̲↓̲̅/̲̅↘̲̅/̲̅/̲̅/̲̅/̲̅/̲̅/̲̅/̲̅       /̲̅/̲̅/̲̅/̲̅/̲̅/̲̅/̲̅/̲̅/̲̅\̲_↑̲_________
+//                        ↓  ↘                        ↑
+//      pe_kick _________/ ̅ ̅ ̅\↓̲ ̲ ̲ ̲ ̲ ̲        ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲↑̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲
 //                            ↓                       ↑
 //      pe_taps _̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅X_̅_̅_̅X_̅_̅       _̅X_̅_̅_̅X_̅_̅_̅X↗̲̅_̅_̅X_̅_̅_̅_̅_̅_̅_̅
 //
@@ -73,8 +73,8 @@ module NABPShifter
 //                   |--------------------------|         cycles = shift count
 {#
     var_delay_map = {
-            # sw_pe_en $\delta$ s_val=>val=>taps
-            'sw_pe_en':      ('', 2),
+            # sw_pe_kick $\delta$ s_val=>val=>taps
+            'sw_pe_kick':      ('', 1),
             # lb_shift_en $\delta$ s_val=>val
             'lb_shift_en':   ('', 1),
             # sc_fill_done $\delta$ s_val=>val=>taps->done
@@ -140,7 +140,7 @@ end
 // mealy outputs
 assign sc_fill_done_l  = (cnt == 0) && (state == fill_s);
 assign sc_shift_done_l = (cnt == 0) && (state == shift_s);
-assign sw_pe_en_l = (state == shift_s);
+assign sw_pe_kick_l = (sc_shift_kick);
 assign mp_kick = sc_fill_kick;
 assign mp_done = sc_shift_done;
 
