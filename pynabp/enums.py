@@ -11,8 +11,8 @@ class scan_direction(enum):
 class processing_element_states(enum):
     def __init__(self):
         self.ready = None
-        self.setup = None
         self.work = None
+        self.work_wait = None
         self.domino = None
         super(processing_element_states, self).__init__()
 

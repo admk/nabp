@@ -73,9 +73,10 @@ parameter [`kImageSizeLength-1:0] pe_tap_offset = 'bz;
 
 wire [`kAddressLength-1:0] addr;
 reg [`kAddressLength-2:0] base_addr;
+reg [`kImageSizeLength-1:0] scan_cnt;
 assign addr = {sw_scan_mode, base_addr};
 
-wire done;
+wire done, scan_done;
 assign done = // PE must be working
               (state == work_s) &&
               // and base_addr reaches the end...
@@ -84,11 +85,16 @@ assign done = // PE must be working
                (base_addr == {# to_base_addr(scan_mode_pixels - 1) #}) :
                // or in the backward direction
                (base_addr == base_addr == {# to_base_addr(0) #}));
+assign scan_done = // PE must be working
+                  (state == work_s) &&
+                  // counter has reached the end of a scan
+                  (scan_cnt == {# to_i(c['image_size'] - 1) #});
 
 always @(posedge clk)
 begin:base_addr_counter
-    if (state == setup_s)
+    if ((state == ready_s) && sw_kick)
     begin
+        scan_cnt <= {# to_i(0) #};
         if (sw_scan_direction == {# scan_direction.forward #})
             base_addr <= {# to_base_addr(0) #};
         else if (sw_scan_direction == {# scan_direction.reverse #})
@@ -96,6 +102,7 @@ begin:base_addr_counter
     end
     else if (state == work_s)
     begin
+        scan_cnt <= scan_cnt + {# to_i(1) #};
         if (sw_scan_direction == {# scan_direction.forward #})
             base_addr <= base_addr + {# to_base_addr(1) #};
         else if (sw_scan_direction == {# scan_direction.reverse #})
@@ -129,14 +136,17 @@ begin:mealy_next_state
     case (state) // synopsys parallel_case full_case
         ready_s:
             if (sw_kick)
-                next_state <= setup_s;
+                next_state <= work_s;
             else if (sw_domino)
                 next_state <= domino_s;
-        setup_s:
-            next_state <= work_s;
         work_s:
             if (done)
                 next_state <= ready_s;
+            else if (scan_done)
+                next_state <= work_wait_s;
+        work_wait_s:
+            if (sw_kick)
+                next_state <= work_s;
         domino_s:
             $display("Domino state: not implemented");
     endcase
