@@ -4,19 +4,14 @@ from itertools import chain
 
 from pynabp.utils import bin_width_of_dec_vals, bin_width_of_dec, dec_repr
 from pynabp.fixed_point_arith import FixedPoint
-from pynabp.phantom import phantom
 
-try:
-    from skimage.transform import radon
-except:
-    raise RuntimeError(
-            "scons breaks skimage and scipy by module name mangling between "
-            "pickle and cPickle. Workaround: set the environment variable:\n"
-            "    export SCONS_HORRIBLE_REGRESSION_TEST_HACK=0")
+from cat_py.phantom import phantom
+from cat_py.parallel_beam import radon
 
 
 def shift_lut_defines(shift_accu_precision):
     fp = FixedPoint(1, shift_accu_precision, value=0)
+
     @fp.verilog_repr_decorator
     def lookup(angle):
         if angle < 0 or angle >= 180:
@@ -31,11 +26,13 @@ def shift_lut_defines(shift_accu_precision):
             }
     return defines
 
+
 def map_lut_defines(conf):
     defines = _map_accu_part_defines(conf)
     defines.update(_map_accu_base_defines(conf))
     defines.update(_map_accu_init_defines(conf))
     return defines
+
 
 def _map_accu_part_lookup(conf):
     pe_last = conf['partition_scheme']['partitions'][-1]
@@ -61,6 +58,7 @@ def _map_accu_part_lookup(conf):
 
     return lookup
 
+
 def _map_accu_base_lookup(angle):
     if ((0 <= angle and angle < 45) or
         (135 <= angle and angle < 180)):
@@ -69,6 +67,7 @@ def _map_accu_base_lookup(angle):
         return math.sin(math.radians(angle))
     else:
         raise RuntimeError('Invalid angle encountered')
+
 
 def _map_accu_part_defines(conf):
     """Define *MapAccuPart constants
@@ -91,6 +90,7 @@ def _map_accu_part_defines(conf):
             }
     return defines
 
+
 def _map_accu_base_defines(conf):
     """Define *MapAccuBase constants
     """
@@ -99,6 +99,7 @@ def _map_accu_base_defines(conf):
             'lutMapAccuBase': map(_map_accu_base_lookup, xrange(0, 180))
             }
     return defines
+
 
 def _map_accu_init_defines(conf):
     """Define *MapAccuInit constants
@@ -111,15 +112,18 @@ def _map_accu_init_defines(conf):
         if angle >= 90:
             line_val = -line_val
         return (part_val, part_val + line_val)
+
     def accu_init_range():
         accu_init_range_list = map(accu_init_vals, xrange(0, 180))
         accu_init_range_list = list(chain.from_iterable(accu_init_range_list))
         return bin_width_of_dec_vals(accu_init_range_list)
+
     # range for accumulated value
     def accu_vals(angle):
         scan_val = conf['image_size'] * _map_accu_base_lookup(angle)
         val_0, val_1 = accu_init_vals(angle)
         return (val_0, val_1, val_0 + scan_val, val_1 + scan_val)
+
     def accu_range():
         accu_range_list = map(accu_vals, xrange(0, 180))
         accu_range_list = list(chain.from_iterable(accu_range_list))
