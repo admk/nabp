@@ -1,21 +1,22 @@
 [*]
 [*] GTKWave Analyzer v3.3.32 (w)1999-2012 BSI
-[*] Sat Mar 17 20:28:33 2012
+[*] Sat Mar 17 21:34:13 2012
 [*]
 [dumpfile] "/Users/admko/Documents/Sorcery/NABP/build/nabp_test.v.lxt"
-[dumpfile_mtime] "Sat Mar 17 19:18:49 2012"
-[dumpfile_size] 535292
+[dumpfile_mtime] "Sat Mar 17 21:33:34 2012"
+[dumpfile_size] 73990
 [savefile] "/Users/admko/Documents/Sorcery/NABP/wave/nabp_test_wave.gtkw"
 [timestart] 0
-[size] 1920 1032
-[pos] 1365 -1
-*-25.000000 12837800 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+[size] 1920 746
+[pos] 1366 0
+*-25.000000 22600000 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
 [treeopen] NABPTest.
 [treeopen] NABPTest.nabp_uut.
+[treeopen] NABPTest.nabp_uut.processing_swap_control.
 [sst_width] 198
 [signals_width] 272
 [sst_expanded] 1
-[sst_vpaned_height] 318
+[sst_vpaned_height] 506
 @800200
 -host
 @28
@@ -44,7 +45,7 @@ NABPTest.sinogram_lut.sg_val[9:0]
 -
 @1000200
 -sinogram end
-@800200
+@c00200
 -filtered ram
 @28
 NABPTest.nabp_uut.filtered_ram_swap_control.hs_has_next_angle[0]
@@ -55,7 +56,7 @@ NABPTest.nabp_uut.filtered_ram_swap_control.state[2:0]
 @28
 NABPTest.nabp_uut.filtered_ram_swap_control.sw_sel[0]
 NABPTest.nabp_uut.filtered_ram_swap_control.swap[0]
-@1000200
+@1401200
 -filtered ram
 @800200
 -processing
@@ -63,7 +64,7 @@ NABPTest.nabp_uut.filtered_ram_swap_control.swap[0]
 NABPTest.nabp_uut.processing_swap_control.fr_has_next_angle[0]
 NABPTest.nabp_uut.processing_swap_control.fr_next_angle[0]
 NABPTest.nabp_uut.processing_swap_control.fr_next_angle_ack[0]
-@25
+@24
 NABPTest.nabp_uut.processing_swap_control.line_cnt[3:0]
 @2024
 ^3 /Users/admko/Documents/Sorcery/NABP/wave/../derived_src/processing_swap_control.vxtf
@@ -79,16 +80,22 @@ NABPTest.nabp_uut.processing_element_0.sw_scan_mode[0]
 NABPTest.nabp_uut.processing_swap_control.pe_angle[7:0]
 @28
 NABPTest.nabp_uut.processing_element_0.sw_kick[0]
+@2024
+^4 /Users/admko/Documents/Sorcery/NABP/wave/../derived_src/processing_element.vxtf
+NABPTest.nabp_uut.processing_element_0.state[2:0]
 @8024
 NABPTest.nabp_uut.processing_element_0.lb_val[12:0]
 @20000
 -
-@24
-NABPTest.nabp_uut.processing_element_0.line_pos[7:0]
-@22
-NABPTest.nabp_uut.processing_element_0.scan_pos[7:0]
 @8024
+NABPTest.nabp_uut.processing_element_0.line_pos[7:0]
+NABPTest.nabp_uut.processing_element_0.scan_pos[7:0]
+@8025
 NABPTest.nabp_uut.processing_element_0.addr[12:0]
+@8022
+NABPTest.nabp_uut.processing_element_0.read_val[15:0]
+@8024
+NABPTest.nabp_uut.processing_element_0.write_val[15:0]
 @1000200
 -processing element 0
 [pattern_trace] 1
