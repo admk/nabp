@@ -1,22 +1,22 @@
 [*]
 [*] GTKWave Analyzer v3.3.32 (w)1999-2012 BSI
-[*] Sat Mar 17 22:04:15 2012
+[*] Sun Mar 18 05:15:36 2012
 [*]
 [dumpfile] "/Users/admko/Documents/Sorcery/NABP/build/nabp_test.v.lxt"
-[dumpfile_mtime] "Sat Mar 17 22:01:55 2012"
-[dumpfile_size] 880765
+[dumpfile_mtime] "Sun Mar 18 05:13:09 2012"
+[dumpfile_size] 352174
 [savefile] "/Users/admko/Documents/Sorcery/NABP/wave/nabp_test_wave.gtkw"
 [timestart] 0
-[size] 1839 990
-[pos] 1398 15
-*-25.000000 0 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+[size] 1366 720
+[pos] 4 15
+*-25.000000 79250000 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
 [treeopen] NABPTest.
 [treeopen] NABPTest.nabp_uut.
 [treeopen] NABPTest.nabp_uut.processing_swap_control.
 [sst_width] 198
 [signals_width] 272
 [sst_expanded] 1
-[sst_vpaned_height] 706
+[sst_vpaned_height] 247
 @800200
 -host
 @28
@@ -37,8 +37,6 @@ NABPTest.nabp_uut.sinogram_addresser.hs_done[0]
 @24
 NABPTest.nabp_uut.sinogram_addresser.fr_angle[7:0]
 NABPTest.nabp_uut.sinogram_addresser.fr_next_angle_ack[0]
-NABPTest.nabp_uut.sinogram_addresser.fr_s_val[8:0]
-NABPTest.nabp_uut.sinogram_addresser.sg_addr[11:0]
 @8024
 NABPTest.sinogram_lut.sg_val[9:0]
 @20000
@@ -64,8 +62,6 @@ NABPTest.nabp_uut.filtered_ram_swap_control.swap[0]
 NABPTest.nabp_uut.processing_swap_control.fr_has_next_angle[0]
 NABPTest.nabp_uut.processing_swap_control.fr_next_angle[0]
 NABPTest.nabp_uut.processing_swap_control.fr_next_angle_ack[0]
-@24
-NABPTest.nabp_uut.processing_swap_control.line_cnt[3:0]
 @2024
 ^3 /Users/admko/Documents/Sorcery/NABP/wave/../derived_src/processing_swap_control.vxtf
 NABPTest.nabp_uut.processing_swap_control.state[3:0]
@@ -87,16 +83,17 @@ NABPTest.nabp_uut.processing_element_0.state[2:0]
 NABPTest.nabp_uut.processing_element_0.lb_val[12:0]
 @20000
 -
+@24
+NABPTest.nabp_uut.processing_element_0.write_en[0]
 @8024
-NABPTest.nabp_uut.processing_element_0.line_pos[7:0]
-NABPTest.nabp_uut.processing_element_0.scan_pos[7:0]
-NABPTest.nabp_uut.processing_element_0.addr[12:0]
-@25
-NABPTest.nabp_uut.processing_element_0.base_addr[11:0]
-@8022
 NABPTest.nabp_uut.processing_element_0.read_val[15:0]
-@8024
 NABPTest.nabp_uut.processing_element_0.write_val[15:0]
+NABPTest.nabp_uut.processing_element_0.im_x[6:0]
+NABPTest.nabp_uut.processing_element_0.im_y[6:0]
+@24
+NABPTest.nabp_uut.processing_element_0.base_addr[9:0]
+@8024
+NABPTest.nabp_uut.processing_element_0.addr[10:0]
 @1000200
 -processing element 0
 [pattern_trace] 1
