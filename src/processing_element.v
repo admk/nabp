@@ -85,8 +85,8 @@ assign done = // PE must be working
               ((sw_scan_direction == {# scan_direction.forward #}) ?
                // in the forward direction
                (base_addr == {# to_base_addr(scan_mode_pixels - 1) #}) :
-               // or in the backward direction
-               (base_addr == base_addr == {# to_base_addr(0) #}));
+               // or in the reverse direction
+               (base_addr == {# to_base_addr(0) #}));
 assign scan_done = // PE must be working
                   (state == work_s) &&
                   // counter has reached the end of a scan
