@@ -4,6 +4,11 @@ import math
 def validate(image_size, scheme):
     """A general validator for partitioning algorithms"""
 
+    # check for partition scheme consistency
+    if scheme['no_of_partitions'] != len(scheme['partitions']):
+        raise ValueError(
+                'Length of partitions and number of partitions given mismatch')
+
     # check for partitioning efficiency
     if scheme['no_of_partitions'] > image_size:
         raise ValueError(
@@ -23,37 +28,21 @@ def validate(image_size, scheme):
         raise ValueError('Last tap and partitions disagree')
 
     # check coverage for consistencies
-    wasted_pixels = int(last_tap + scheme['size'] - image_size)
+    wasted_pixels = int((last_tap + scheme['size']) - (image_size - 1))
     if wasted_pixels < 0:
-        raise ValueError('Partitions does not cover the entire image size')
+        raise ValueError('Partitions do not cover the entire image size')
 
     # check coverage efficiency
     if wasted_pixels >= scheme['size']:
         raise ValueError('Some partitions are not necessary.')
 
 
-def validate_decorate(partition_function):
-    """Encapsulate a validator to use as a decorator"""
-
-    def validate_wrapper(image_size, no_of_partitions):
-        # generate scheme with the partition function
-        scheme = partition_function(image_size, no_of_partitions)
-        # validation
-        validate(image_size, scheme)
-        return scheme
-
-    return validate_wrapper
-
-
 def partition(image_size, no_of_partitions):
     """
-    >>> partition(512, 3)
-    {'partitions': [0, 171, 342], 'no_of_partitions': 3, 'size': 171}
-    >>> partition(512, 4)
-    {'partitions': [0, 128, 256, 384], 'no_of_partitions': 4, 'size': 128}
-    >>> partition(512, 5)
-    {'partitions': [0, 103, 206, 309, 412], 'no_of_partitions': 5, 'size': 103}
+    Partitioning algorithm
     """
+
+    # find optimal partition size
     partition_size = int(math.ceil(image_size / float(no_of_partitions)))
 
     partition_scheme = {
@@ -64,9 +53,11 @@ def partition(image_size, no_of_partitions):
                         for idx in xrange(no_of_partitions)],
             }
 
+    # partition pruning or appending
+    while partition_size * (partition_scheme['no_of_partitions'] - 1) \
+            > image_size - 1:
+        # has one more unnecessary partition
+        partition_scheme['no_of_partitions'] -= 1
+        partition_scheme['partitions'] = partition_scheme['partitions'][:-1]
+
     return partition_scheme
-
-
-if __name__ == '__main__':
-    import doctest
-    doctest.testmod()
