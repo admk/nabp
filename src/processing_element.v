@@ -94,22 +94,27 @@ assign scan_done = // PE must be working
 
 always @(posedge clk)
 begin:base_addr_counter
-    if ((state == ready_s) && sw_kick)
-    begin
-        scan_cnt <= {# to_i(0) #};
-        if (sw_scan_direction == {# scan_direction.forward #})
-            base_addr <= {# to_base_addr(0) #};
-        else if (sw_scan_direction == {# scan_direction.reverse #})
-            base_addr <= {# to_base_addr(scan_mode_pixels - 1) #};
-    end
-    else if (state == work_s)
-    begin
-        scan_cnt <= scan_cnt + {# to_i(1) #};
-        if (sw_scan_direction == {# scan_direction.forward #})
-            base_addr <= base_addr + {# to_base_addr(1) #};
-        else if (sw_scan_direction == {# scan_direction.reverse #})
-            base_addr <= base_addr - {# to_base_addr(1) #};
-    end
+    case (state)
+        ready_s:
+            if (sw_kick)
+            begin
+                scan_cnt <= {# to_i(0) #};
+                if (sw_scan_direction == {# scan_direction.forward #})
+                    base_addr <= {# to_base_addr(0) #};
+                else if (sw_scan_direction == {# scan_direction.reverse #})
+                    base_addr <= {# to_base_addr(scan_mode_pixels - 1) #};
+            end
+        work_wait_s:
+            scan_cnt <= {# to_i(0) #};
+        work_s:
+        begin
+            scan_cnt <= scan_cnt + {# to_i(1) #};
+            if (sw_scan_direction == {# scan_direction.forward #})
+                base_addr <= base_addr + {# to_base_addr(1) #};
+            else if (sw_scan_direction == {# scan_direction.reverse #})
+                base_addr <= base_addr - {# to_base_addr(1) #};
+        end
+    endcase
 end
 
 reg write_en;
