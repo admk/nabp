@@ -1,22 +1,22 @@
 [*]
 [*] GTKWave Analyzer v3.3.32 (w)1999-2012 BSI
-[*] Sat Mar 17 21:34:13 2012
+[*] Sat Mar 17 22:04:15 2012
 [*]
 [dumpfile] "/Users/admko/Documents/Sorcery/NABP/build/nabp_test.v.lxt"
-[dumpfile_mtime] "Sat Mar 17 21:33:34 2012"
-[dumpfile_size] 73990
+[dumpfile_mtime] "Sat Mar 17 22:01:55 2012"
+[dumpfile_size] 880765
 [savefile] "/Users/admko/Documents/Sorcery/NABP/wave/nabp_test_wave.gtkw"
 [timestart] 0
-[size] 1920 746
-[pos] 1366 0
-*-25.000000 22600000 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+[size] 1839 990
+[pos] 1398 15
+*-25.000000 0 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
 [treeopen] NABPTest.
 [treeopen] NABPTest.nabp_uut.
 [treeopen] NABPTest.nabp_uut.processing_swap_control.
 [sst_width] 198
 [signals_width] 272
 [sst_expanded] 1
-[sst_vpaned_height] 506
+[sst_vpaned_height] 706
 @800200
 -host
 @28
@@ -90,8 +90,9 @@ NABPTest.nabp_uut.processing_element_0.lb_val[12:0]
 @8024
 NABPTest.nabp_uut.processing_element_0.line_pos[7:0]
 NABPTest.nabp_uut.processing_element_0.scan_pos[7:0]
-@8025
 NABPTest.nabp_uut.processing_element_0.addr[12:0]
+@25
+NABPTest.nabp_uut.processing_element_0.base_addr[11:0]
 @8022
 NABPTest.nabp_uut.processing_element_0.read_val[15:0]
 @8024

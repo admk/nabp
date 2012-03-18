@@ -37,8 +37,10 @@ begin:kick_done_handler
     kick = 1;
     @(posedge clk);
     kick = 0;
-    @(posedge done);
+    @(negedge done);
     err = $pyeval("test.finish()");
+    @(posedge clk);
+    @(posedge clk);
     $finish;
 end
 
