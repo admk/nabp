@@ -7,7 +7,7 @@ exit_on_fail()
     fi
 }
 
-NABP_TARGET=$1
+NABP_TARGET=$1_test
 VPI_MODULE_PATH=vpi_pyeval/build/vpi_pyeval
 VPI_MODULE=pyeval
 
