@@ -64,8 +64,7 @@ begin:mealy_next_state
     endcase
 end
 
-assign fr_has_next_angle = (state == work_s) &&
-                           (fr_angle < ({# to_a(180) #} - hs_angle_step));
+assign fr_has_next_angle = (fr_angle < ({# to_a(180) #} - hs_angle_step));
 assign fr_next_angle_ack = (state == work_s) &&
                            (fr_has_next_angle && fr_next_angle);
 
@@ -75,7 +74,7 @@ reg [`kAngleLength-1:0] fr_angle_l;
 
 always @(posedge clk)
 begin:fr_angle_iterate
-    if (!reset_n)
+    if (!reset_n || state == ready_s)
     begin
         fr_angle <= {# to_a(0) #};
         fr_angle_l <= {# to_a(0) #};
@@ -87,6 +86,9 @@ begin:fr_angle_iterate
         fr_angle_l <= fr_angle_l + hs_angle_step;
         sg_base_addr <= sg_base_addr +
                 {# to_sg_addr(c['projection_line_size']) #};
+        {% if c['debug'] %}
+            $display("angle: %d", fr_angle);
+        {% end %}
     end
 end
 

@@ -103,7 +103,7 @@ NABPFilteredRAMSwapControl filtered_ram_swap_control
     .pr1_val(pr1_val)
 );
 
-wire pe_reset, pe_en, pe_scan_mode, pe_scan_direction;
+wire pe_kick, pe_scan_mode, pe_scan_direction;
 wire [`kFilteredDataLength*`kNoOfPartitions-1:0] pe_taps;
 NABPProcessingSwapControl processing_swap_control
 (
@@ -117,8 +117,7 @@ NABPProcessingSwapControl processing_swap_control
     .fr0_val(pr0_val),
     .fr1_val(pr1_val),
     // output to processing elements
-    .pe_reset(pe_reset),
-    .pe_en(pe_en),
+    .pe_kick(pe_kick),
     .pe_scan_mode(pe_scan_mode),
     .pe_scan_direction(pe_scan_direction),
     .pe_taps(pe_taps),
@@ -140,8 +139,9 @@ NABPProcessingElement
 processing_element_{#i#}
 (
     .clk(clk),
-    .sw_reset(pe_reset),
-    .sw_en(pe_en),
+    .reset_n(reset_n),
+    .sw_kick(pe_kick),
+    .sw_domino(0),
     .sw_scan_mode(pe_scan_mode),
     .sw_scan_direction(pe_scan_direction),
     .lb_val(pe_tap_val[{#i#}])
