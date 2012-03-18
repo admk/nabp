@@ -30,18 +30,24 @@ wire done;
 
 // control signals
 initial
-begin:kick_done_handler
+begin:kick_handler
     @(posedge reset_n);
     kick = 0;
     @(posedge clk);
     kick = 1;
     @(posedge clk);
     kick = 0;
-    @(negedge done);
-    err = $pyeval("test.finish()");
-    @(posedge clk);
-    @(posedge clk);
-    $finish;
+end
+
+always @(posedge clk)
+begin:done_handler
+    if (done)
+    begin
+        err = $pyeval("test.finish()");
+        @(posedge clk);
+        @(posedge clk);
+        $finish;
+    end
 end
 
 wire [`kDataLength-1:0] sg_val;
