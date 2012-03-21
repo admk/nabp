@@ -23,7 +23,7 @@ end
 
 // controls
 reg sw_swap_ack, sw_next_itr_ack;
-wire sw_swap, sw_next_itr, sw_pe_en;
+wire sw_swap, sw_next_itr, sw_pe_kick;
 wire [`kFilteredDataLength*`kNoOfPartitions-1:0] pe_taps;
 
 always @(posedge clk)
@@ -50,7 +50,7 @@ NABPProcessingSwappable uut
     // outputs to swap control
     .sw_swap(sw_swap),
     .sw_next_itr(sw_next_itr),
-    .sw_pe_en(sw_pe_en),
+    .sw_pe_kick(sw_pe_kick),
     // output to RAM
     .fr_s_val(fr_s_val),
     // output to PEs
@@ -77,7 +77,7 @@ data_path_verify
     .pv1_s_val(0),
     .pv0_val(fr_val),
     .pv1_val(),
-    .pe_en(sw_pe_en),
+    .pe_kick(sw_pe_kick),
     .pe_taps(pe_taps)
 );
 

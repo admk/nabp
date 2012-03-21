@@ -23,7 +23,7 @@ module NABPProcessingDataPathVerify
     output reg [`kFilteredDataLength-1:0] pv{#i#}_val,
     {% end %}
     // pe side
-    input wire pe_en,
+    input wire pe_kick,
     input wire [`kFilteredDataLength*`kNoOfPartitions-1:0] pe_taps
 );
 
@@ -82,6 +82,19 @@ function integer verify;
     end
 endfunction
 
+// generate pe_en
+reg [`kImageSizeLength-1:0] pe_scan_cnt;
+assign pe_en = (pe_scan_cnt != {# to_i(0) #});
+always @(posedge clk)
+begin:deprecated_pe_en
+    if (!reset_n)
+        pe_scan_cnt <= {# to_i(0) #};
+    else if (pe_kick)
+        pe_scan_cnt <= {# to_i(c['image_size'] - 1) #};
+    if (pe_en)
+        pe_scan_cnt <= pe_scan_cnt - {# to_i(1) #};
+end
+
 integer scan_itr, scan_end, scan_base;
 integer line, x, y, angle, i, v, verify_cnt, px_cnt;
 real accuracy;
@@ -96,7 +109,7 @@ assign tap_val[{#i#}] = pe_taps[
 reg scan_mode;
 always
 begin:pe_verify
-    @(posedge pe_en);
+    @(posedge pe_en); #1;
     if (tt_angle < `kAngle45 || tt_angle >= `kAngle135)
         scan_mode = {# scan_mode.x #};
     else
