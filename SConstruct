@@ -1,8 +1,3 @@
-# FIXME scons is crazy, it replaces pickle with cPickle and mangles the name.
-# This breaks scipy.
-# Workaround: in bash shell do
-#     export SCONS_HORRIBLE_REGRESSION_TEST_HACK=0
-
 import os
 os.environ['NABP_CONFIG_PATH'] = os.path.abspath('default.naconfig')
 
