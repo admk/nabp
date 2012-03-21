@@ -88,9 +88,9 @@ assign done = // PE must be working
                // or in the reverse direction
                (base_addr == {# to_base_addr(0) #}));
 assign scan_done = // PE must be working
-                  (state == work_s) &&
-                  // counter has reached the end of a scan
-                  (scan_cnt == {# to_i(c['image_size'] - 1) #});
+                   (state == work_s) &&
+                   // counter has reached the end of a scan
+                   (scan_cnt == {# to_i(0) #});
 
 always @(posedge clk)
 begin:base_addr_counter
@@ -98,17 +98,17 @@ begin:base_addr_counter
         ready_s:
             if (sw_kick)
             begin
-                scan_cnt <= {# to_i(0) #};
+                scan_cnt <= {# to_i(c['image_size'] - 1) #};
                 if (sw_scan_direction == {# scan_direction.forward #})
                     base_addr <= {# to_base_addr(0) #};
                 else if (sw_scan_direction == {# scan_direction.reverse #})
                     base_addr <= {# to_base_addr(scan_mode_pixels - 1) #};
             end
         work_wait_s:
-            scan_cnt <= {# to_i(0) #};
+            scan_cnt <= {# to_i(c['image_size'] - 1) #};
         work_s:
         begin
-            scan_cnt <= scan_cnt + {# to_i(1) #};
+            scan_cnt <= scan_cnt - {# to_i(1) #};
             if (sw_scan_direction == {# scan_direction.forward #})
                 base_addr <= base_addr + {# to_base_addr(1) #};
             else if (sw_scan_direction == {# scan_direction.reverse #})
