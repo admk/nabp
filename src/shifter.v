@@ -74,7 +74,7 @@ module NABPShifter
 {#
     var_delay_map = {
             # sw_pe_kick $\delta$ s_val=>val=>taps
-            'sw_pe_kick':      ('', 1),
+            'sw_pe_kick':    ('', 1),
             # lb_shift_en $\delta$ s_val=>val
             'lb_shift_en':   ('', 1),
             # sc_fill_done $\delta$ s_val=>val=>taps->done
