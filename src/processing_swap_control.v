@@ -152,12 +152,14 @@ assign swap_ack = // if wants next angle, then wish to insert angle setup
                   // bubble, swap when setup is done. Both swappable are
                   // guaranteed to be waiting when entering this state
                   (state == angle_setup_3_s) ||
-                  // else if not wanting next angle
-                  (!fr_next_angle &&
-                   // proceed without delay when swa fill done
-                   ((state == fill_s && swa_swap) ||
-                   // or swa fill done and swb shift done
-                   (state == fill_and_shift_s && swa_swap && swb_next_itr)));
+                  (// else if not wanting next angle
+                   !fr_next_angle &&
+                   (// proceed without delay when swa fill done
+                    (state == fill_s && swa_swap) ||
+                    // or swa fill done and swb shift done
+                    (swa_swap && swb_next_itr &&
+                     ((state == fill_and_shift_s) ||
+                      (state == diverged_fill_and_shift_s)))));
 // kicks the other swappable
 assign swb_next_itr_ack = // if we want to swap
                           swap_ack &&
@@ -165,15 +167,18 @@ assign swb_next_itr_ack = // if we want to swap
                           (fr_has_next_angle || has_next_line_itr);
 // external
 assign fr_prev_angle_release = // release old angle when ready
-                               reset_n && (state == ready_s) ||
-                               // or at least try to at each end of scan
-                               swap_ack;
+                               (reset_n && (state == ready_s)) ||
+                               (// or done for diverged data path
+                                swap_ack &&
+                                (state == diverged_fill_and_shift_s));
 assign fr_next_angle = // only ask for next angle if has next angle
                        reset_n && fr_has_next_angle &&
                        (// it's not already starting a new angle
                         (state != angle_setup_1_s &&
                          state != angle_setup_2_s &&
                          state != angle_setup_3_s &&
+                         // already in diverge path, can't diverge any more
+                         state != diverged_fill_and_shift_s &&
                          // and swb is ready to start with a new line and all
                          // lines are being processed for the current angle
                          swb_next_itr && !has_next_line_itr));
@@ -198,7 +203,7 @@ begin:mealy_next_state
     next_state <= state;
     case (state) // synopsys parallel_case full_case
         ready_s:
-            if (fr_next_angle_ack)
+            if (fr_prev_angle_release_ack)
                 next_state <= setup_1_s;
         setup_1_s:
             next_state <= setup_2_s;
@@ -233,7 +238,10 @@ begin:mealy_next_state
         angle_setup_2_s:
             next_state <= angle_setup_3_s;
         angle_setup_3_s:
-            next_state <= fill_and_shift_s;
+            next_state <= diverged_fill_and_shift_s;
+        diverged_fill_and_shift_s:
+            if (swa_swap && swb_next_itr && fr_prev_angle_release_ack)
+                next_state <= fill_and_shift_s;
         shift_s:
             if (swb_next_itr)
                 next_state <= ready_s;

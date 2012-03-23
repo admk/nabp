@@ -150,7 +150,8 @@ assign prev_angle_release = // release oldest angle if want next angle and
                              // to become the current main buffer, and fill the
                              // old buffer
                              (state == diverged_work_s));
-assign pr_prev_angle_release_ack = // acknowledgement happens when needed and
+assign pr_prev_angle_release_ack = (state != ready_s) &&
+                                   // acknowledgement happens when needed and
                                    pr_prev_angle_release &&
                                    // swap happens because prev_angle_release
                                    swap;

@@ -1,15 +1,15 @@
 [*]
 [*] GTKWave Analyzer v3.3.32 (w)1999-2012 BSI
-[*] Wed Mar 21 16:18:58 2012
+[*] Fri Mar 23 18:58:18 2012
 [*]
 [dumpfile] "/Users/admko/Documents/Sorcery/NABP/build/nabp_test.v.lxt"
-[dumpfile_mtime] "Wed Mar 21 16:06:14 2012"
-[dumpfile_size] 352174
+[dumpfile_mtime] "Fri Mar 23 18:50:17 2012"
+[dumpfile_size] 309611
 [savefile] "/Users/admko/Documents/Sorcery/NABP/wave/nabp_test_wave.gtkw"
 [timestart] 0
 [size] 1366 720
 [pos] 4 15
-*-25.000000 94800000 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+*-25.000000 14570000 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
 [treeopen] NABPTest.
 [treeopen] NABPTest.nabp_uut.
 [treeopen] NABPTest.nabp_uut.processing_swap_control.
@@ -43,7 +43,7 @@ NABPTest.sinogram_lut.sg_val[9:0]
 -
 @1000200
 -sinogram end
-@c00200
+@800200
 -filtered ram
 @28
 NABPTest.nabp_uut.filtered_ram_swap_control.hs_has_next_angle[0]
@@ -54,30 +54,34 @@ NABPTest.nabp_uut.filtered_ram_swap_control.state[2:0]
 @28
 NABPTest.nabp_uut.filtered_ram_swap_control.sw_sel[0]
 NABPTest.nabp_uut.filtered_ram_swap_control.swap[0]
-@1401200
+@1000200
 -filtered ram
-@c00201
+@800200
 -processing
 @28
 NABPTest.nabp_uut.processing_swap_control.fr_has_next_angle[0]
 NABPTest.nabp_uut.processing_swap_control.fr_next_angle[0]
 NABPTest.nabp_uut.processing_swap_control.fr_next_angle_ack[0]
+NABPTest.nabp_uut.processing_swap_control.fr_prev_angle_release[0]
+NABPTest.nabp_uut.processing_swap_control.fr_prev_angle_release_ack[0]
 @2024
 ^3 /Users/admko/Documents/Sorcery/NABP/wave/../derived_src/processing_swap_control.vxtf
 NABPTest.nabp_uut.processing_swap_control.state[3:0]
+@24
+NABPTest.nabp_uut.processing_swap_control.line_cnt[2:0]
 @28
 NABPTest.nabp_uut.processing_swap_control.sw_sel[0]
-@1401201
+@1000200
 -processing
 @800200
 -processing element 0
+@29
+NABPTest.nabp_uut.processing_element_0.sw_kick[0]
 @28
 NABPTest.nabp_uut.processing_element_0.sw_scan_direction[0]
 NABPTest.nabp_uut.processing_element_0.sw_scan_mode[0]
 @24
 NABPTest.nabp_uut.processing_swap_control.pe_angle[7:0]
-@28
-NABPTest.nabp_uut.processing_element_0.sw_kick[0]
 @2024
 ^4 /Users/admko/Documents/Sorcery/NABP/wave/../derived_src/processing_element.vxtf
 NABPTest.nabp_uut.processing_element_0.state[2:0]
