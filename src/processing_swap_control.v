@@ -159,7 +159,9 @@ assign swap_ack = // if wants next angle, then wish to insert angle setup
                     // or swa fill done and swb shift done
                     (swa_swap && swb_next_itr &&
                      ((state == fill_and_shift_s) ||
-                      (state == diverged_fill_and_shift_s)))));
+                      (state == diverged_fill_and_shift_s &&
+                       // if diverged wait for release ack
+                       fr_prev_angle_release_ack)))));
 // kicks the other swappable
 assign swb_next_itr_ack = // if we want to swap
                           swap_ack &&
@@ -169,7 +171,7 @@ assign swb_next_itr_ack = // if we want to swap
 assign fr_prev_angle_release = // release old angle when ready
                                (reset_n && (state == ready_s)) ||
                                (// or done for diverged data path
-                                swap_ack &&
+                                swa_swap && swb_next_itr &&
                                 (state == diverged_fill_and_shift_s));
 assign fr_next_angle = // only ask for next angle if has next angle
                        reset_n && fr_has_next_angle &&
@@ -240,7 +242,7 @@ begin:mealy_next_state
         angle_setup_3_s:
             next_state <= diverged_fill_and_shift_s;
         diverged_fill_and_shift_s:
-            if (swa_swap && swb_next_itr && fr_prev_angle_release_ack)
+            if (fr_prev_angle_release_ack)
                 next_state <= fill_and_shift_s;
         shift_s:
             if (swb_next_itr)

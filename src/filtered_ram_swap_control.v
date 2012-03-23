@@ -97,7 +97,7 @@ always @(posedge clk)
         // must have some angle for processing
         pr_has_next_angle <= 1;
     end
-    else if (pr_prev_angle_release_ack)
+    else if (pr_next_angle_ack || pr_prev_angle_release_ack)
     begin
         pr_angle <= hs_angle;
         pr_has_next_angle <= hs_has_next_angle;

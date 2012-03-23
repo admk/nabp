@@ -1,30 +1,31 @@
 [*]
 [*] GTKWave Analyzer v3.3.32 (w)1999-2012 BSI
-[*] Fri Mar 23 18:58:18 2012
+[*] Fri Mar 23 23:42:23 2012
 [*]
 [dumpfile] "/Users/admko/Documents/Sorcery/NABP/build/nabp_test.v.lxt"
-[dumpfile_mtime] "Fri Mar 23 18:50:17 2012"
-[dumpfile_size] 309611
+[dumpfile_mtime] "Fri Mar 23 23:34:15 2012"
+[dumpfile_size] 375325
 [savefile] "/Users/admko/Documents/Sorcery/NABP/wave/nabp_test_wave.gtkw"
 [timestart] 0
-[size] 1366 720
-[pos] 4 15
-*-25.000000 14570000 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+[size] 1366 867
+[pos] 1719 88
+*-25.000000 0 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
 [treeopen] NABPTest.
 [treeopen] NABPTest.nabp_uut.
 [treeopen] NABPTest.nabp_uut.processing_swap_control.
+[treeopen] NABPTest.nabp_uut.processing_swap_control.sw0.
 [sst_width] 198
 [signals_width] 272
 [sst_expanded] 1
-[sst_vpaned_height] 247
-@800200
+[sst_vpaned_height] 309
+@c00200
 -host
 @28
 NABPTest.nabp_uut.clk[0]
 NABPTest.nabp_uut.reset_n[0]
 NABPTest.nabp_uut.kick[0]
 NABPTest.nabp_uut.done[0]
-@1000200
+@1401200
 -host
 @800200
 -sinogram end
@@ -53,17 +54,20 @@ NABPTest.nabp_uut.filtered_ram_swap_control.hs_next_angle[0]
 NABPTest.nabp_uut.filtered_ram_swap_control.state[2:0]
 @28
 NABPTest.nabp_uut.filtered_ram_swap_control.sw_sel[0]
-NABPTest.nabp_uut.filtered_ram_swap_control.swap[0]
 @1000200
 -filtered ram
 @800200
 -processing
+@c00201
+-control
 @28
 NABPTest.nabp_uut.processing_swap_control.fr_has_next_angle[0]
 NABPTest.nabp_uut.processing_swap_control.fr_next_angle[0]
 NABPTest.nabp_uut.processing_swap_control.fr_next_angle_ack[0]
 NABPTest.nabp_uut.processing_swap_control.fr_prev_angle_release[0]
 NABPTest.nabp_uut.processing_swap_control.fr_prev_angle_release_ack[0]
+@1401201
+-control
 @2024
 ^3 /Users/admko/Documents/Sorcery/NABP/wave/../derived_src/processing_swap_control.vxtf
 NABPTest.nabp_uut.processing_swap_control.state[3:0]
@@ -75,9 +79,8 @@ NABPTest.nabp_uut.processing_swap_control.sw_sel[0]
 -processing
 @800200
 -processing element 0
-@29
-NABPTest.nabp_uut.processing_element_0.sw_kick[0]
 @28
+NABPTest.nabp_uut.processing_element_0.sw_kick[0]
 NABPTest.nabp_uut.processing_element_0.sw_scan_direction[0]
 NABPTest.nabp_uut.processing_element_0.sw_scan_mode[0]
 @24
