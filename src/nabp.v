@@ -76,6 +76,7 @@ NABPFilter filter
 
 wire [`kAngleLength-1:0] pr_angle;
 wire pr_next_angle, pr_next_angle_ack, pr_has_next_angle;
+wire pr_prev_angle_release, pr_prev_angle_release_ack;
 wire [`kSLength-1:0] pr0_s_val, pr1_s_val;
 wire [`kFilteredDataLength-1:0] pr0_val, pr1_val;
 NABPFilteredRAMSwapControl filtered_ram_swap_control
@@ -92,6 +93,7 @@ NABPFilteredRAMSwapControl filtered_ram_swap_control
     .pr0_s_val(pr0_s_val),
     .pr1_s_val(pr1_s_val),
     .pr_next_angle(pr_next_angle),
+    .pr_prev_angle_release(pr_prev_angle_release),
     // outputs to sinogram RAM
     .hs_s_val(fr_sa_s_val),
     // outputs to hs_angle_specification
@@ -100,6 +102,7 @@ NABPFilteredRAMSwapControl filtered_ram_swap_control
     .pr_angle(pr_angle),
     .pr_has_next_angle(pr_has_next_angle),
     .pr_next_angle_ack(pr_next_angle_ack),
+    .pr_prev_angle_release_ack(pr_prev_angle_release_ack),
     .pr0_val(pr0_val),
     .pr1_val(pr1_val)
 );
@@ -115,6 +118,7 @@ NABPProcessingSwapControl processing_swap_control
     .fr_angle(pr_angle),
     .fr_has_next_angle(pr_has_next_angle),
     .fr_next_angle_ack(pr_next_angle_ack),
+    .fr_prev_angle_release_ack(pr_prev_angle_release_ack),
     .fr0_val(pr0_val),
     .fr1_val(pr1_val),
     // output to processing elements
@@ -124,6 +128,7 @@ NABPProcessingSwapControl processing_swap_control
     .pe_taps(pe_taps),
     // output to RAM
     .fr_next_angle(pr_next_angle),
+    .fr_prev_angle_release(pr_prev_angle_release),
     .fr0_s_val(pr0_s_val),
     .fr1_s_val(pr1_s_val)
 );
