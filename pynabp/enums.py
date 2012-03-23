@@ -64,6 +64,7 @@ class filtered_ram_swap_control_states(enum):
         self.ready = None
         self.fill = None
         self.fill_and_work = None
+        self.diverged_work = None
         self.work = None
         super(filtered_ram_swap_control_states, self).__init__()
 
