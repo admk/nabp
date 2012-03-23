@@ -42,6 +42,7 @@ module NABPProcessingSwapControl
     input wire [`kAngleLength-1:0] fr_angle,
     input wire fr_has_next_angle,
     input wire fr_next_angle_ack,
+    input wire fr_prev_angle_release_ack,
     input wire signed [`kFilteredDataLength-1:0] fr0_val,
     input wire signed [`kFilteredDataLength-1:0] fr1_val,
     // output to processing elements
@@ -51,6 +52,7 @@ module NABPProcessingSwapControl
     output wire [`kFilteredDataLength*`kNoOfPartitions-1:0] pe_taps,
     // output to RAM
     output wire fr_next_angle,
+    output wire fr_prev_angle_release,
     output wire signed [`kSLength-1:0] fr0_s_val,
     output wire signed [`kSLength-1:0] fr1_s_val
     {% if c['debug'] %},
@@ -162,11 +164,13 @@ assign swb_next_itr_ack = // if we want to swap
                           // and still has pending iterations
                           (fr_has_next_angle || has_next_line_itr);
 // external
+assign fr_prev_angle_release = // release old angle when ready
+                               reset_n && (state == ready_s) ||
+                               // or at least try to at each end of scan
+                               swap_ack;
 assign fr_next_angle = // only ask for next angle if has next angle
                        reset_n && fr_has_next_angle &&
-                       // either it's ready to start processing from idle
-                       ((state == ready_s) ||
-                        // or it's not starting a new angle
+                       (// it's not already starting a new angle
                         (state != angle_setup_1_s &&
                          state != angle_setup_2_s &&
                          state != angle_setup_3_s &&
