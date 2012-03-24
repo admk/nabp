@@ -1,4 +1,3 @@
-import pickle
 import numpy
 from PIL import Image
 
@@ -10,6 +9,7 @@ def image(results):
     for (x, y), val in numpy.ndenumerate(results):
         i.putpixel((x, y), val)
     return i
+
 
 def init(image_size):
     global _test_results

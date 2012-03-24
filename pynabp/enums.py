@@ -1,12 +1,15 @@
 from utils import enum
 
+
 class scan_mode(enum):
     x = '0'
     y = '1'
 
+
 class scan_direction(enum):
     forward = '0'
     reverse = '1'
+
 
 class processing_element_states(enum):
     def __init__(self):
@@ -16,6 +19,7 @@ class processing_element_states(enum):
         self.domino = None
         super(processing_element_states, self).__init__()
 
+
 class processing_state_control_states(enum):
     def __init__(self):
         self.ready = None
@@ -23,6 +27,7 @@ class processing_state_control_states(enum):
         self.fill_done = None
         self.shift = None
         super(processing_state_control_states, self).__init__()
+
 
 class shifter_states(enum):
     def __init__(self):
@@ -32,11 +37,13 @@ class shifter_states(enum):
         self.shift = None
         super(shifter_states, self).__init__()
 
+
 class mapper_states(enum):
     def __init__(self):
         self.ready = None
         self.mapping = None
         super(mapper_states, self).__init__()
+
 
 class processing_swap_control_states(enum):
     def __init__(self):
@@ -52,12 +59,14 @@ class processing_swap_control_states(enum):
         self.shift = None
         super(processing_swap_control_states, self).__init__()
 
+
 class filtered_ram_control_states(enum):
     def __init__(self):
         self.ready = None
         self.delay = None
         self.fill = None
         super(filtered_ram_control_states, self).__init__()
+
 
 class filtered_ram_swap_control_states(enum):
     def __init__(self):
@@ -66,6 +75,7 @@ class filtered_ram_swap_control_states(enum):
         self.fill_and_work = None
         self.work = None
         super(filtered_ram_swap_control_states, self).__init__()
+
 
 class sinogram_addresser_states(enum):
     def __init__(self):

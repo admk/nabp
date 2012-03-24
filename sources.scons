@@ -84,10 +84,8 @@ Import('SOURCE_DIR')
 
 for target in sources.iterkeys():
     sources[target] = device_path(
-            config['device'],
-            device_specific,
-            sources[target] + ingredients['common'],
-            SOURCE_DIR)
+            config['device'], device_specific,
+            sources[target] + ingredients['common'], SOURCE_DIR)
 
 sources['all'] = flatten(sources)
 

@@ -8,6 +8,7 @@ from translate_process_generate import \
 
 Import('SOURCE_DIR')
 
+
 def generate_derived_sources(target, source, env):
     pynap_path = env['PYNABP_PATH']
     if not (pynap_path in sys.path):

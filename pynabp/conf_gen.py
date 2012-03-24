@@ -23,7 +23,7 @@ config = import_conf(path)
 # validation
 PreValidatorCollate(config).perform_validations()
 
-# derived configiguration
+
 def derive(config):
     """Derive additional configuration defines from a validated configuration
     dictionary.
@@ -69,6 +69,7 @@ def derive(config):
                     config['kDataLength']))
 
     return derived
+
 
 # update config with derived configigurations
 config.update(derive(config))

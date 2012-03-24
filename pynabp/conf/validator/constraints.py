@@ -11,6 +11,7 @@ negative = lambda val: val < 0
 odd = lambda val: val % 2 == 1
 even = lambda val: val % 2 == 0
 
+
 def boundaries(
         min_val=None, min_inclusive=False,
         max_val=None, max_inclusive=False):
@@ -23,11 +24,13 @@ def boundaries(
         (val != min_val if not min_inclusive else True) and \
         (val != max_val if not max_inclusive else True)
 
+
 def time_unit(val):
     """Time unit constraint finds values of the form: 10ns
     """
     import re
     return re.search(r'^\d+(s|ms|us|ns|ps|fs)$', val) is not None
+
 
 def function_arg_count(count):
     import inspect
@@ -37,8 +40,10 @@ def function_arg_count(count):
 class TypeValidateError(ValidateError):
     """Type mismatch found"""
 
+
 class NullableValidateError(ValidateError):
     """Cannot be None valued"""
+
 
 class ConstraintFunctionValidateError(ValidateError):
     """Failed to validate with function"""
@@ -67,7 +72,6 @@ class ConstraintsValidator(Validator):
         if dictionary:
             self._constraints.update(dictionary)
         self._constraints.update(**kwargs)
-
 
     def validate_constraints(self, conf):
         """A validator method that perform preliminary checks to parameters.
