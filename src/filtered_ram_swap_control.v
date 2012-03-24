@@ -134,10 +134,29 @@ always @(posedge clk)
 //
 //    [A/B]: Processing swappables
 //    [0/1]: Filtered swappables
+//
+// D̲i̲v̲e̲r̲g̲e̲d̲ ̲D̲a̲t̲a̲ ̲P̲a̲t̲h̲ ̲P̲r̲o̲t̲o̲c̲o̲l̲
+// In f̲i̲l̲l̲_̲a̲n̲d̲_̲s̲h̲i̲f̲t̲_̲s̲, both processing swappables are reading off from the
+// same filtered RAM swappable, and the filling and working swappables
+// swapping are handled by the filtered RAM swap control.
+//
+//    [A] ̶* ̶>[0]   / [A] ̶*  [0]
+//        |       /      |
+//    [B] ̶*  [1] /   [B] ̶* ̶>[1]
+//     (sw_sel)       (!sw_sel)
+//       {fill_and_work_s}
+//
+// In d̲i̲v̲e̲r̲g̲e̲d̲_̲w̲o̲r̲k̲_̲s̲, filtered RAM swap control makes the ports p̲r̲0̲_̲s̲_̲v̲a̲l̲ and
+// p̲r̲0̲_̲v̲a̲l̲ provide data paths for the current angle being shifted, while
+// p̲r̲1̲_̲s̲_̲v̲a̲l̲ and p̲r̲1̲_̲v̲a̲l̲ provide the next angle to fill the processing
+// swappable. Processing swap control will figure out how to handle routing
+// with this protocol. See S̲e̲l̲e̲c̲t̲ ̲&̲ ̲D̲i̲v̲e̲r̲g̲e̲d̲ ̲T̲a̲b̲l̲e̲.
 
 // mealy outputs
 // to processing
-wire prev_angle_release;
+wire prev_angle_release, diverged;
+assign diverged = // data path diverged when in diverged_work_s state
+                  (state == diverged_work_s);
 assign prev_angle_release = // release oldest angle if want next angle and
                             pr_prev_angle_release &&
                             // fill done
@@ -250,7 +269,13 @@ NABPFilteredRAMSwappable sw{#i#}
 );
 {% end %}
 
+//     S̲e̲l̲e̲c̲t̲ ̲&̲ ̲D̲i̲v̲e̲r̲g̲e̲d̲ ̲T̲a̲b̲l̲e̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲
+//    | ̲s̲w̲_̲s̲e̲l̲ ̲|̲ ̲d̲i̲v̲e̲r̲g̲e̲d̲ ̲|̲ ̲ ̲ ̲ ̲ ̲s̲w̲0̲ ̲|̲ ̲ ̲ ̲ ̲ ̲s̲w̲1̲ ̲|̲ ̲p̲r̲0̲ ̲|̲ ̲p̲r̲1̲ ̲|
+//    |      0 |        0 | working | filling | sw0 | sw0 |
+//    |      0 |        1 | working | working | sw0 | sw1 |
+//    |      1 |        0 | filling | working | sw1 | sw1 |
+//    | ̲ ̲ ̲ ̲ ̲ ̲1̲ ̲|̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲1̲ ̲|̲ ̲w̲o̲r̲k̲i̲n̲g̲ ̲|̲ ̲w̲o̲r̲k̲i̲n̲g̲ ̲|̲ ̲s̲w̲1̲ ̲|̲ ̲s̲w̲0̲ ̲|
 assign pr0_val = sw_sel ? sw1_pr0_val : sw0_pr0_val;
-assign pr1_val = sw_sel ? sw1_pr1_val : sw0_pr1_val;
+assign pr1_val = (sw_sel ^ diverged) ? sw1_pr1_val : sw0_pr1_val;
 
 endmodule
