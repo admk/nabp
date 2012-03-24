@@ -56,10 +56,10 @@ module NABPFilteredRAMSwapControl
 #}
 
 // swappable mux & demux select signal
-//       S̲e̲l̲e̲c̲t̲ ̲T̲a̲b̲l̲e̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲
-//      | ̲s̲w̲_̲s̲e̲l̲ ̲|̲ ̲s̲w̲0̲ ̲ ̲ ̲ ̲ ̲|̲ ̲s̲w̲1̲ ̲ ̲ ̲ ̲ ̲|
-//      | 0      | working | filling |
-//      | ̲1̲ ̲ ̲ ̲ ̲ ̲ ̲|̲ ̲f̲i̲l̲l̲i̲n̲g̲ ̲|̲ ̲w̲o̲r̲k̲i̲n̲g̲ ̲|
+//     S̲e̲l̲e̲c̲t̲ ̲T̲a̲b̲l̲e̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲
+//    | ̲s̲w̲_̲s̲e̲l̲ ̲|̲ ̲ ̲ ̲ ̲ ̲s̲w̲0̲ ̲|̲ ̲ ̲ ̲ ̲ ̲s̲w̲1̲ ̲|
+//    |      0 | working | filling |
+//    | ̲ ̲ ̲ ̲ ̲ ̲1̲ ̲|̲ ̲f̲i̲l̲l̲i̲n̲g̲ ̲|̲ ̲w̲o̲r̲k̲i̲n̲g̲ ̲|
 reg sw_sel;
 
 {% for i in swap_list %}
@@ -103,37 +103,37 @@ always @(posedge clk)
         pr_has_next_angle <= hs_has_next_angle;
     end
 
-// F̲i̲l̲t̲e̲r̲e̲d̲ ̲R̲A̲M̲ ̲S̲w̲a̲p̲p̲a̲b̲l̲e̲ ̲-̲>̲ ̲P̲r̲o̲c̲e̲s̲s̲i̲n̲g̲ ̲S̲w̲a̲p̲p̲a̲b̲l̲e̲ ̲D̲a̲t̲a̲ ̲P̲a̲t̲h̲ ̲R̲o̲u̲t̲i̲n̲g̲ ̲S̲c̲h̲e̲m̲e̲
+// F̲i̲l̲t̲e̲r̲e̲d̲ ̲R̲A̲M̲ ̲S̲w̲a̲p̲p̲a̲b̲l̲e̲ ̲<̲-̲>̲ ̲P̲r̲o̲c̲e̲s̲s̲i̲n̲g̲ ̲S̲w̲a̲p̲p̲a̲b̲l̲e̲ ̲D̲a̲t̲a̲ ̲P̲a̲t̲h̲ ̲R̲o̲u̲t̲i̲n̲g̲ ̲S̲c̲h̲e̲m̲e̲
 // Diverging allows two processing swappables to work on two different angles
-// simultaneously. It happens after pr_next_angle_ack response, and then
-// allowed to continue after pr_prev_angle_release_ack.  The routing is
-// handled by processing swappable, filtered RAM swappable only cares about
-// how buffer swapping should be handled.
+// simultaneously. It happens after p̲r̲_̲n̲e̲x̲t̲_̲a̲n̲g̲l̲e̲_̲a̲c̲k̲ response, and then
+// allowed to continue after p̲r̲_̲p̲r̲e̲v̲_̲a̲n̲g̲l̲e̲_̲r̲e̲l̲e̲a̲s̲e̲_̲a̲c̲k̲. The routing is handled
+// by processing swappable, filtered RAM swappable only cares about how buffer
+// swapping should be handled.
 //
-//    [A] ̶* ̶>[0]   / [A] ̶*  [0]
-//        |       /      |
-//    [B] ̶*  [1] /   [B] ̶* ̶>[1]
+//    [A]< ̶* ̶>[0]   / [A]< ̶*  [0]
+//         |       /       |
+//    [B]< ̶*  [1] /   [B]< ̶* ̶>[1]
 //     (sw_sel)       (!sw_sel)
 //       {fill_and_work_s}
 //
 // after pr_next_angle_ack -
 //
-//    [A] ̶ ̶ ̶>[0]   / [A] ̶x ̶>[0]
-//                /      |      (swapped)
-//    [B] ̶ ̶ ̶>[1] /   [B] ̶x ̶>[1]
+//    [A]< ̶ ̶ ̶>[0]   / [A]< ̶x ̶>[0]
+//                 /       |      (swapped)
+//    [B]< ̶ ̶ ̶>[1] /   [B]< ̶x ̶>[1]
 //
 //        {diverged_work_s}
 //
 // after pr_prev_angle_release_ack -
 //
-//    [A] ̶*  [0]   / [A] ̶* ̶>[0]
-//        |       /      |
-//    [B] ̶* ̶>[1] /   [B] ̶*  [1]
+//    [A]< ̶*  [0]   / [A]< ̶* ̶>[0]
+//         |       /       |
+//    [B]< ̶* ̶>[1] /   [B]< ̶*  [1]
 //     (!sw_sel)      (sw_sel)
 //        {fill_and_work_s}
 //
-//    [A/B]: Filtered swappables
-//    [0/1]: Processing swappables
+//    [A/B]: Processing swappables
+//    [0/1]: Filtered swappables
 
 // mealy outputs
 // to processing
