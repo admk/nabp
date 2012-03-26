@@ -19,9 +19,9 @@ def init(image_size):
 def update(x, y, val):
     global _test_results
     try:
-        _test_results[x, y] = val
+        _test_results[x, y] += val
     except:
-        pass
+        print "cannot write:", x, y
 
 
 def finish():

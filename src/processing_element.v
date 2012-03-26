@@ -184,6 +184,10 @@ pe_cache
 {% if c['debug'] %}
 integer err;
 reg [`kImageSizeLength-1:0] im_x, im_y, scan_pos, line_pos;
+reg [`kFilteredDataLength-1:0] lb_val_d;
+
+always @(posedge clk)
+    lb_val_d <= lb_val;
 
 always @(posedge clk)
     if (state == work_s)
@@ -201,7 +205,7 @@ always @(posedge clk)
             im_x = line_pos;
             im_y = scan_pos;
         end
-        err = $pyeval("test.update(", im_x, ",", im_y, ",", write_val, ")");
+        err = $pyeval("test.update(", im_x, ",", im_y, ",", lb_val_d, ")");
     end
 {% end %}
 

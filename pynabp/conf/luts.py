@@ -140,7 +140,7 @@ def _map_accu_init_defines(conf):
 
 
 def sinogram_defines(
-        image_size, projection_line_size, angle_step_size, no_of_angles,
+        projection_line_size, angle_step_size, no_of_angles,
         data_length):
     # phantom to be projection size / sqrt(2)
     ph = phantom(int(projection_line_size / numpy.sqrt(2)))

@@ -64,9 +64,8 @@ def derive(config):
     # debug mode configurations
     if config['debug']:
         derived.update(sinogram_defines(
-                    config['image_size'], config['projection_line_size'],
-                    config['angle_step_size'], derived['kNoOfAngles'],
-                    config['kDataLength']))
+                    config['projection_line_size'], config['angle_step_size'],
+                    derived['kNoOfAngles'], config['kDataLength']))
 
     return derived
 

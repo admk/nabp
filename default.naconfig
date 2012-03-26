@@ -81,8 +81,8 @@ config = \
         # where $p$ is the projection line size, $\theta$ is the angle value
         # and $s$ is the projection offset.
         # Constraints:
-        #   Positive integers.
-        'angle_step_size': None if not debug else 30,
+        #   Positive numbers.
+        'angle_step_size': None if not debug else 10,
 
         # The bit length of the data representation for a single projection
         # data point.
