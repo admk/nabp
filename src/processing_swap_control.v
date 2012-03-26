@@ -355,8 +355,8 @@ NABPProcessingSwappable sw{#i#}
 // |      0 |        1 | sw1 | sw0 |
 // |      1 |        0 | sw0 | sw1 |
 // | ̲ ̲ ̲ ̲ ̲ ̲1̲ ̲|̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲1̲ ̲|̲ ̲s̲w̲0̲ ̲|̲ ̲s̲w̲1̲ ̲|
-assign sw0_fr_s_val = (!sw_sel && diverged) ? fr1_s_val : fr0_s_val;
-assign sw1_fr_s_val = (!sw_sel && diverged) ? fr0_s_val : fr1_s_val;
+assign fr0_s_val = (!sw_sel && diverged) ? sw1_fr_s_val : sw0_fr_s_val;
+assign fr1_s_val = (!sw_sel && diverged) ? sw0_fr_s_val : sw1_fr_s_val;
 assign sw0_fr_val = (!sw_sel && diverged) ? fr1_val : fr0_val;
 assign sw1_fr_val = (!sw_sel && diverged) ? fr0_val : fr1_val;
 
