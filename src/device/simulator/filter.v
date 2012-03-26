@@ -21,7 +21,7 @@ assign filter_val_in = val_in;
 shift_register fake_filter
 (
     .clk(clk),
-    .enable(enable), 
+    .enable(enable),
     .clear(clear),
     .val_in(filter_val_in),
     .val_out(val_out)

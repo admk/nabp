@@ -6,7 +6,7 @@
 // with one tap of the line buffer.
 //
 // S̲c̲h̲e̲m̲a̲t̲i̲c̲
-//  
+//
 //   ____________
 //  |  Filtered  |
 //  |  RAM Swap  |

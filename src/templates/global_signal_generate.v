@@ -25,7 +25,7 @@ begin:clk_limit
     clk_cnt = 0;
     while (clk_cnt < 400000)
     begin
-        @(posedge clk); 
+        @(posedge clk);
         clk_cnt = clk_cnt + 1;
     end
     $finish;

@@ -262,7 +262,7 @@ reg [`kAngleLength-1:0] pe_angle;
     wire [`kPartitionSizeLength-1:0] line_cnt_d;
 
     // line_cnt signal delay for debug
-    {# 
+    {#
         include('templates/signal_delay(delay_map).v',
                 delay_map={'line_cnt_d': ('[`kPartitionSizeLength-1:0]', 2)})
     #}
@@ -274,7 +274,7 @@ reg [`kAngleLength-1:0] pe_angle;
 
     // wiring
     assign db_line_itr = (pe_angle < `kAngle90) ?  db_line_cnt :
-                        {# to_l(c['partition_scheme']['size'] - 1) #} - 
+                        {# to_l(c['partition_scheme']['size'] - 1) #} -
                         db_line_cnt;
     assign db_angle = pe_angle;
 {% end %}

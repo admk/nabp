@@ -137,7 +137,7 @@ wire [`kFilteredDataLength-1:0] pe_tap_val[`kNoOfPartitions-1:0];
 {% for i in xrange(c['partition_scheme']['no_of_partitions']) %}
 assign pe_tap_val[{#i#}] = pe_taps[
         `kFilteredDataLength*{#i+1#}-1:`kFilteredDataLength*{#i#}];
-NABPProcessingElement 
+NABPProcessingElement
 #(
     .pe_id({#i#}),
     .pe_tap_offset({# c['partition_scheme']['partitions'][i] #})
