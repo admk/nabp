@@ -143,7 +143,7 @@ class FixedPoint(object):
         return self._value
 
     @value.setter
-    def set_value(self, value):
+    def value(self, value):
         """
         >>> FixedPoint(4, 4, True, value=-6.37).value
         -6.3125
