@@ -1,5 +1,6 @@
 import os
 
+
 def add_extension(file_list, ext):
     """
     Change or add extension to a file
@@ -11,6 +12,7 @@ def add_extension(file_list, ext):
     if type(file_list) is str:
         file_list = [file_list]
     return list(_iterator())
+
 
 def flatten(files_dict):
     """
@@ -24,6 +26,7 @@ def flatten(files_dict):
         else:
             flat_files.add(f)
     return list(flat_files)
+
 
 def device_path(
         device_name, device_specific_file_list, source_file_list, source_dir):
@@ -39,6 +42,7 @@ def device_path(
         return os.path.join('device', 'generic', src)
 
     return map(device_path_mapper, source_file_list)
+
 
 def pynabp_sources(path):
     import fnmatch

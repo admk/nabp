@@ -1,5 +1,4 @@
 import os
-from scons_utils import add_extension
 
 Import('env derived_sources translate_filter_processes')
 

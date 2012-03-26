@@ -20,7 +20,7 @@ module NABPProcessingSwappable
     // outputs to swap control
     output wire sw_swap,
     output wire sw_next_itr,
-    output wire sw_pe_en,
+    output wire sw_pe_kick,
     // output to RAM
     output wire signed [`kSLength-1:0] fr_s_val,
     // output to PEs
@@ -84,7 +84,7 @@ NABPShifter shifter
     .lb_clear(sh_lb_clear),
     .lb_shift_en(sh_lb_shift_en),
     // outputs to PEs
-    .sw_pe_en(sw_pe_en)
+    .sw_pe_kick(sw_pe_kick)
 );
 
 NABPMapper mapper

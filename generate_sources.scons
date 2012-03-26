@@ -8,6 +8,7 @@ from translate_process_generate import \
 
 Import('SOURCE_DIR')
 
+
 def generate_derived_sources(target, source, env):
     pynap_path = env['PYNABP_PATH']
     if not (pynap_path in sys.path):
@@ -37,11 +38,9 @@ env.Append(BUILDERS = {
 
 derived_sources = {}
 for alias, sources in sources.iteritems():
-    derived_list = map(
-            lambda src:
-                env.Generate(
-                        target=add_extension(src, 'vx'),
-                        source=src), sources)
+    derived_list = [
+                env.Generate(target=add_extension(src, 'vx'), source=src)
+                for src in sources]
     Depends(derived_list, '#default.naconfig')
     Depends(derived_list, pynabp_sources(Dir('#pynabp').abspath))
     SideEffect(add_extension(sources, 'vxtf'), derived_list)

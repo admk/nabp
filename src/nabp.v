@@ -9,6 +9,7 @@
 //    ̅ ̅ ̅ ̅ ̅ ̅ ̅ ̅ ̅ ̅ ̅ ̅ ̅|̅ ̅ ̅ ̅ ̅ ̅ ̅ ̅ ̅ ̅ ̅ ̅ ̅
 //   _____________v̲____________
 //  | ̲ ̲ ̲ ̲S̲i̲n̲o̲g̲r̲a̲m̲ ̲A̲d̲d̲r̲e̲s̲s̲e̲r̲ ̲ ̲ ̲ ̲| <- TODO rebinning
+//  | ̲ ̲ ̲ ̲ ̲ ̲ ̲F̲I̲R̲ ̲F̲i̲l̲t̲e̲r̲i̲n̲g̲ ̲ ̲ ̲ ̲ ̲ ̲| <- TODO filtering
 //  | Filtered RAM Swap Control|
 //    ̅ ̅ ̅ ̅ ̅ ̅ ̅ ̅ ̅ ̅ ̅ ̅ ̅|̅ ̅ ̅ ̅ ̅ ̅ ̅ ̅ ̅ ̅ ̅ ̅ ̅
 //   _____________v̲____________
@@ -75,6 +76,7 @@ NABPFilter filter
 
 wire [`kAngleLength-1:0] pr_angle;
 wire pr_next_angle, pr_next_angle_ack, pr_has_next_angle;
+wire pr_prev_angle_release, pr_prev_angle_release_ack;
 wire [`kSLength-1:0] pr0_s_val, pr1_s_val;
 wire [`kFilteredDataLength-1:0] pr0_val, pr1_val;
 NABPFilteredRAMSwapControl filtered_ram_swap_control
@@ -91,6 +93,7 @@ NABPFilteredRAMSwapControl filtered_ram_swap_control
     .pr0_s_val(pr0_s_val),
     .pr1_s_val(pr1_s_val),
     .pr_next_angle(pr_next_angle),
+    .pr_prev_angle_release(pr_prev_angle_release),
     // outputs to sinogram RAM
     .hs_s_val(fr_sa_s_val),
     // outputs to hs_angle_specification
@@ -99,11 +102,12 @@ NABPFilteredRAMSwapControl filtered_ram_swap_control
     .pr_angle(pr_angle),
     .pr_has_next_angle(pr_has_next_angle),
     .pr_next_angle_ack(pr_next_angle_ack),
+    .pr_prev_angle_release_ack(pr_prev_angle_release_ack),
     .pr0_val(pr0_val),
     .pr1_val(pr1_val)
 );
 
-wire pe_reset, pe_en, pe_scan_mode, pe_scan_direction;
+wire pe_kick, pe_scan_mode, pe_scan_direction;
 wire [`kFilteredDataLength*`kNoOfPartitions-1:0] pe_taps;
 NABPProcessingSwapControl processing_swap_control
 (
@@ -114,16 +118,17 @@ NABPProcessingSwapControl processing_swap_control
     .fr_angle(pr_angle),
     .fr_has_next_angle(pr_has_next_angle),
     .fr_next_angle_ack(pr_next_angle_ack),
+    .fr_prev_angle_release_ack(pr_prev_angle_release_ack),
     .fr0_val(pr0_val),
     .fr1_val(pr1_val),
     // output to processing elements
-    .pe_reset(pe_reset),
-    .pe_en(pe_en),
+    .pe_kick(pe_kick),
     .pe_scan_mode(pe_scan_mode),
     .pe_scan_direction(pe_scan_direction),
     .pe_taps(pe_taps),
     // output to RAM
     .fr_next_angle(pr_next_angle),
+    .fr_prev_angle_release(pr_prev_angle_release),
     .fr0_s_val(pr0_s_val),
     .fr1_s_val(pr1_s_val)
 );
@@ -140,8 +145,9 @@ NABPProcessingElement
 processing_element_{#i#}
 (
     .clk(clk),
-    .sw_reset(pe_reset),
-    .sw_en(pe_en),
+    .reset_n(reset_n),
+    .sw_kick(pe_kick),
+    .sw_domino(0),
     .sw_scan_mode(pe_scan_mode),
     .sw_scan_direction(pe_scan_direction),
     .lb_val(pe_tap_val[{#i#}])

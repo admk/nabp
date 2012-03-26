@@ -85,5 +85,6 @@ class PostRelationValidator(Validator):
 class PreValidatorCollate(PreRelationValidator, PreConstraintsValidator):
     """Collate all pre-deriviation validation classes into a unified one"""
 
+
 class PostValidatorCollate(PostRelationValidator):
     """Collate all post-deriviation validation classes"""

@@ -1,5 +1,6 @@
 from utils import dec2bin
 
+
 class FixedPoint(object):
     """
     A simple fixed point arithmetic utility for generating
@@ -142,7 +143,7 @@ class FixedPoint(object):
         return self._value
 
     @value.setter
-    def value(self, value):
+    def set_value(self, value):
         """
         >>> FixedPoint(4, 4, True, value=-6.37).value
         -6.3125
@@ -169,6 +170,7 @@ class FixedPoint(object):
 
     def __repr__(self):
         return self.__str__()
+
 
 if __name__ == '__main__':
     import doctest

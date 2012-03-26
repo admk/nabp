@@ -29,7 +29,7 @@ hs_angles angles_generate
     .hs_has_next_angle(hs_has_next_angle)
 );
 
-wire pe_en;
+wire pe_kick;
 wire [`kFilteredDataLength*`kNoOfPartitions-1:0] pe_taps;
 wire [`kAngleLength-1:0] pe_angle;
 wire [`kPartitionSizeLength-1:0] pe_line_itr;
@@ -49,8 +49,7 @@ NABPProcessingSwapControl uut
     .fr0_val(fr0_val),
     .fr1_val(fr1_val),
     // output to processing elements
-    .pe_reset(),
-    .pe_en(pe_en),
+    .pe_kick(pe_kick),
     .pe_scan_mode(),
     .pe_scan_direction(),
     .pe_taps(pe_taps),
@@ -82,7 +81,7 @@ data_path_verify
     .pv0_val(fr0_val),
     .pv1_val(fr1_val),
     // pe side
-    .pe_en(pe_en),
+    .pe_kick(pe_kick),
     .pe_taps(pe_taps)
 );
 

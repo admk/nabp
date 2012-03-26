@@ -38,7 +38,7 @@ config = \
         # How wide the projection line is.
         # Constraints:
         #   Value must be an odd number to calculate an integer valued center
-        'projection_line_size': 361,
+        'projection_line_size': 179,
 
         # The image size.
         # If not specified, then it defaults to the nearest odd valued

@@ -23,7 +23,7 @@ integer clk_cnt;
 initial
 begin:clk_limit
     clk_cnt = 0;
-    while (clk_cnt < 20000)
+    while (clk_cnt < 400000)
     begin
         @(posedge clk); 
         clk_cnt = clk_cnt + 1;

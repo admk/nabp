@@ -38,6 +38,7 @@ def fixed_point_translate_filter_process_files():
         if type(v) is FixedPoint:
             yield k + '.pytf'
 
+
 def write_translate_process(target):
     target_key = os.path.splitext(target)[0]
     target_key = os.path.split(target_key)[1]

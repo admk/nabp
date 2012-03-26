@@ -1,0 +1,11 @@
+#!/bin/sh
+
+NABP_TARGET=$1_test
+VPI_MODULE_PATH=vpi_pyeval/build/vpi_pyeval
+VPI_MODULE=pyeval
+
+# build target
+scons $NABP_TARGET || exit 1
+vvp -M $VPI_MODULE_PATH -m $VPI_MODULE "build/$NABP_TARGET.vvp" -lxt2 || exit 1
+gtkwave -z -o build/$NABP_TARGET.v.lxt wave/$NABP_TARGET\_wave.gtkw &
+exit

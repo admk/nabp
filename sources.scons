@@ -5,7 +5,6 @@ from scons_utils import flatten, device_path
 ingredients = {
         'common': Split("""
             shift_register.v
-            hs_angles.v
             """),
         'filtered_ram': Split("""
             dual_port_ram.v
@@ -47,21 +46,24 @@ device_specific = Split("""
 
 # targets
 sources = {
-        'fr_test':
+        'filtered_ram_test':
             ingredients['filtered_ram'] +
             Split("""
+                hs_angles.v
                 filtered_ram_test.v
                 filter.v
                 """),
-        'pg_test':
+        'processing_swappable_test':
             ingredients['processing'] +
             Split("""
+                hs_angles.v
                 processing_data_path_verify.v
                 processing_swappable_test.v
                 """),
-        'pw_test':
+        'processing_test':
             ingredients['processing'] +
             Split("""
+                hs_angles.v
                 processing_data_path_verify.v
                 processing_swap_control.v
                 processing_test.v
@@ -82,10 +84,8 @@ Import('SOURCE_DIR')
 
 for target in sources.iterkeys():
     sources[target] = device_path(
-            config['device'],
-            device_specific,
-            sources[target] + ingredients['common'],
-            SOURCE_DIR)
+            config['device'], device_specific,
+            sources[target] + ingredients['common'], SOURCE_DIR)
 
 sources['all'] = flatten(sources)
 
