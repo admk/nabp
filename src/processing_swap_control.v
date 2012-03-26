@@ -5,8 +5,8 @@
 // Handles swapping between the swappable instances
 // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //
-// Swappable Mux & Demux Scheme
-// ------------------------------
+// S̲w̲a̲p̲p̲a̲b̲l̲e̲ ̲M̲u̲x̲ ̲&̲ ̲D̲e̲m̲u̲x̲ ̲S̲c̲h̲e̲m̲e̲
+//
 // inputs                                      outputs
 //         /|          _____          |\
 // 0  ̶ ̶/̶ ̶ ̶| | ̶/̶ ̶[a] ̶/̶ ̶| FSM | ̶/̶ ̶[a] ̶/̶ ̶| | ̶ ̶/̶ ̶ ̶ 0
@@ -15,13 +15,11 @@
 //         |                           |
 // sw_sel -*---------------------------*
 //
-// V̲a̲l̲u̲e̲ ̲T̲a̲b̲l̲e̲
-//  _______________________
-// | ̲s̲w̲_̲s̲e̲l̲ ̲ ̲|̲ ̲0̲ ̲ ̲ ̲ ̲|̲ ̲1̲ ̲ ̲ ̲ ̲|
-// | inputs  | 0->a | 0->b |
-// | ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲|̲ ̲1̲-̲>̲b̲ ̲|̲ ̲1̲-̲>̲a̲ ̲|
-// | outputs | a->0 | a->1 |
-// | ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲|̲ ̲b̲-̲>̲1̲ ̲|̲ ̲b̲-̲>̲0̲ ̲|
+// S̲e̲l̲e̲c̲t̲ ̲R̲o̲u̲t̲i̲n̲g̲ ̲T̲a̲b̲l̲e̲
+//  ______________________
+// | ̲s̲w̲_̲s̲e̲l̲ ̲|̲ ̲ ̲ ̲ ̲ ̲r̲o̲u̲t̲i̲n̲g̲ ̲|
+// |      0 | 0<->a 1<->b |
+// | ̲ ̲ ̲ ̲ ̲ ̲1̲ ̲|̲ ̲0̲<̲-̲>̲b̲ ̲1̲<̲-̲>̲a̲ ̲|
 //
 // S̲w̲a̲p̲p̲a̲b̲l̲e̲ ̲S̲t̲a̲t̲e̲s̲ ̲T̲a̲b̲l̲e̲
 //   ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲
@@ -144,6 +142,8 @@ assign sw1_next_itr_ack = sw_sel ? swa_next_itr_ack : swb_next_itr_ack;
 assign sw0_swap_ack = sw_sel ? 0 : swap_ack;
 assign sw1_swap_ack = sw_sel ? swap_ack : 0;
 // internal
+wire diverged;
+assign diverged = (state == diverged_fill_and_shift_s);
 // initial kick to start swapping
 assign swa_next_itr_ack = (state == setup_3_s);
 // swap_ack to the correct swappable
@@ -317,6 +317,8 @@ wire {# c['tMapAccuPart'].verilog_decl() #} mp_accu_part;
 wire {# c['tShiftAccuBase'].verilog_decl() #} sw{#i#}_sh_accu_base;
 wire {# c['tMapAccuInit'].verilog_decl() #} sw{#i#}_mp_accu_init;
 wire {# c['tMapAccuBase'].verilog_decl() #} sw{#i#}_mp_accu_base;
+wire [`kSLength-1:0] sw{#i#}_fr_s_val;
+wire [`kFilteredDataLength-1:0] sw{#i#}_fr_val;
 wire [`kFilteredDataLength*`kNoOfPartitions-1:0] sw{#i#}_pe_taps;
 assign sw{#i#}_sh_accu_base = sh_accu_base;
 assign sw{#i#}_mp_accu_init = mp_accu_init;
@@ -334,17 +336,29 @@ NABPProcessingSwappable sw{#i#}
     .sw_swap_ack(sw{#i#}_swap_ack),
     .sw_next_itr_ack(sw{#i#}_next_itr_ack),
     // inputs from Filtered RAM
-    .fr_val(fr{#i#}_val),
+    .fr_val(sw{#i#}_fr_val),
     // outputs to swap control
     .sw_swap(sw{#i#}_swap),
     .sw_next_itr(sw{#i#}_next_itr),
     .sw_pe_kick(sw{#i#}_pe_kick),
     // outputs to Filtered RAM
-    .fr_s_val(fr{#i#}_s_val),
+    .fr_s_val(sw{#i#}_fr_s_val),
     // outputs to PEs
     .pe_taps(sw{#i#}_pe_taps)
 );
 {% end %}
+
+// F̲i̲l̲t̲e̲r̲e̲d̲ ̲R̲A̲M̲ ̲P̲o̲r̲t̲s̲ ̲<̲-̲>̲ ̲P̲r̲o̲c̲e̲s̲s̲i̲n̲g̲ ̲S̲w̲a̲p̲p̲a̲b̲l̲e̲s̲ ̲R̲o̲u̲t̲i̲n̲g̲ ̲T̲a̲b̲l̲e̲
+//   ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲
+// | ̲s̲w̲_̲s̲e̲l̲ ̲|̲ ̲d̲i̲v̲e̲r̲g̲e̲d̲ ̲|̲ ̲f̲r̲0̲ ̲|̲ ̲f̲r̲1̲ ̲|
+// |      0 |        0 | sw0 | sw1 |
+// |      0 |        1 | sw1 | sw0 |
+// |      1 |        0 | sw0 | sw1 |
+// | ̲ ̲ ̲ ̲ ̲ ̲1̲ ̲|̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲1̲ ̲|̲ ̲s̲w̲0̲ ̲|̲ ̲s̲w̲1̲ ̲|
+assign sw0_fr_s_val = (!sw_sel && diverged) ? fr1_s_val : fr0_s_val;
+assign sw1_fr_s_val = (!sw_sel && diverged) ? fr0_s_val : fr1_s_val;
+assign sw0_fr_val = (!sw_sel && diverged) ? fr1_val : fr0_val;
+assign sw1_fr_val = (!sw_sel && diverged) ? fr0_val : fr1_val;
 
 // look-up tables
 NABPMapperLUT mapper_lut
