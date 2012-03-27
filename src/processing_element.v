@@ -182,6 +182,7 @@ pe_cache
 );
 
 {% if c['debug'] %}
+{# include('templates/pe_dump.v') #}
 integer err;
 reg [`kImageSizeLength-1:0] im_x, im_y, scan_pos, line_pos;
 reg [`kFilteredDataLength-1:0] lb_val_d;
@@ -205,7 +206,7 @@ always @(posedge clk)
             im_x = line_pos;
             im_y = scan_pos;
         end
-        err = $pyeval("test.update(", im_x, ",", im_y, ",", lb_val_d, ")");
+        pe_dump_pixel(im_x, im_y, lb_val_d);
     end
 {% end %}
 

@@ -9,20 +9,15 @@ module NABPTest();
     include('templates/global_signal_generate.v')
     include('templates/dump_wave.v')
     include('templates/data_test_vals.v')
+    include('templates/pe_dump.v')
 
     if not c['debug']:
         raise RuntimeError('Must be in debug mode to perform this test.')
 #}
 
-integer err;
 initial
 begin
-    err = $pyeval("import os");
-    err = $pyeval("path = os.getcwd()");
-    err = $pyeval("import sys");
-    err = $pyeval("sys.path.append(path)");
-    err = $pyeval("from pynabp import test");
-    err = $pyeval("test.init(", {# c['image_size'] #}, ")");
+    pe_dump_init();
 end
 
 reg kick;
@@ -43,7 +38,7 @@ always @(posedge clk)
 begin:done_handler
     if (done)
     begin
-        err = $pyeval("test.finish()");
+        pe_dump_finish();
         @(posedge clk);
         @(posedge clk);
         $finish;
