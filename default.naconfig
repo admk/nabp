@@ -91,12 +91,14 @@ config = \
         'kDataLength': 10,
 
         # The decimal places (in binary) of data after filtering appended.
+        # TODO actually make use of this precision.
         # Constraints:
         #   Natural integers.
         'kFilteredDataPrecision': 3,
 
         # The decimal places (in binary) of the angles' representation
         # precision.
+        # TODO actually make use of this precision.
         # Constraints:
         #   Natural integers.
         'kAnglePrecision': 0,
