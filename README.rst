@@ -53,6 +53,13 @@ Example usage (In MATLAB)::
 
     figure; nabp(radon(phantom()), 0:179);
 
+TODOs
+=====
+
+Run in shell::
+
+    git grep TODO
+
 Dependencies
 ============
 

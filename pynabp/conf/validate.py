@@ -72,7 +72,6 @@ class PostRelationValidator(Validator):
         """Validate partition scheme by trying to partition
 
         It performs checks for partitioning efficiency.
-        Possible FIXME: override config to give a sensible partition scheme?
         """
         try:
             partition.validate(
