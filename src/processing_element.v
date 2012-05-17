@@ -156,6 +156,9 @@ begin:mealy_next_state
                 next_state <= work_s;
         domino_s:
             $display("Domino state: not implemented");
+        default:
+            if (reset_n)
+                $display("<NABPProcessingElement> Invalid state: %d", state);
     endcase
 end
 

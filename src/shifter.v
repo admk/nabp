@@ -160,6 +160,9 @@ begin:mealy_next_state
         shift_s:
             if (sc_shift_done_l)
                 next_state <= ready_s;
+        default:
+            if (reset_n)
+                $display("<NABPShifter> Invalid state: %d", state);
     endcase
 end
 

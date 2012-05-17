@@ -61,6 +61,9 @@ begin:mealy_next_state
         work_s:
             if (hs_done)
                 next_state <= ready_s;
+        default:
+            if (reset_n)
+                $display("<NABPSinogramAddresser> Invalid state: %d", state);
     endcase
 end
 

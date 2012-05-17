@@ -248,9 +248,9 @@ begin:mealy_next_state
             if (swb_next_itr)
                 next_state <= ready_s;
         default:
-            $display(
-                "<NABPProcessingSwapControl> Invalid state encountered: %d",
-                state);
+            if (reset_n)
+                $display(
+                    "<NABPProcessingSwapControl> Invalid state: %d", state);
     endcase
 end
 

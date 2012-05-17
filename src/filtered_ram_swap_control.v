@@ -239,6 +239,10 @@ begin:mealy_next_state
         work_s:
             if (fill_done)
                 next_state <= ready_s;
+        default:
+            if (reset_n)
+                $display("<NABPFilteredRAMSwapControl> Invalid state: %d",
+                    state);
     endcase
 end
 
