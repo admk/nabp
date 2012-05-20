@@ -58,11 +58,17 @@ module NABPProcessingElement
     input wire reset_n,
     // inputs from swap control
     input wire sw_kick,
-    input wire sw_domino,
     input wire sw_scan_mode,
     input wire sw_scan_direction,
+    input wire sw_domino_enable,
     // input from line buffer
-    input wire signed [`kFilteredDataLength-1:0] lb_val
+    input wire signed [`kFilteredDataLength-1:0] lb_val,
+    // inputs from the previous PE
+    input wire pe_domino_kick,
+    input wire signed [`kCacheDataLength-1:0] pe_in_val,
+    // outputs to the next PE
+    output wire pe_domino_done,
+    output reg signed [`kCacheDataLength-1:0] pe_out_val
 );
 
 parameter integer pe_id = 'bz;
@@ -76,9 +82,11 @@ parameter [`kImageSizeLength-1:0] pe_tap_offset = 'bz;
 wire [`kAddressLength-1:0] addr;
 reg [`kAddressLength-2:0] base_addr;
 reg [`kImageSizeLength-1:0] scan_cnt;
-assign addr = {sw_scan_mode, base_addr};
+wire done, scan_done, scan_domino_done, scan_domino_mode;
 
-wire done, scan_done;
+assign scan_domino_mode = (state == domino_0_s) ? 0 : 1;
+assign addr = {(state == work_s) ? sw_scan_mode : scan_domino_mode, base_addr};
+
 assign done = // PE must be working
               (state == work_s) &&
               // and base_addr reaches the end...
@@ -91,6 +99,24 @@ assign scan_done = // PE must be working
                    (state == work_s) &&
                    // counter has reached the end of a scan
                    (scan_cnt == {# to_i(0) #});
+assign scan_domino_done = // PE must be in one of the domino modes
+                          (state == domino_0_s || state == domino_1_s) &&
+                          // counter has reached the end of a scan for all
+                          // pixels
+                          (base_addr == {# to_base_addr(0) #});
+
+assign pe_domino_done = // all domino operations are complete
+                        (state == domino_1_s) && scan_domino_done;
+always @(posedge clk)
+begin:pe_domino_vals_update
+    if (sw_domino_enable)
+    begin
+        if (state == ready_s)
+            pe_out_val <= pe_in_val;
+        else if (state == domino_0_s || state == domino_1_s)
+            pe_out_val <= read_val;
+    end
+end
 
 always @(posedge clk)
 begin:base_addr_counter
@@ -114,6 +140,11 @@ begin:base_addr_counter
             else if (sw_scan_direction == {# scan_direction.reverse #})
                 base_addr <= base_addr - {# to_base_addr(1) #};
         end
+        domino_0_ready_s, domino_1_ready_s:
+            base_addr <= {# to_base_addr(scan_mode_pixels - 1) #};
+        domino_0_s, domino_1_s:
+            if (sw_domino_enable)
+                base_addr <= base_addr - {# to_base_addr(1) #}; 
     endcase
 end
 
@@ -144,8 +175,8 @@ begin:mealy_next_state
         ready_s:
             if (sw_kick)
                 next_state <= work_s;
-            else if (sw_domino)
-                next_state <= domino_s;
+            else if (pe_domino_kick)
+                next_state <= domino_0_ready_s;
         work_s:
             if (done)
                 next_state <= ready_s;
@@ -154,8 +185,16 @@ begin:mealy_next_state
         work_wait_s:
             if (sw_kick)
                 next_state <= work_s;
-        domino_s:
-            $display("Domino state: not implemented");
+        domino_0_ready_s:
+            next_state <= domino_0_s;
+        domino_0_s:
+            if (scan_domino_done)
+                next_state <= domino_1_ready_s;
+        domino_1_ready_s:
+            next_state <= domino_1_s;
+        domino_1_s:
+            if (pe_domino_done)
+                next_state <= ready_s;
         default:
             if (reset_n)
                 $display("<NABPProcessingElement> Invalid state: %d", state);
