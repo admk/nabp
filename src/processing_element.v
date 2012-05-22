@@ -88,7 +88,8 @@ module NABPProcessingElement
     input wire sw_kick,
     input wire sw_scan_mode,
     input wire sw_scan_direction,
-    input wire sw_domino_enable,
+    // input from image RAM
+    input wire ir_domino_enable,
     // input from line buffer
     input wire signed [`kFilteredDataLength-1:0] lb_val,
     // inputs from the previous PE
@@ -96,7 +97,7 @@ module NABPProcessingElement
     input wire signed [`kCacheDataLength-1:0] pe_in_val,
     // outputs to the next PE
     output wire pe_domino_done,
-    output reg signed [`kCacheDataLength-1:0] pe_out_val
+    output wire signed [`kCacheDataLength-1:0] pe_out_val
 );
 
 parameter integer pe_id = 'bz;
@@ -135,16 +136,13 @@ assign scan_domino_done = // PE must be in one of the domino modes
 
 assign pe_domino_done = // all domino operations are complete
                         (state == domino_1_s) && scan_domino_done;
+
+assign pe_out_val = (state == domino_0_s || state == domino_1_s) ?
+                    read_val : pe_in_val_d;
+reg [`kCacheDataLength-1:0] pe_in_val_d;
 always @(posedge clk)
-begin:pe_domino_vals_update
     if (sw_domino_enable)
-    begin
-        if (state == ready_s)
-            pe_out_val <= pe_in_val;
-        else if (state == domino_0_s || state == domino_1_s)
-            pe_out_val <= read_val;
-    end
-end
+        pe_in_val_d <= pe_in_val;
 
 always @(posedge clk)
 begin:base_addr_counter
@@ -172,7 +170,7 @@ begin:base_addr_counter
             base_addr <= {# to_base_addr(scan_mode_pixels - 1) #};
         domino_0_s, domino_1_s:
             if (sw_domino_enable)
-                base_addr <= base_addr - {# to_base_addr(1) #}; 
+                base_addr <= base_addr - {# to_base_addr(1) #};
     endcase
 end
 
