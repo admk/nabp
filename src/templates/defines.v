@@ -40,6 +40,7 @@
 `define kSLength {# bin_width(c['projection_line_size']) #}
 
 `define kImageSizeLength {# bin_width(c['image_size']) #}
+`define kImageAddressLength {# bin_width(c['image_size'] ** 2) #}
 
 `define kNoOfAngles {# c['kNoOfAngles'] #}
 `define kNoOfAnglesLength {# bin_width(c['kNoOfAngles']) #}
