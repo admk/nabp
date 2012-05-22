@@ -30,6 +30,34 @@
 //  |         | ||̶ ̶ ̶>| PE |--*-->| Image RAM |
 //  |           ̅ |     ̅ ̅ ̅ ̅       |           |
 //    ̅ ̅ ̅ ̅ ̅ ̅ ̅ ̅ ̅ ̅ ̅ ̅                  ̅ ̅ ̅ ̅ ̅ ̅ ̅ ̅ ̅ ̅ ̅
+// D̲̲o̲̲m̲̲i̲̲n̲̲o̲̲ ̲̲S̲i̲̲g̲̲n̲̲a̲̲l̲̲ ̲̲A̲s̲̲s̲̲i̲̲g̲̲n̲̲m̲̲e̲̲n̲̲t̲̲ ̲a̲c̲r̲o̲s̲s̲ ̲P̲r̲o̲c̲e̲s̲s̲i̲n̲g̲ ̲E̲l̲e̲m̲e̲n̲t̲s̲
+//
+// ir_kick
+//     |
+//    _v̲_
+//   | 0 | ̶/̶ ̶ ̶ ̶*  domino val out
+//     ̅|̅ ̅      |
+//    _v̲_      |
+//   | 1 | ̶/̶ ̶* |
+//     ̅|̅|̅    | |
+//     |* ̶ ̶>\M̲̅U̲̅X̲̅/ select signal: domino or ready states
+//     |       |
+//     |      **
+//    _v̲_      |
+//   | 2 | ̶/̶ ̶* |
+//     ̅|̅|̅    | |
+//     |* ̶ ̶>\M̲̅U̲̅X̲̅/
+//     |       |
+//
+//        ⋮
+//     |       |
+//    _v̲_      |
+//   |N-1| ̶/̶ ̶* |
+//     ̅ ̅|̅    | |
+//      * ̶ ̶>\M̲̅U̲̅X̲̅/
+//            |
+//            * ̶ ̶> ir_val
+//
 // C̲o̲m̲m̲e̲n̲t̲s̲ ̲o̲n̲ ̲a̲d̲d̲r̲e̲s̲s̲ ̲p̲a̲c̲k̲i̲n̲g̲
 // Address packing for the two scan modes won't have any effect, since -
 //     $\log_2{2il}=\log_2{il}+1$,
