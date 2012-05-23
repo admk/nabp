@@ -42,7 +42,7 @@
 //     ̅|̅|̅    | |
 //     |* ̶ ̶>\M̲̅U̲̅X̲̅/ select signal: domino or ready states
 //     |       |
-//     |      **
+//     |       |
 //    _v̲_      |
 //   | 2 | ̶/̶ ̶* |
 //     ̅|̅|̅    | |
@@ -141,7 +141,7 @@ assign pe_out_val = (state == domino_0_s || state == domino_1_s) ?
                     read_val : pe_in_val_d;
 reg [`kCacheDataLength-1:0] pe_in_val_d;
 always @(posedge clk)
-    if (sw_domino_enable)
+    if (ir_domino_enable)
         pe_in_val_d <= pe_in_val;
 
 always @(posedge clk)
@@ -169,7 +169,7 @@ begin:base_addr_counter
         domino_0_ready_s, domino_1_ready_s:
             base_addr <= {# to_base_addr(scan_mode_pixels - 1) #};
         domino_0_s, domino_1_s:
-            if (sw_domino_enable)
+            if (ir_domino_enable)
                 base_addr <= base_addr - {# to_base_addr(1) #};
     endcase
 end
