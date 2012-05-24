@@ -16,10 +16,10 @@ class processing_element_states(enum):
         self.ready = None
         self.work = None
         self.work_wait = None
-        self.domino_0_ready = None
+        self.domino_start = None
         self.domino_0 = None
-        self.domino_1_ready = None
         self.domino_1 = None
+        self.domino_finish = None
         super(processing_element_states, self).__init__()
 
 

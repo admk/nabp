@@ -135,7 +135,7 @@ assign scan_domino_done = // PE must be in one of the domino modes
                           (base_addr == {# to_base_addr(0) #});
 
 assign pe_domino_done = // all domino operations are complete
-                        (state == domino_1_s) && scan_domino_done;
+                        (state == domino_finish_s);
 
 assign pe_out_val = (state == domino_0_s || state == domino_1_s) ?
                     read_val : pe_in_val_d;
@@ -197,11 +197,16 @@ begin:base_addr_counter
             else if (sw_scan_direction == {# scan_direction.reverse #})
                 base_addr <= base_addr - {# to_base_addr(1) #};
         end
-        domino_0_ready_s, domino_1_ready_s:
+        domino_start_s:
             base_addr <= {# to_base_addr(scan_mode_pixels - 1) #};
         domino_0_s, domino_1_s:
             if (ir_domino_enable)
-                base_addr <= base_addr - {# to_base_addr(1) #};
+            begin
+                if (scan_domino_done)
+                    base_addr <= {# to_base_addr(scan_mode_pixels - 1) #};
+                else
+                    base_addr <= base_addr - {# to_base_addr(1) #};
+            end
     endcase
 end
 
@@ -233,7 +238,7 @@ begin:mealy_next_state
             if (sw_kick)
                 next_state <= work_s;
             else if (pe_domino_kick)
-                next_state <= domino_0_ready_s;
+                next_state <= domino_start_s;
         work_s:
             if (done)
                 next_state <= ready_s;
@@ -242,15 +247,14 @@ begin:mealy_next_state
         work_wait_s:
             if (sw_kick)
                 next_state <= work_s;
-        domino_0_ready_s:
-            next_state <= domino_0_s;
         domino_0_s:
-            if (scan_domino_done)
-                next_state <= domino_1_ready_s;
-        domino_1_ready_s:
-            next_state <= domino_1_s;
+            if (ir_domino_enable && scan_domino_done)
+                next_state <= domino_1_s;
         domino_1_s:
-            if (pe_domino_done)
+            if (ir_domino_enable && scan_domino_done)
+                next_state <= domino_finish_s;
+        domino_finish_s:
+            if (ir_domino_enable)
                 next_state <= ready_s;
         default:
             if (reset_n)
