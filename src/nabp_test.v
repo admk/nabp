@@ -58,10 +58,18 @@ NABP nabp_uut
     .sg_kick(kick),
     // inputs from sinogram
     .sg_val(sg_val),
+    // inputs from image RAM
+    .ir_kick(0),
+    .ir_enable(0),
     // outputs to host
     .sg_done(done),
     // outputs to sinogram
     .sg_addr(sg_addr)
+    // outputs to image RAM
+    .ir_kick_ack(),
+    .ir_done(),
+    .ir_addr(),
+    .ir_val()
 );
 
 // sinogram RAM
