@@ -4,7 +4,7 @@
 // The image address generator for values streaming from the PE domino chain.
 // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 {#
-    from pynabp.enums import image_addresser_states
+    from pynabp.enums import image_addresser_states, scan_mode
 
     no_of_partitions = c['partition_scheme']['no_of_partitions']
 
@@ -23,7 +23,7 @@ module NABPImageAddresser
     // outputs to image RAM
     output wire ir_kick_ack,
     output wire [`kImageAddressLength-1:0] ir_addr
-)
+);
 
 {#
     include('templates/state_decl(states).v',
@@ -57,7 +57,7 @@ begin:ir_addr_update
                     ir_base_addr <= line_pos + {# to_addr(1) #};
                 else
                     ir_base_addr <= ir_base_addr +
-                            {# to_addr(c['image_size'] #};
+                            {# to_addr(c['image_size']) #};
         endcase
     end
 end
@@ -137,7 +137,7 @@ begin:mealy_next_state
                 next_state <= delay_s;
         delay_s:
             if (delay_done)
-                next_state <= addressing_s;
+                next_state <= addressing_x_s;
         addressing_x_s:
             if (ir_enable && scan_done && line_done)
                 next_state <= addressing_y_s;

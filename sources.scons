@@ -24,6 +24,7 @@ ingredients = {
             nabp.v
             sinogram_addresser.v
             processing_element.v
+            image_addresser.v
             """),
     }
 

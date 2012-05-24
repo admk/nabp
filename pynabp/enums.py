@@ -88,6 +88,7 @@ class image_addresser_states(enum):
         self.delay = None
         self.addressing_x = None
         self.addressing_y = None
+        super(image_addresser_states, self).__init__()
 
 
 class sinogram_addresser_states(enum):

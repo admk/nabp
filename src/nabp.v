@@ -163,7 +163,6 @@ processing_element_{#i#}
     .reset_n(reset_n),
     // inputs from swap control
     .sw_kick(pe_kick),
-    .sw_domino(0),
     .sw_scan_mode(pe_scan_mode),
     .sw_scan_direction(pe_scan_direction),
     // input from image RAM
@@ -195,6 +194,6 @@ NABPImageAddresser image_addresser
     // outputs to image RAM
     .ir_kick_ack(ir_kick_ack),
     .ir_addr(ir_addr)
-)
+);
 
 endmodule

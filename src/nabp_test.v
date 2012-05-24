@@ -64,7 +64,7 @@ NABP nabp_uut
     // outputs to host
     .sg_done(done),
     // outputs to sinogram
-    .sg_addr(sg_addr)
+    .sg_addr(sg_addr),
     // outputs to image RAM
     .ir_kick_ack(),
     .ir_done(),
