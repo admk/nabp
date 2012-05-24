@@ -82,6 +82,14 @@ class filtered_ram_swap_control_states(enum):
         super(filtered_ram_swap_control_states, self).__init__()
 
 
+class image_addresser_states(enum):
+    def __init__(self):
+        self.ready = None
+        self.delay = None
+        self.addressing_x = None
+        self.addressing_y = None
+
+
 class sinogram_addresser_states(enum):
     def __init__(self):
         self.ready = None
