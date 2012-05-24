@@ -34,7 +34,7 @@
 `define kPartitionSizeLength {#
             bin_width(c['partition_scheme']['size']) #}
 
-`define kDelayLength {# c['fir_order'] / 2 #}
+`define kFIRDelayLength {# c['fir_order'] / 2 #}
 
 `define kProjectionLineSize {# c['projection_line_size'] #}
 `define kSLength {# bin_width(c['projection_line_size']) #}
