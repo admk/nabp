@@ -6,8 +6,8 @@
 {#
     from pynabp.enums import sinogram_addresser_states
     def to_sg_addr(val):
-        return dec_repr(
-                val, c['kNoOfAngles'] * c['projection_line_size'] - 1)
+        return dec_repr(val,
+                bin_width(c['kNoOfAngles'] * c['projection_line_size'] - 1))
 #}
 
 module NABPSinogramAddresser
