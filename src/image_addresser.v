@@ -21,7 +21,7 @@ module NABPImageAddresser
     input wire ir_kick,
     input wire ir_enable,
     // outputs to image RAM
-    output wire [`kImageAddressLength-1:0] ir_addr,
+    output wire [`kImageAddressLength-1:0] ir_addr
 )
 
 {#
@@ -65,10 +65,10 @@ end
 assign scan_mode = (state == addressing_y_s) ?
                    {# scan_mode.y #} : {# scan_mode.x #};
 assign pe_done = (pe_pos == {# to_p(no_of_partitions - 1) #});
-assign delay_done = (pe_pos ==
-                     {# to_p(no_of_partitions - addr_update_delay - 1) #});
 assign scan_done = (scan_pos == {# to_i(c['image_size']) #});
 assign line_done = (line_pos == {# to_l(c['partition_scheme']['size']) #});
+
+assign delay_done = (state == delay_s) && pe_done;
 
 // delay state duration
 always @(posedge clk)
