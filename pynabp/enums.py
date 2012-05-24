@@ -16,7 +16,10 @@ class processing_element_states(enum):
         self.ready = None
         self.work = None
         self.work_wait = None
-        self.domino = None
+        self.domino_start = None
+        self.domino_0 = None
+        self.domino_1 = None
+        self.domino_finish = None
         super(processing_element_states, self).__init__()
 
 
@@ -77,6 +80,14 @@ class filtered_ram_swap_control_states(enum):
         self.diverged_work = None
         self.work = None
         super(filtered_ram_swap_control_states, self).__init__()
+
+
+class image_addresser_states(enum):
+    def __init__(self):
+        self.ready = None
+        self.delay = None
+        self.addressing_x = None
+        self.addressing_y = None
 
 
 class sinogram_addresser_states(enum):

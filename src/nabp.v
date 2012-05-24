@@ -33,12 +33,17 @@ module NABP
     input wire kick,
     // inputs from sinogram
     input wire [`kDataLength-1:0] sg_val,
-    // TODO inputs from image RAM
+    // TODO connect inputs from image RAM
+    input wire ir_kick,
+    input wire ir_enable,
     // outputs to host
     output wire done,
     // outputs to sinogram
-    output wire [`kSinogramAddressLength-1:0] sg_addr
-    // TODO outputs to image RAM
+    output wire [`kSinogramAddressLength-1:0] sg_addr,
+    // TODO connect outputs to image RAM
+    output wire ir_done,
+    output wire [`kImageAddressLength-1:0] ir_addr,
+    output wire [`kCacheDataLength-1:0] ir_val
 );
 
 wire [`kAngleLength-1:0] sa_fr_angle;
@@ -134,6 +139,14 @@ NABPProcessingSwapControl processing_swap_control
 );
 
 wire [`kFilteredDataLength-1:0] pe_tap_val[`kNoOfPartitions-1:0];
+wire pe_domino[`kNoOfPartitions:0];
+wire [`kCacheDataLength-1:0] pe_domino_val[`kNoOfPartitions-1:0];
+
+// domino connections
+assign pe_domino[0] = ir_kick;
+assign ir_done = pe_domino[`kNoOfPartitions];
+assign ir_val = pe_domino_val[`kNoOfPartitions-1];
+
 {% for i in xrange(c['partition_scheme']['no_of_partitions']) %}
 assign pe_tap_val[{#i#}] = pe_taps[
         `kFilteredDataLength*{#i+1#}-1:`kFilteredDataLength*{#i#}];
@@ -144,14 +157,42 @@ NABPProcessingElement
 )
 processing_element_{#i#}
 (
+    // global signals
     .clk(clk),
     .reset_n(reset_n),
+    // inputs from swap control
     .sw_kick(pe_kick),
     .sw_domino(0),
     .sw_scan_mode(pe_scan_mode),
     .sw_scan_direction(pe_scan_direction),
-    .lb_val(pe_tap_val[{#i#}])
+    // input from image RAM
+    .ir_domino_enable(ir_enable),
+    // input from line buffer
+    .lb_val(pe_tap_val[{#i#}]),
+    // inputs from the previous PE
+    .pe_domino_kick(pe_domino[{#i#}]),
+    .pe_in_val(
+        {% if i == 0 %}
+            0
+        {% else %}
+            pe_domino_val[{#i-1#}]
+        {% end %}),
+    // outputs to the next PE
+    .pe_domino_done(pe_domino[{#i+1#}]),
+    .pe_out_val(pe_domino_val[{#i#}])
 );
 {% end %}
+
+NABPImageAddresser image_addresser
+(
+    // global signals
+    .clk(clk),
+    .reset_n(reset_n),
+    // inputs from Image RAM
+    .ir_kick(ir_kick),
+    .ir_enable(ir_enable),
+    // outputs to image RAM
+    .ir_addr(ir_addr),
+)
 
 endmodule
