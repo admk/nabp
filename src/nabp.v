@@ -30,14 +30,14 @@ module NABP
     input wire clk,
     input wire reset_n,
     // inputs from host
-    input wire kick,
+    input wire sg_kick,
     // inputs from sinogram
     input wire [`kDataLength-1:0] sg_val,
     // inputs from image RAM
     input wire ir_kick,
     input wire ir_enable,
     // outputs to host
-    output wire done,
+    output wire sg_done,
     // outputs to sinogram
     output wire [`kSinogramAddressLength-1:0] sg_addr,
     // outputs to image RAM
@@ -56,12 +56,12 @@ NABPSinogramAddresser sinogram_addresser
     .clk(clk),
     .reset_n(reset_n),
     // inputs from host
-    .hs_kick(kick),
+    .hs_kick(sg_kick),
     // inputs from filtered RAM
     .fr_s_val(fr_sa_s_val),
     .fr_next_angle(fr_sa_next_angle),
     // outputs to host
-    .hs_done(done),
+    .hs_done(sg_done),
     // outputs to filtered RAM
     .fr_angle(sa_fr_angle),
     .fr_has_next_angle(sa_fr_has_next_angle),

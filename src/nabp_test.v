@@ -55,11 +55,11 @@ NABP nabp_uut
     .clk(clk),
     .reset_n(reset_n),
     // inputs from host
-    .kick(kick),
+    .sg_kick(kick),
     // inputs from sinogram
     .sg_val(sg_val),
     // outputs to host
-    .done(done),
+    .sg_done(done),
     // outputs to sinogram
     .sg_addr(sg_addr)
 );
