@@ -41,6 +41,7 @@ module NABP
     // outputs to sinogram
     output wire [`kSinogramAddressLength-1:0] sg_addr,
     // outputs to image RAM
+    output wire ir_kick_ack,
     output wire ir_done,
     output wire [`kImageAddressLength-1:0] ir_addr,
     output wire [`kCacheDataLength-1:0] ir_val
@@ -192,7 +193,8 @@ NABPImageAddresser image_addresser
     .ir_kick(ir_kick),
     .ir_enable(ir_enable),
     // outputs to image RAM
-    .ir_addr(ir_addr),
+    .ir_kick_ack(ir_kick_ack),
+    .ir_addr(ir_addr)
 )
 
 endmodule

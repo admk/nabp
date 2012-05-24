@@ -21,6 +21,7 @@ module NABPImageAddresser
     input wire ir_kick,
     input wire ir_enable,
     // outputs to image RAM
+    output wire ir_kick_ack,
     output wire [`kImageAddressLength-1:0] ir_addr
 )
 
@@ -69,6 +70,7 @@ assign scan_done = (scan_pos == {# to_i(c['image_size']) #});
 assign line_done = (line_pos == {# to_l(c['partition_scheme']['size']) #});
 
 assign delay_done = (state == delay_s) && pe_done;
+assign ir_kick_ack = delay_done;
 
 // delay state duration
 always @(posedge clk)
