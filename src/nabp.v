@@ -33,14 +33,14 @@ module NABP
     input wire kick,
     // inputs from sinogram
     input wire [`kDataLength-1:0] sg_val,
-    // TODO connect inputs from image RAM
+    // inputs from image RAM
     input wire ir_kick,
     input wire ir_enable,
     // outputs to host
     output wire done,
     // outputs to sinogram
     output wire [`kSinogramAddressLength-1:0] sg_addr,
-    // TODO connect outputs to image RAM
+    // outputs to image RAM
     output wire ir_done,
     output wire [`kImageAddressLength-1:0] ir_addr,
     output wire [`kCacheDataLength-1:0] ir_val
