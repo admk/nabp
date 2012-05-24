@@ -14,6 +14,9 @@
         return dec_repr(val, bin_width(c['image_size']))
     def to_v(val):
         return dec_repr(val, c['kFilteredDataLength'])
+    def to_p(val):
+        return dec_repr(val,
+                bin_width(c['partition_scheme']['no_of_partitions']))
 
     __angle_defines = { k: v for k, v in c.iteritems() if 'kAngle' in k }
 #}
