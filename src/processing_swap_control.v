@@ -88,8 +88,7 @@ wire mp_accu_init_step_direction;
 assign mp_accu_init_step_direction = (fr_angle < `kAngle90) ?
                                      {# scan_direction.forward #} :
                                      {# scan_direction.reverse #};
-// accumulator value set up
-// V̲a̲l̲u̲e̲ ̲T̲i̲m̲i̲n̲g̲ ̲D̲i̲a̲g̲r̲a̲m̲
+// A̲c̲c̲u̲m̲u̲l̲a̲t̲o̲r̲ ̲U̲p̲d̲a̲t̲e̲ ̲T̲i̲m̲i̲n̲g̲ ̲D̲i̲a̲g̲r̲a̲m̲
 //
 //          clk  ̅ ̅ ̅ ̅ ̅|_____| ̅ ̅ ̅ ̅ ̅|_____| ̅ ̅ ̅ ̅ ̅|_____| ̅ ̅ ̅ ̅ ̅|_____| ̅ ̅ ̅ ̅ ̅|_____
 //
