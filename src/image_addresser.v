@@ -30,7 +30,7 @@ module NABPImageAddresser
             states=image_addresser_states())
 #}
 
-wire pe_done, scan_mode, scan_done, line_done;
+wire delay_done, pe_done, scan_mode, scan_done, line_done;
 reg [`kNoOfPartitonsLength-1:0] pe_pos;
 reg [`kImageSizeLength-1:0] scan_pos;
 reg [`kPartitionSizeLength-1:0] line_pos;
