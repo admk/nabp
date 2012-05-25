@@ -51,6 +51,7 @@ module NABPProcessingSwapControl
     // output to RAM
     output wire fr_next_angle,
     output wire fr_prev_angle_release,
+    output wire fr_done,
     output wire signed [`kSLength-1:0] fr0_s_val,
     output wire signed [`kSLength-1:0] fr1_s_val
     {% if c['debug'] %},
@@ -183,6 +184,11 @@ assign fr_next_angle = // only ask for next angle if has next angle
                          // and swb is ready to start with a new line and all
                          // lines are being processed for the current angle
                          swb_next_itr && !has_next_line_itr));
+assign fr_done = // finish last part of work for a sinogram, state must be a
+                 // final shift
+                 (state == shift_s) &&
+                 // and shifting is complete
+                 swb_next_itr;
 
 always @(posedge clk)
 begin:transition
