@@ -61,7 +61,7 @@ NABPSinogramAddresser sinogram_addresser
     .fr_s_val(fr_sa_s_val),
     .fr_next_angle(fr_sa_next_angle),
     // outputs to host
-    .hs_done(sg_done),
+    .hs_done(),
     // outputs to filtered RAM
     .fr_angle(sa_fr_angle),
     .fr_has_next_angle(sa_fr_has_next_angle),
@@ -100,6 +100,7 @@ NABPFilteredRAMSwapControl filtered_ram_swap_control
     .pr1_s_val(pr1_s_val),
     .pr_next_angle(pr_next_angle),
     .pr_prev_angle_release(pr_prev_angle_release),
+    .pr_done(sg_done),
     // outputs to sinogram RAM
     .hs_s_val(fr_sa_s_val),
     // outputs to hs_angle_specification
@@ -125,6 +126,7 @@ NABPProcessingSwapControl processing_swap_control
     .fr_has_next_angle(pr_has_next_angle),
     .fr_next_angle_ack(pr_next_angle_ack),
     .fr_prev_angle_release_ack(pr_prev_angle_release_ack),
+    .fr_done(sg_done),
     .fr0_val(pr0_val),
     .fr1_val(pr1_val),
     // output to processing elements

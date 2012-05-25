@@ -38,6 +38,7 @@ module NABPFilteredRAMSwapControl
     input wire [`kSLength-1:0] pr1_s_val,
     input wire pr_next_angle,
     input wire pr_prev_angle_release,
+    input wire pr_done,
     // outputs to host RAM
     output wire [`kSLength-1:0] hs_s_val,
     output wire hs_next_angle,
@@ -237,7 +238,7 @@ begin:mealy_next_state
                 else
                     next_state <= work_s;
         work_s:
-            if (fill_done)
+            if (pr_done)
                 next_state <= ready_s;
         default:
             if (reset_n)
