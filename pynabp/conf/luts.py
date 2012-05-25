@@ -143,7 +143,7 @@ _lutSinogram = None
 _tSinogram = None
 _tSinogramBase = None
 
-def sinogram_defines(
+def init_sinogram_defines(
         projection_line_size, angle_step_size, no_of_angles,
         data_length):
     # phantom to be projection size / sqrt(2)
@@ -170,6 +170,10 @@ def sinogram_defines(
     _lutSinogram = sg_ram
     _tSinogram = sg_fixed_point
     _tSinogramBase = _tSinogram.fractional_width ** 2
+
+
+def sinogram_defines():
+    global _tSinogram
     return {'tSinogram': _tSinogram, }
 
 
