@@ -2,7 +2,7 @@ import math
 import numpy
 from itertools import chain
 
-from pynabp.utils import bin_width_of_dec_vals, bin_width_of_dec, dec_repr
+from pynabp.utils import bin_width_of_dec_vals, bin_width_of_dec, bin2dec
 from pynabp.fixed_point_arith import FixedPoint
 
 from cat_py.phantom import phantom
@@ -139,6 +139,10 @@ def _map_accu_init_defines(conf):
     return defines
 
 
+_lutSinogram = None
+_tSinogram = None
+_tSinogramBase = None
+
 def sinogram_defines(
         projection_line_size, angle_step_size, no_of_angles,
         data_length):
@@ -156,17 +160,19 @@ def sinogram_defines(
     frac_width = data_length - int_width
     sg_fixed_point = FixedPoint(int_width, frac_width, False)
 
-    # prepare sg as contents of the RAM
-    addr_len = bin_width_of_dec(no_of_angles) + \
-            bin_width_of_dec(projection_line_size)
+    # prepare sg as contents of the LUT
     sg_ram = {
-            dec_repr(a * projection_line_size + s, addr_len):
-            sg_fixed_point.verilog_repr(sg[s, a])
+            (a * projection_line_size + s): sg[s, a]
             for a in xrange(sg.shape[1])
             for s in xrange(sg.shape[0])}
 
-    defines = {
-            'lutSinogram': sg_ram,
-            'tSinogram': sg_fixed_point,
-            }
-    return defines
+    global _lutSinogram, _tSinogram, _tSinogramBase
+    _lutSinogram = sg_ram
+    _tSinogram = sg_fixed_point
+    _tSinogramBase = _tSinogram.fractional_width ** 2
+    return {'tSinogram': _tSinogram, }
+
+
+def sinogram_lookup(s_val):
+    global _lutSinogram, _tSinogramBase
+    return int(_lutSinogram[s_val] * _tSinogramBase + 0.5)
