@@ -4,21 +4,16 @@ import math
 from pynabp.conf.validate import PreValidatorCollate, PostValidatorCollate
 from pynabp.conf.partition import partition
 from pynabp.conf.utils import import_conf, center, filter_coefs, angle_defines
-from pynabp.conf.luts import shift_lut_defines, map_lut_defines, \
-        sinogram_defines
+from pynabp.conf.luts import shift_lut_defines, map_lut_defines
 
 
 # setup path for configuration file
-conf_env_var = 'NABP_CONFIG_PATH'
-conf_default_path = 'default.naconfig'
-
-if conf_env_var in os.environ:
-    path = os.environ[conf_env_var]
-else:
-    path = os.path.abspath(conf_default_path)
+conf_path = 'build/current.naconfig'
+if not os.path.exists(conf_path):
+    conf_path = 'default.naconfig'
 
 # import configuration
-config = import_conf(path)
+config = import_conf(os.path.abspath(conf_path))
 
 # validation
 PreValidatorCollate(config).perform_validations()
