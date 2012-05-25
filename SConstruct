@@ -1,5 +1,13 @@
 import os
-os.environ['NABP_CONFIG_PATH'] = os.path.abspath('default.naconfig')
+
+AddOption(
+        '--naconfig',
+        dest='naconfig',
+        type='string',
+        action='store',
+        default='default.naconfig',
+        help='configuration file location')
+os.environ['NABP_CONFIG_PATH'] = os.path.abspath(GetOption('naconfig'))
 
 env = Environment()
 
