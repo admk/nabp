@@ -94,10 +94,12 @@ begin:fr_angle_iterate
             sg_base_addr <= sg_base_addr +
                     {# to_sg_addr(c['projection_line_size']) #};
         end
-        {% if c['debug'] %}
-            $display("angle: %d", fr_angle);
-        {% end %}
     end
 end
+
+{% if c['debug'] %}
+always @(fr_angle)
+    $display("angle: %d", fr_angle);
+{% end %}
 
 endmodule
