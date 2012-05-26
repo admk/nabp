@@ -169,7 +169,7 @@ def init_sinogram_defines(
     global _lutSinogram, _tSinogram, _tSinogramBase
     _lutSinogram = sg_ram
     _tSinogram = sg_fixed_point
-    _tSinogramBase = _tSinogram.fractional_width ** 2
+    _tSinogramBase = 2 ** _tSinogram.fractional_width
 
 
 def sinogram_defines():
