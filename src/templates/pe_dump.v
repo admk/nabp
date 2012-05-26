@@ -22,6 +22,8 @@ task pe_dump_pixel;
     input integer y;
     input integer val;
     begin
-        __pe_dump_err = $pyeval("test.update(", x, ",", y, ",", val, ")");
+        if (x < {# config['image_size'] #} &&
+            y < {# config['image_size'] #})
+            __pe_dump_err = $pyeval("test.update(", x, ",", y, ",", val, ")");
     end
 endtask
