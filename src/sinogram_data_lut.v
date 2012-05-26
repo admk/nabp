@@ -19,17 +19,20 @@ module NABPSinogramDataLUT
     output reg [`kDataLength-1:0] sg_val
 );
 
+{# include('templates/python_path_update.v') #}
+
 integer err;
 initial
 begin
+    python_path_update();
     err = $pyeval(
         "from pynabp.conf.luts ",
         "import init_sinogram_defines, sinogram_lookup");
     err = $pyeval(
         "init_sinogram_defines(",
-        {# c['projection_line_size'] #},
-        {# c['angle_step_size'] #},
-        {# c['kNoOfAngles'] #},
+        {# c['projection_line_size'] #}, ",",
+        {# c['angle_step_size'] #}, ",",
+        {# c['kNoOfAngles'] #}, ",",
         {# c['kDataLength'] #}, ")");
 end
 

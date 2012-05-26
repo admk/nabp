@@ -1,14 +1,11 @@
-{# 
-    from pynabp.conf_gen import config
-#}
+{# from pynabp.conf_gen import config #}
+{# include('python_path_update.v') #}
+
 integer __pe_dump_err;
 
 task pe_dump_init;
     begin
-        __pe_dump_err = $pyeval("import os");
-        __pe_dump_err = $pyeval("path = os.getcwd()");
-        __pe_dump_err = $pyeval("import sys");
-        __pe_dump_err = $pyeval("sys.path.append(path)");
+        python_path_update();
         __pe_dump_err = $pyeval("from pynabp import test");
         __pe_dump_err = $pyeval("test.init(", {# config['image_size'] #}, ")");
     end
