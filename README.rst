@@ -2,14 +2,10 @@
 NABP
 ====
 
-============= =============================
-Author        Xitong Gao (gxtfmx@gmail.com)
-------------- -----------------------------
-Version       Unreleased 0.1.x
-------------- -----------------------------
-Description   An efficient hardware implementation of parallelised back
-              projection reconstruction for computerised tomography.
-============= =============================
+:Author:        Xitong Gao (gxtfmx@gmail.com)
+:Version:       Unreleased 0.1.x
+:Description:   An efficient hardware implementation of parallelised back
+                projection reconstruction for computerised tomography.
 
 Current Simulation Result Image
 ===============================
