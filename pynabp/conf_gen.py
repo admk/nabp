@@ -4,7 +4,8 @@ import math
 from pynabp.conf.validate import PreValidatorCollate, PostValidatorCollate
 from pynabp.conf.partition import partition
 from pynabp.conf.utils import import_conf, center, filter_coefs, angle_defines
-from pynabp.conf.luts import shift_lut_defines, map_lut_defines
+from pynabp.conf.luts import shift_lut_defines, map_lut_defines, \
+        init_sinogram_defines, sinogram_defines
 
 
 # setup path for configuration file
@@ -56,11 +57,10 @@ def derive(config):
     derived.update(shift_lut_defines(config['kShiftAccuPrecision']))
     derived.update(map_lut_defines(config_n_derived))
 
-    # debug mode configurations
-    if config['debug']:
-        derived.update(sinogram_defines(
+    init_sinogram_defines(
                     config['projection_line_size'], config['angle_step_size'],
-                    derived['kNoOfAngles'], config['kDataLength']))
+                    derived['kNoOfAngles'], config['kDataLength'])
+    derived.update(sinogram_defines())
 
     return derived
 

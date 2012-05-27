@@ -36,6 +36,26 @@ def dec2bin(num, width=0):
         binary = '0'
     return binary[::-1]
 
+def bin2dec(num, signed=False):
+    """
+    >>> bin2dec('111')
+    7
+    >>> bin2dec('111', signed=True)
+    -1
+    >>> bin2dec('0111')
+    7
+    >>> bin2dec('10011')
+    19
+    """
+    base = 2 ** (len(num) - 1)
+    val = int(num[0]) * base
+    if signed:
+        val = -val
+    for digit in num[1:]:
+        base = base / 2
+        val += int(digit) * base
+    return val
+
 def bin_width_of_dec(num):
     """
     >>> bin_width_of_dec(255)
