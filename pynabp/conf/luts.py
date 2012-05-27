@@ -139,6 +139,7 @@ def _map_accu_init_defines(conf):
     return defines
 
 
+_projection_line_size = None
 _lutSinogram = None
 _tSinogram = None
 _tSinogramBase = None
@@ -153,20 +154,15 @@ def init_sinogram_defines(
     # resize radon transformed sinogram to projection line size, i.e. multiply
     # by sqrt(2))
     # FIXME: this is bad, because the sinogram RAM could be offsetted slightly
-    sg = radon(ph, numpy.arange(0, 180, angle_step_size))
+    sg_ram = radon(ph, numpy.arange(0, 180, angle_step_size))
 
     # auto determine the data value representation
-    int_width = bin_width_of_dec(numpy.max(sg))
+    int_width = bin_width_of_dec(numpy.max(sg_ram))
     frac_width = data_length - int_width
     sg_fixed_point = FixedPoint(int_width, frac_width, False)
 
-    # prepare sg as contents of the LUT
-    sg_ram = {
-            (a * projection_line_size + s): sg[s, a]
-            for a in xrange(sg.shape[1])
-            for s in xrange(sg.shape[0])}
-
-    global _lutSinogram, _tSinogram, _tSinogramBase
+    global _lutSinogram, _tSinogram, _tSinogramBase, _projection_line_size
+    _projection_line_size = projection_line_size
     _lutSinogram = sg_ram
     _tSinogram = sg_fixed_point
     _tSinogramBase = 2 ** _tSinogram.fractional_width
@@ -177,6 +173,9 @@ def sinogram_defines():
     return {'tSinogram': _tSinogram, }
 
 
-def sinogram_lookup(s_val):
-    global _lutSinogram, _tSinogramBase
-    return int(_lutSinogram[s_val] * _tSinogramBase + 0.5)
+def sinogram_lookup(address):
+    global _lutSinogram, _tSinogramBase, _projection_line_size
+    angle = address / _projection_line_size
+    point = address % _projection_line_size
+    val = _lutSinogram[point, angle]
+    return int(val * _tSinogramBase + 0.5)

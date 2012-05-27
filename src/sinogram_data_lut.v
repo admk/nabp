@@ -36,7 +36,10 @@ begin
         {# c['kDataLength'] #}, ")");
 end
 
+integer sg_val_a;
+always @(sg_addr)
+    sg_val_a = $pyeval("sinogram_lookup(", sg_addr, ")");
 always @(posedge clk)
-    sg_val <= $pyeval("sinogram_lookup(", sg_addr, ")");
+    sg_val <= sg_val_a;
 
 endmodule
