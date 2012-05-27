@@ -2,11 +2,19 @@
 NABP
 ====
 
-:Author:Xitong Gao (gxtfmx@gmail.com)
-:Version:Unreleased
+============= =============================
+Author        Xitong Gao (gxtfmx@gmail.com)
+------------- -----------------------------
+Version       Unreleased 0.1.x
+------------- -----------------------------
+Description   An efficient hardware implementation of parallelised back
+              projection reconstruction for computerised tomography.
+============= =============================
 
-An efficient hardware implementation of parallelised back projection
-reconstruction for computerised tomography.
+Current Simulation Result Image
+===============================
+
+.. image:: http://f.cl.ly/items/3S043O2H1R0w0T0b1q3p/result.png
 
 Simulation Instructions
 =======================
@@ -42,6 +50,38 @@ Code Generation
 The code generation engine akpytemp_ is used to transform the Template Verilog
 source files into Verilog source files.
 
+Project Structure
+=================
+
+================ ================
+Folder & Files   Description
+================ ================
+akpytemp/        A simple but awesome general purpose templating utility.
+---------------- ----------------
+build/           Contains compiled executables and the files they generates.
+---------------- ----------------
+cat_py/          A third party library for generating the phantom image and
+                 also contains functions for the Radon and the inverse Radon
+                 transforms.
+---------------- ----------------
+derived_src/     Preprocessed Verilog source files.
+---------------- ----------------
+MATLAB/          The algorithm implemented in MATLAB. This does not reflect the
+                 implementation of its Verilog counterpart.
+---------------- ----------------
+pynabp/          Python utilities dedicated for the templated Verilog source
+                 files. Also contains Python modules loadable in simulation
+                 runtime.
+---------------- ----------------
+src/             Templated Verilog source files. Contains the actual
+                 implementation of the architecture.
+---------------- ----------------
+vpi_pyeval/      Minimal Verilog Procedual Interface extension for Python.
+---------------- ----------------
+wave/            Waveform files for the GTKWave wave viewer. Used to display
+                 signals for the test cases.
+================ ================
+
 MATLAB Algorithm Instructions
 =============================
 
@@ -63,14 +103,20 @@ Run in shell::
 Dependencies
 ============
 
-:akpytemp_: A Simple but Awesome General Purpose Templating Utility
-:vpi_pyeval_: Minimal Verilog Procedual Interface (VPI) Extension for the Python Scripting Language
-:`Icarus Verilog 0.9`_: Open source Verilog simulation and synthesis tool
-:GTKWave_: GTK+ based wave viewer for Unix, Win32, and Mac OSX
-:`PIL 1.1.7`_: Python Imaging Library
+====================== =======================
+Dependency             Description
+====================== =======================
+akpytemp_              A Simple but Awesome General Purpose Templating Utility
+---------------------- -----------------------
+vpi_pyeval_            Minimal Verilog Procedual Interface Extension for Python
+---------------------- -----------------------
+`Icarus Verilog 0.9`_  Open source Verilog simulation and synthesis tool
+---------------------- -----------------------
+GTKWave_               GTK+ based wave viewer for Unix, Win32, and Mac OSX
+---------------------- -----------------------
+`PIL 1.1.7`_           Python Imaging Library
+====================== =======================
 
-Links
-=====
 
 .. _akpytemp: http://github.com/admk/akpytemp
 .. _vpi_pyeval: http://github.com/admk/vpi_pyeval
@@ -79,4 +125,4 @@ Links
 .. _PIL 1.1.7: http://www.pythonware.com/products/pil/
 
 
-vim:tw=78:sw=4:ts=8:ft=rst:norl
+.. vim:tw=78:sw=4:ts=8:ft=rst:norl
