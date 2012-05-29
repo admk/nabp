@@ -21,7 +21,7 @@ begin
 end
 
 reg kick;
-wire done;
+wire sg_done;
 
 // control signals
 initial
@@ -36,7 +36,7 @@ end
 
 always @(posedge clk)
 begin:done_handler
-    if (done)
+    if (sg_done)
     begin
         pe_dump_finish();
         @(posedge clk);
@@ -62,7 +62,7 @@ NABP nabp_uut
     .ir_kick(0),
     .ir_enable(0),
     // outputs to host
-    .sg_done(done),
+    .sg_done(sg_done),
     // outputs to sinogram
     .sg_addr(sg_addr),
     // outputs to image RAM
