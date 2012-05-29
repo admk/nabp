@@ -23,8 +23,10 @@ ingredients = {
         'nabp': Split("""
             nabp.v
             sinogram_addresser.v
+            processing_swap_control.v
             processing_element.v
             image_addresser.v
+            filter.v
             """),
     }
 
@@ -69,15 +71,21 @@ sources = {
                 processing_swap_control.v
                 processing_test.v
                 """),
+        'reconstruction_test':
+            ingredients['filtered_ram'] +
+            ingredients['processing'] +
+            ingredients['nabp'] +
+            Split("""
+                sinogram_data_lut.v
+                reconstruction_test.v
+                """),
         'nabp_test':
             ingredients['filtered_ram'] +
             ingredients['processing'] +
             ingredients['nabp'] +
             Split("""
-                processing_swap_control.v
                 sinogram_data_lut.v
                 nabp_test.v
-                filter.v
                 """),
     }
 
