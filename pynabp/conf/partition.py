@@ -28,7 +28,7 @@ def validate(image_size, scheme):
         raise ValueError('Last tap and partitions disagree')
 
     # check coverage for consistencies
-    wasted_pixels = int((last_tap + scheme['size']) - (image_size - 1))
+    wasted_pixels = int(last_tap + scheme['size'] - image_size)
     if wasted_pixels < 0:
         raise ValueError('Partitions do not cover the entire image size')
 
