@@ -1,28 +1,19 @@
 {#
-    from pynabp.conf_gen import config
     pp_conf_excludes = ['lut', 'coefs']
-    pp_conf = []
-    for k, v in config.iteritems():
-        spoil = False
-        for exclude in pp_conf_excludes:
-            if exclude in k:
-                spoil = True
-                break
-        if not spoil:
-            pp_conf.append((k, v))
-
-    def escape(string):
-        string = string.replace(r'"', r'\"');
-        string = string.replace('\n', r'\n');
-        return '\'\'\'' + string + '\'\'\''
 #}
 // dump config
 integer dump_status;
 initial
 begin
+    python_path_update();
+    dump_status = $pyeval("from pynabp.conf_gen import config");
     dump_status = $pyeval("from pprint import pprint");
-    {% for k, v in pp_conf %}
-    dump_status = $pyeval("pprint({# escape(repr((k, v))) #})");{% end %}
+    dump_status = $pyeval(
+        "for (k, v) in config.iteritems():\n",
+        "    p = True\n",
+        "    for e in {# pp_conf_excludes #}:\n",
+        "        if e in k: p = False\n",
+        "    if p: pprint((k, v))");
 end
 // dump all signals
 initial
