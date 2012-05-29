@@ -1,5 +1,4 @@
 {# from pynabp.conf_gen import config #}
-{# include('python_path_update.v') #}
 
 integer __pe_dump_err;
 

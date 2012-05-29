@@ -6,10 +6,11 @@
 module NABPTest();
 
 {#
+    include('templates/python_path_update.v')
     include('templates/global_signal_generate.v')
-    include('templates/dump_wave.v')
     include('templates/data_test_vals.v')
     include('templates/pe_dump.v')
+    include('templates/dump_wave.v')
 
     if not c['debug']:
         raise RuntimeError('Must be in debug mode to perform this test.')
