@@ -29,6 +29,8 @@ def derive(config):
         image_size = config['image_size']
     else:
         image_size = int(config['projection_line_size'] / math.sqrt(2))
+        if image_size % 2 == 0:
+            image_size += 1
 
     derived = \
         {
