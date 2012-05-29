@@ -190,11 +190,13 @@ NABPImageAddresser image_addresser
     // global signals
     .clk(clk),
     .reset_n(reset_n),
+    // inputs from host
+    .hs_kick(sg_done),
     // inputs from Image RAM
-    .ir_kick(ir_kick),
     .ir_enable(ir_enable),
     // outputs to image RAM
-    .ir_kick_ack(ir_kick_ack),
+    .ir_kick(ir_kick),
+    .ir_done(ir_done),
     .ir_addr(ir_addr)
 );
 
