@@ -14,7 +14,7 @@ endtask
 
 task pe_dump_finish;
     begin
-        __pe_dump_err = $pyeval("image_dump.finish()");
+        __pe_dump_err = $pyeval("image_dump.dump('pe_dump')");
     end
 endtask
 
@@ -25,6 +25,8 @@ task pe_dump_pixel;
     begin
         if (x < {# config['image_size'] #} &&
             y < {# config['image_size'] #})
-            __pe_dump_err = $pyeval("image_dump.update(", x, ",", y, ",", val, ")");
+            __pe_dump_err = $pyeval(
+                    "image_dump.update('pe_dump', ",
+                    x, ",", y, ",", val, ")");
     end
 endtask
