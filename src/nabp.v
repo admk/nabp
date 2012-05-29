@@ -34,14 +34,13 @@ module NABP
     // inputs from sinogram
     input wire [`kDataLength-1:0] sg_val,
     // inputs from image RAM
-    input wire ir_kick,
     input wire ir_enable,
     // outputs to host
     output wire sg_done,
     // outputs to sinogram
     output wire [`kSinogramAddressLength-1:0] sg_addr,
     // outputs to image RAM
-    output wire ir_kick_ack,
+    output wire ir_kick,
     output wire ir_done,
     output wire [`kImageAddressLength-1:0] ir_addr,
     output wire [`kCacheDataLength-1:0] ir_val
@@ -146,7 +145,7 @@ wire pe_domino[`kNoOfPartitions:0];
 wire [`kCacheDataLength-1:0] pe_domino_val[`kNoOfPartitions-1:0];
 
 // domino connections
-assign pe_domino[0] = ir_kick;
+assign pe_domino[0] = sg_done;
 assign ir_done = pe_domino[`kNoOfPartitions];
 assign ir_val = pe_domino_val[`kNoOfPartitions-1];
 
