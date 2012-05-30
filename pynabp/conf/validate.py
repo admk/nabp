@@ -38,6 +38,7 @@ class PreConstraintsValidator(ConstraintsValidator):
         constraints = {
                     # key,               type,  None,   constraint functions
                     'debug':            (bool,  False,  None),
+                    'target':           (list,  True,   None),
                     'clock_period':     ((float, int),
                                                 False,  positive),
                     'time_precision':   (str,   False,  time_unit),

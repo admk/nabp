@@ -12,6 +12,13 @@ config = \
         #   True / False
         'debug': debug,
 
+        # Scons build targets.
+        # This specifies what build target to build.
+        # Constraints:
+        #   A valid list of strings, each string represents an existing build
+        #   target that can be found in ``sources.scons``.
+        'target': ['domino_test', ],
+
         # Simulation clock period.
         # The clock period used for simulation, in nanoseconds.
         # Constraints:
