@@ -10,9 +10,9 @@ Import('SOURCE_DIR')
 
 
 def generate_derived_sources(target, source, env):
-    pynap_path = env['PYNABP_PATH']
-    if not (pynap_path in sys.path):
-        sys.path.append(pynap_path)
+    pynabp_path = env['PYNABP_PATH']
+    if not (pynabp_path in sys.path):
+        sys.path.append(pynabp_path)
     for tgt, src in itertools.izip(target, source):
         t = Template(path=str(src), include_path=SOURCE_DIR)
         t.save(str(tgt), **env.__dict__)
