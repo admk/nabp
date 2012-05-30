@@ -284,8 +284,14 @@ pe_cache
     .data_out_1(read_val)
 );
 
-{% if c['debug'] %}
-{# include('templates/pe_dump.v') #}
+{#
+    try:
+        dump_pixels
+    except:
+        dump_pixels = False
+#}
+{% if dump_pixels %}
+{# include('templates/image_dump(image_name).v', image_name='pe_dump') #}
 integer err;
 reg [`kImageSizeLength-1:0] im_x, im_y, scan_pos, line_pos;
 reg [`kFilteredDataLength-1:0] lb_val_d;
@@ -309,7 +315,7 @@ always @(posedge clk)
             im_x = line_pos;
             im_y = scan_pos;
         end
-        pe_dump_pixel(im_x, im_y, lb_val_d);
+        image_dump_pixel(im_x, im_y, lb_val_d);
     end
 {% end %}
 

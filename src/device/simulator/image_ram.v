@@ -3,12 +3,7 @@
 //     30 May 2012
 {#
     from pynabp.enums import image_ram_states
-
-    include('templates/image_dump(image_name).v', image_name='image_ram')
 #}
-
-initial
-    image_dump_init();
 
 module NABPImageRAM
 (
@@ -24,7 +19,10 @@ module NABPImageRAM
     output wire ir_enable
 );
 
-{# include('templates/state_decl(states).v', states=image_ram_states()) #}
+{#
+    include('templates/image_dump(image_name).v', image_name='image_ram')
+    include('templates/state_decl(states).v', states=image_ram_states())
+#}
 
 // mealy outputs
 wire working;
@@ -32,7 +30,7 @@ assign working = (state == work_s);
 
 // mealy next state
 always @(*)
-begin:next_state
+begin:next_state_update
     next_state <= state;
     case (state) // synopsys parallel_case full_case
         ready_s:
@@ -63,7 +61,9 @@ begin:image_ram_update
         im_x = ir_addr - `kImageNoOfPixels * im_y;
         image_dump_pixel(im_x, im_y, ir_val);
     end
-    if (ir_done)
+    if (ir_kick)
+        image_dump_init();
+    else if (ir_done)
         image_dump_finish();
 end
 

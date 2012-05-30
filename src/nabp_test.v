@@ -16,7 +16,7 @@ module NABPTest();
 #}
 
 reg sg_kick;
-wire ir_kick, ir_done;
+wire ir_kick, ir_done, ir_enable;
 
 // control signals
 initial
@@ -80,7 +80,7 @@ NABPSinogramDataLUT sinogram_lut
 );
 
 // image RAM
-NABPImageRAM
+NABPImageRAM image_ram
 (
     // global signals
     .clk(clk),
