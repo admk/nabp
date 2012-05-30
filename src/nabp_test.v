@@ -15,23 +15,23 @@ module NABPTest();
         raise RuntimeError('Must be in debug mode to perform this test.')
 #}
 
-reg kick;
-wire sg_done;
+reg sg_kick;
+wire ir_kick, ir_done;
 
 // control signals
 initial
 begin:kick_handler
     @(posedge reset_n);
-    kick = 0;
+    sg_kick = 0;
     @(posedge clk);
-    kick = 1;
+    sg_kick = 1;
     @(posedge clk);
-    kick = 0;
+    sg_kick = 0;
 end
 
 always @(posedge clk)
 begin:done_handler
-    if (sg_done)
+    if (ir_done)
     begin
         @(posedge clk);
         @(posedge clk);
@@ -41,6 +41,8 @@ end
 
 wire [`kDataLength-1:0] sg_val;
 wire [`kSinogramAddressLength-1:0] sg_addr;
+wire [`kImageAddressLength-1:0] ir_addr;
+wire [`kCacheDataLength-1:0] ir_val;
 
 // unit under test
 NABP nabp_uut
@@ -49,21 +51,20 @@ NABP nabp_uut
     .clk(clk),
     .reset_n(reset_n),
     // inputs from host
-    .sg_kick(kick),
+    .sg_kick(sg_kick),
     // inputs from sinogram
     .sg_val(sg_val),
     // inputs from image RAM
-    .ir_kick(0),
     .ir_enable(0),
     // outputs to host
-    .sg_done(sg_done),
+    .sg_done(),
     // outputs to sinogram
     .sg_addr(sg_addr),
     // outputs to image RAM
-    .ir_kick_ack(),
-    .ir_done(),
-    .ir_addr(),
-    .ir_val()
+    .ir_kick(ir_kick),
+    .ir_done(ir_done),
+    .ir_addr(ir_addr),
+    .ir_val(ir_val)
 );
 
 // sinogram RAM
@@ -76,6 +77,21 @@ NABPSinogramDataLUT sinogram_lut
     .sg_addr(sg_addr),
     // outputs to nabp
     .sg_val(sg_val)
+);
+
+// image RAM
+NABPImageRAM
+(
+    // global signals
+    .clk(clk),
+    .reset_n(reset_n),
+    // inputs from image addresser
+    .ir_kick(ir_kick),
+    .ir_done(ir_done),
+    .ir_addr(ir_addr),
+    .ir_val(ir_val),
+    // output to image addresser & processing elements
+    .ir_enable(ir_enable)
 );
 
 endmodule
