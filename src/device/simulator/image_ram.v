@@ -3,7 +3,12 @@
 //     30 May 2012
 {#
     from pynabp.enums import image_ram_states
+
+    include('templates/image_dump(image_name).v', image_name='image_ram')
 #}
+
+initial
+    image_dump_init();
 
 module NABPImageRAM
 (
@@ -48,5 +53,18 @@ begin:transition
         state <= next_state;
 end
 
+reg [`kImageSizeLength-1:0] im_x, im_y;
+
+always @(posedge clk)
+begin:image_ram_update
+    if (working && ir_addr < `kImageNoOfPixels)
+    begin
+        im_y = ir_addr / `kImageNoOfPixels;
+        im_x = ir_addr - `kImageNoOfPixels * im_y;
+        image_dump_pixel(im_x, im_y, ir_val);
+    end
+    if (ir_done)
+        image_dump_finish();
+end
 
 endmodule
