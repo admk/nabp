@@ -146,6 +146,7 @@ wire [`kCacheDataLength-1:0] pe_domino_val[`kNoOfPartitions-1:0];
 
 // domino connections
 assign pe_domino[0] = sg_done;
+assign ir_done = pe_domino[`kNoOfPartitions];
 assign ir_val = pe_domino_val[`kNoOfPartitions-1];
 
 {% for i in xrange(c['partition_scheme']['no_of_partitions']) %}
