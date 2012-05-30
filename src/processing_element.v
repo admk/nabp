@@ -286,13 +286,7 @@ pe_cache
     .data_out_1(read_val)
 );
 
-{#
-    try:
-        dump_pixels
-    except:
-        dump_pixels = False
-#}
-{% if dump_pixels %}
+{% if 'reconstruction_test' in c['target'] %}
 {# include('templates/image_dump(image_name).v', image_name='pe_dump') #}
 integer err;
 reg [`kImageSizeLength-1:0] im_x, im_y, scan_pos, line_pos;
@@ -319,6 +313,14 @@ always @(posedge clk)
         end
         image_dump_pixel(im_x, im_y, lb_val_d);
     end
+{% end %}
+
+{% if 'domino_test' in c['target'] %}
+always @(state)
+    if (state == domino_start_s)
+        $display("Processing element %d started domino", pe_id);
+    else if (state == domino_finish_s)
+        $display("Processing element %d finished domino", pe_id);
 {% end %}
 
 endmodule
