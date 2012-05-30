@@ -55,7 +55,7 @@ NABP nabp_uut
     // inputs from sinogram
     .sg_val(sg_val),
     // inputs from image RAM
-    .ir_enable(0),
+    .ir_enable(ir_enable),
     // outputs to host
     .sg_done(),
     // outputs to sinogram

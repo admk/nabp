@@ -24,6 +24,9 @@ module NABPImageRAM
     include('templates/state_decl(states).v', states=image_ram_states())
 #}
 
+// always high for ir_enable
+assign ir_enable = 1;
+
 // mealy outputs
 wire working;
 assign working = (state == work_s);
