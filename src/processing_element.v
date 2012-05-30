@@ -247,6 +247,8 @@ begin:mealy_next_state
         work_wait_s:
             if (sw_kick)
                 next_state <= work_s;
+        domino_start_s:
+            next_state <= domino_0_s;
         domino_0_s:
             if (ir_domino_enable && scan_domino_done)
                 next_state <= domino_1_s;
