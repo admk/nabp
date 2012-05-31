@@ -16,7 +16,16 @@ module NABPTest();
 #}
 
 reg sg_kick;
-wire ir_kick, ir_done, ir_enable;
+wire sg_done, ir_kick, ir_done, ir_enable;
+
+{% if 'reconstruction_test' in c['target'] %}
+{# include('templates/image_dump(image_name).v', image_name='pe_dump') #}
+initial
+    image_dump_init();
+always @(posedge clk)
+    if (sg_done)
+        image_dump_finish();
+{% end %}
 
 // control signals
 initial
@@ -57,7 +66,7 @@ NABP nabp_uut
     // inputs from image RAM
     .ir_enable(ir_enable),
     // outputs to host
-    .sg_done(),
+    .sg_done(sg_done),
     // outputs to sinogram
     .sg_addr(sg_addr),
     // outputs to image RAM
