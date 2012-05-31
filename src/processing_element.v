@@ -139,8 +139,9 @@ assign scan_domino_done = // PE must be in one of the domino modes
 assign pe_domino_done = // all domino operations are complete
                         (state == domino_finish_s);
 
-assign pe_out_val = (state == domino_0_s || state == domino_1_s) ?
-                    read_val : pe_in_val_d;
+assign pe_out_val = (state == domino_0_s ||
+                     state == domino_1_s ||
+                     state == domino_finish_s) ? read_val : pe_in_val_d;
 reg [`kCacheDataLength-1:0] pe_in_val_d;
 always @(posedge clk)
     if (ir_domino_enable)
