@@ -68,8 +68,9 @@ end
 assign scan_mode = (state == addressing_y_s) ?
                    {# scan_mode.y #} : {# scan_mode.x #};
 assign pe_done = (pe_pos == {# to_p(no_of_partitions - 1) #});
-assign scan_done = (scan_pos == {# to_i(c['image_size']) #});
-assign line_done = (line_pos == {# to_l(c['partition_scheme']['size']) #});
+assign scan_done = (scan_pos == {# to_i(c['image_size'] - 1) #});
+assign line_done = (line_pos ==
+                    {# to_l(c['partition_scheme']['size'] - 1) #});
 
 assign delay_done = (state == delay_s) && pe_done;
 assign ir_kick = delay_done;
