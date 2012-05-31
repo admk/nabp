@@ -1,15 +1,15 @@
 [*]
-[*] GTKWave Analyzer v3.3.32 (w)1999-2012 BSI
-[*] Thu May 31 03:29:01 2012
+[*] GTKWave Analyzer v3.3.31 (w)1999-2012 BSI
+[*] Thu May 31 17:06:29 2012
 [*]
 [dumpfile] "/Users/admko/Documents/Sorcery/NABP/build/nabp_test.v.lxt"
-[dumpfile_mtime] "Thu May 31 03:28:11 2012"
-[dumpfile_size] 2685590
+[dumpfile_mtime] "Thu May 31 16:58:04 2012"
+[dumpfile_size] 2682595
 [savefile] "/Users/admko/Documents/Sorcery/NABP/wave/nabp_test_wave.gtkw"
-[timestart] 0
-[size] 1366 720
-[pos] 0 44
-*-27.467815 352910000 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+[timestart] 245300000
+[size] 1920 1088
+[pos] 1 44
+*-26.467815 335970000 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
 [treeopen] NABPTest.
 [treeopen] NABPTest.nabp_uut.
 [treeopen] NABPTest.nabp_uut.processing_swap_control.
@@ -18,13 +18,15 @@
 [sst_width] 198
 [signals_width] 272
 [sst_expanded] 1
-[sst_vpaned_height] 323
-@c00200
+[sst_vpaned_height] 523
+@800200
 -host
 @28
 NABPTest.nabp_uut.clk[0]
 NABPTest.nabp_uut.reset_n[0]
-@1401200
+NABPTest.ir_kick[0]
+NABPTest.ir_done[0]
+@1000200
 -host
 @c00200
 -sinogram end
@@ -130,7 +132,7 @@ NABPTest.nabp_uut.processing_swap_control.line_cnt[2:0]
 NABPTest.nabp_uut.processing_swap_control.sw_sel[0]
 @1401200
 -processing
-@800200
+@c00200
 -processing element 0
 @28
 NABPTest.nabp_uut.processing_element_0.sw_kick[0]
@@ -151,7 +153,7 @@ NABPTest.nabp_uut.processing_element_0.lb_val[12:0]
 @8024
 [color] 7
 NABPTest.nabp_uut.processing_element_0.addr[10:0]
-@1000200
+@1401200
 -processing element 0
 @800200
 -processing elements
@@ -159,26 +161,19 @@ NABPTest.nabp_uut.processing_element_0.addr[10:0]
 [color] 1
 ^5 /Users/admko/Documents/Sorcery/NABP/wave/../derived_src/processing_element.vxtf
 NABPTest.nabp_uut.processing_element_0.state[2:0]
-@8024
-NABPTest.nabp_uut.processing_element_0.addr[10:0]
-@2024
 [color] 2
 ^5 /Users/admko/Documents/Sorcery/NABP/wave/../derived_src/processing_element.vxtf
 NABPTest.nabp_uut.processing_element_1.state[2:0]
 [color] 3
 ^5 /Users/admko/Documents/Sorcery/NABP/wave/../derived_src/processing_element.vxtf
 NABPTest.nabp_uut.processing_element_2.state[2:0]
-[color] 4
 ^5 /Users/admko/Documents/Sorcery/NABP/wave/../derived_src/processing_element.vxtf
-NABPTest.nabp_uut.processing_element_3.state[2:0]
-[color] 5
-^5 /Users/admko/Documents/Sorcery/NABP/wave/../derived_src/processing_element.vxtf
-NABPTest.nabp_uut.processing_element_4.state[2:0]
+NABPTest.nabp_uut.processing_element_18.state[2:0]
 @1000200
 -processing elements
 @800200
 -image_addresser
-@8025
+@8024
 NABPTest.image_ram.ir_val[17:0]
 @28
 NABPTest.nabp_uut.image_addresser.ir_kick[0]
@@ -205,13 +200,14 @@ NABPTest.nabp_uut.image_addresser.ir_done[0]
 [color] 7
 ^7 /Users/admko/Documents/Sorcery/NABP/wave/../derived_src/device/simulator/image_ram.vxtf
 NABPTest.image_ram.state[1:0]
-@8024
+@8025
 [color] 3
 NABPTest.image_ram.ir_val[17:0]
+@8024
 [color] 3
-NABPTest.image_ram.im_x[6:0]
+NABPTest.image_ram.im_x[31:0]
 [color] 3
-NABPTest.image_ram.im_y[6:0]
+NABPTest.image_ram.im_y[31:0]
 @1000200
 -image ram
 [pattern_trace] 1
