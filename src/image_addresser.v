@@ -37,7 +37,7 @@ reg [`kNoOfPartitonsLength-1:0] pe_pos;
 reg [`kImageSizeLength-1:0] scan_pos;
 reg [`kPartitionSizeLength-1:0] line_pos;
 
-reg [`kImageSizeLength-1:0] ir_base_addr, addr_off_x, addr_off_y;
+reg [`kImageAddressLength-1:0] ir_base_addr, addr_off_x, addr_off_y;
 assign ir_addr = ir_base_addr +
                  ((scan_mode == {# scan_mode.x #}) ? addr_off_x : addr_off_y);
 always @(posedge clk)

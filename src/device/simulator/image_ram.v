@@ -54,14 +54,14 @@ begin:transition
         state <= next_state;
 end
 
-reg [`kImageSizeLength-1:0] im_x, im_y;
+integer im_x, im_y;
 
 always @(posedge clk)
 begin:image_ram_update
     if (working && ir_addr < `kImageNoOfPixels)
     begin
-        im_y = ir_addr / `kImageNoOfPixels;
-        im_x = ir_addr - `kImageNoOfPixels * im_y;
+        im_y = ir_addr / {# c['image_size'] #};
+        im_x = ir_addr - {# c['image_size'] #} * im_y;
         image_dump_pixel(im_x, im_y, ir_val);
     end
     if (ir_kick)

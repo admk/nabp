@@ -1,15 +1,15 @@
 [*]
 [*] GTKWave Analyzer v3.3.32 (w)1999-2012 BSI
-[*] Thu May 31 03:11:21 2012
+[*] Thu May 31 03:29:01 2012
 [*]
 [dumpfile] "/Users/admko/Documents/Sorcery/NABP/build/nabp_test.v.lxt"
-[dumpfile_mtime] "Thu May 31 03:10:41 2012"
-[dumpfile_size] 2585777
+[dumpfile_mtime] "Thu May 31 03:28:11 2012"
+[dumpfile_size] 2685590
 [savefile] "/Users/admko/Documents/Sorcery/NABP/wave/nabp_test_wave.gtkw"
 [timestart] 0
 [size] 1366 720
 [pos] 0 44
-*-27.467815 371530000 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+*-27.467815 352910000 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
 [treeopen] NABPTest.
 [treeopen] NABPTest.nabp_uut.
 [treeopen] NABPTest.nabp_uut.processing_swap_control.
@@ -178,20 +178,21 @@ NABPTest.nabp_uut.processing_element_4.state[2:0]
 -processing elements
 @800200
 -image_addresser
+@8025
+NABPTest.image_ram.ir_val[17:0]
 @28
 NABPTest.nabp_uut.image_addresser.ir_kick[0]
 @2024
 [color] 7
 ^6 /Users/admko/Documents/Sorcery/NABP/wave/../derived_src/image_addresser.vxtf
 NABPTest.nabp_uut.image_addresser.state[2:0]
-@8025
+@8024
 [color] 3
 NABPTest.nabp_uut.image_addresser.pe_pos[4:0]
 [color] 3
 NABPTest.nabp_uut.image_addresser.line_pos[2:0]
 [color] 3
 NABPTest.nabp_uut.image_addresser.scan_pos[6:0]
-@8024
 [color] 7
 NABPTest.nabp_uut.image_addresser.ir_addr[13:0]
 @1000200
