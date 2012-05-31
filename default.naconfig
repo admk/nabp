@@ -17,7 +17,7 @@ config = \
         # Constraints:
         #   A valid list of strings, each string represents an existing build
         #   target that can be found in ``sources.scons``.
-        'target': ['domino_test', ],
+        'target': ['domino_test', 'reconstruction_test'],
 
         # Simulation clock period.
         # The clock period used for simulation, in nanoseconds.

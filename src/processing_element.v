@@ -284,10 +284,10 @@ pe_cache
     .data_out_1(read_val)
 );
 
-{% if c['debug'] %}
-{# include('templates/pe_dump.v') #}
-integer err;
-reg [`kImageSizeLength-1:0] im_x, im_y, scan_pos, line_pos;
+{% if 'reconstruction_test' in c['target'] %}
+{# include('templates/image_dump(image_name).v', image_name='pe_dump') #}
+
+integer err, im_x, im_y, scan_pos, line_pos;
 reg [`kFilteredDataLength-1:0] lb_val_d;
 
 always @(posedge clk)
