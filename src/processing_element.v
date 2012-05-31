@@ -319,9 +319,7 @@ always @(posedge clk)
 {% if 'domino_test' in c['target'] %}
 always @(state)
     if (state == domino_start_s)
-        $display("Processing element %d started domino", pe_id);
-    else if (state == domino_finish_s)
-        $display("Processing element %d finished domino", pe_id);
+        $display("domino: %d", pe_id);
 {% end %}
 
 endmodule
