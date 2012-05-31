@@ -133,7 +133,8 @@ assign scan_domino_done = // PE must be in one of the domino modes
                           (state == domino_0_s || state == domino_1_s) &&
                           // counter has reached the end of a scan for all
                           // pixels
-                          (base_addr == {# to_base_addr(0) #});
+                          (base_addr ==
+                           {# to_base_addr(scan_mode_pixels - 1) #});
 
 assign pe_domino_done = // all domino operations are complete
                         (state == domino_finish_s);
@@ -188,6 +189,8 @@ begin:base_addr_counter
                 else if (sw_scan_direction == {# scan_direction.reverse #})
                     base_addr <= {# to_base_addr(scan_mode_pixels - 1) #};
             end
+            else if (pe_domino_kick)
+                base_addr <= {# to_base_addr(0) #};
         work_wait_s:
             scan_cnt <= {# to_i(c['image_size'] - 1) #};
         work_s:
@@ -198,15 +201,13 @@ begin:base_addr_counter
             else if (sw_scan_direction == {# scan_direction.reverse #})
                 base_addr <= base_addr - {# to_base_addr(1) #};
         end
-        domino_start_s:
-            base_addr <= {# to_base_addr(scan_mode_pixels - 1) #};
-        domino_0_s, domino_1_s:
+        domino_start_s, domino_0_s, domino_1_s:
             if (ir_domino_enable)
             begin
                 if (scan_domino_done)
-                    base_addr <= {# to_base_addr(scan_mode_pixels - 1) #};
+                    base_addr <= {# to_base_addr(0) #};
                 else
-                    base_addr <= base_addr - {# to_base_addr(1) #};
+                    base_addr <= base_addr + {# to_base_addr(1) #};
             end
     endcase
 end
