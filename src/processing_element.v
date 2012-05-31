@@ -113,7 +113,8 @@ reg [`kAddressLength-2:0] base_addr;
 reg [`kImageSizeLength-1:0] scan_cnt;
 wire done, scan_done, scan_domino_done, scan_domino_mode;
 
-assign scan_domino_mode = (state == domino_0_s) ? 0 : 1;
+assign scan_domino_mode = (state == domino_start_s || state == domino_0_s) ?
+                          0 : 1;
 assign addr = {(state == work_s) ? sw_scan_mode : scan_domino_mode, base_addr};
 
 assign done = // PE must be working
