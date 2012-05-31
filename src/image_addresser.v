@@ -74,7 +74,7 @@ assign line_done = (line_pos ==
 
 assign delay_done = (state == delay_s) && pe_done;
 assign ir_kick = delay_done;
-assign ir_done = (next_state == ready_s);
+assign ir_done = (state == addressing_y_s && next_state == ready_s);
 
 // delay state duration
 always @(posedge clk)
