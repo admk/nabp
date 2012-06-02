@@ -17,11 +17,13 @@ module NABPImageAddresser
     // global signals
     input wire clk,
     input wire reset_n,
+    // inputs from host
+    input wire hs_kick,
     // inputs from Image RAM
-    input wire ir_kick,
     input wire ir_enable,
     // outputs to image RAM
-    output wire ir_kick_ack,
+    output wire ir_kick,
+    output wire ir_done,
     output wire [`kImageAddressLength-1:0] ir_addr
 );
 
@@ -35,7 +37,7 @@ reg [`kNoOfPartitonsLength-1:0] pe_pos;
 reg [`kImageSizeLength-1:0] scan_pos;
 reg [`kPartitionSizeLength-1:0] line_pos;
 
-reg [`kImageSizeLength-1:0] ir_base_addr, addr_off_x, addr_off_y;
+reg [`kImageAddressLength-1:0] ir_base_addr, addr_off_x, addr_off_y;
 assign ir_addr = ir_base_addr +
                  ((scan_mode == {# scan_mode.x #}) ? addr_off_x : addr_off_y);
 always @(posedge clk)
@@ -66,11 +68,13 @@ end
 assign scan_mode = (state == addressing_y_s) ?
                    {# scan_mode.y #} : {# scan_mode.x #};
 assign pe_done = (pe_pos == {# to_p(no_of_partitions - 1) #});
-assign scan_done = (scan_pos == {# to_i(c['image_size']) #});
-assign line_done = (line_pos == {# to_l(c['partition_scheme']['size']) #});
+assign scan_done = (scan_pos == {# to_i(c['image_size'] - 1) #});
+assign line_done = (line_pos ==
+                    {# to_l(c['partition_scheme']['size'] - 1) #});
 
 assign delay_done = (state == delay_s) && pe_done;
-assign ir_kick_ack = delay_done;
+assign ir_kick = delay_done;
+assign ir_done = (state == addressing_y_s && next_state == ready_s);
 
 // delay state duration
 always @(posedge clk)
@@ -133,7 +137,7 @@ begin:mealy_next_state
     next_state <= state;
     case (state) // synopsys parallel_case full_case
         ready_s:
-            if (ir_kick)
+            if (hs_kick)
                 next_state <= delay_s;
         delay_s:
             if (delay_done)

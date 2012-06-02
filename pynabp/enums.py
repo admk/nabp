@@ -91,6 +91,13 @@ class image_addresser_states(enum):
         super(image_addresser_states, self).__init__()
 
 
+class image_ram_states(enum):
+    def __init__(self):
+        self.ready = None
+        self.work = None
+        super(image_ram_states, self).__init__()
+
+
 class sinogram_addresser_states(enum):
     def __init__(self):
         self.ready = None

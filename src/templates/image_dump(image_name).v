@@ -14,7 +14,7 @@ endtask
 
 task image_dump_finish;
     begin
-        __image_dump_err = $pyeval("image_dump.finish('{# image_name #}')");
+        __image_dump_err = $pyeval("image_dump.dump('{# image_name #}')");
     end
 endtask
 

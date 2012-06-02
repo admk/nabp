@@ -113,7 +113,8 @@ reg [`kAddressLength-2:0] base_addr;
 reg [`kImageSizeLength-1:0] scan_cnt;
 wire done, scan_done, scan_domino_done, scan_domino_mode;
 
-assign scan_domino_mode = (state == domino_0_s) ? 0 : 1;
+assign scan_domino_mode = (state == domino_start_s || state == domino_0_s) ?
+                          0 : 1;
 assign addr = {(state == work_s) ? sw_scan_mode : scan_domino_mode, base_addr};
 
 assign done = // PE must be working
@@ -132,13 +133,15 @@ assign scan_domino_done = // PE must be in one of the domino modes
                           (state == domino_0_s || state == domino_1_s) &&
                           // counter has reached the end of a scan for all
                           // pixels
-                          (base_addr == {# to_base_addr(0) #});
+                          (base_addr ==
+                           {# to_base_addr(scan_mode_pixels - 1) #});
 
 assign pe_domino_done = // all domino operations are complete
                         (state == domino_finish_s);
 
-assign pe_out_val = (state == domino_0_s || state == domino_1_s) ?
-                    read_val : pe_in_val_d;
+assign pe_out_val = (state == domino_0_s ||
+                     state == domino_1_s ||
+                     state == domino_finish_s) ? read_val : pe_in_val_d;
 reg [`kCacheDataLength-1:0] pe_in_val_d;
 always @(posedge clk)
     if (ir_domino_enable)
@@ -187,6 +190,8 @@ begin:base_addr_counter
                 else if (sw_scan_direction == {# scan_direction.reverse #})
                     base_addr <= {# to_base_addr(scan_mode_pixels - 1) #};
             end
+            else if (pe_domino_kick)
+                base_addr <= {# to_base_addr(0) #};
         work_wait_s:
             scan_cnt <= {# to_i(c['image_size'] - 1) #};
         work_s:
@@ -197,29 +202,27 @@ begin:base_addr_counter
             else if (sw_scan_direction == {# scan_direction.reverse #})
                 base_addr <= base_addr - {# to_base_addr(1) #};
         end
-        domino_start_s:
-            base_addr <= {# to_base_addr(scan_mode_pixels - 1) #};
-        domino_0_s, domino_1_s:
+        domino_start_s, domino_0_s, domino_1_s:
             if (ir_domino_enable)
             begin
                 if (scan_domino_done)
-                    base_addr <= {# to_base_addr(scan_mode_pixels - 1) #};
+                    base_addr <= {# to_base_addr(0) #};
                 else
-                    base_addr <= base_addr - {# to_base_addr(1) #};
+                    base_addr <= base_addr + {# to_base_addr(1) #};
             end
     endcase
 end
 
 reg write_en;
 reg [`kAddressLength-1:0] write_addr;
-reg [`kCacheDataLength-1:0] write_val;
+wire [`kCacheDataLength-1:0] write_val;
 wire [`kCacheDataLength-1:0] read_val;
 
+assign write_val = read_val + lb_val;
 always @(posedge clk)
 begin:write_back_sync
     write_en <= (state == work_s);
     write_addr <= addr;
-    write_val <= read_val + lb_val;
 end
 
 always @(posedge clk)
@@ -247,6 +250,8 @@ begin:mealy_next_state
         work_wait_s:
             if (sw_kick)
                 next_state <= work_s;
+        domino_start_s:
+            next_state <= domino_0_s;
         domino_0_s:
             if (ir_domino_enable && scan_domino_done)
                 next_state <= domino_1_s;
@@ -286,31 +291,28 @@ pe_cache
 
 {% if 'reconstruction_test' in c['target'] %}
 {# include('templates/image_dump(image_name).v', image_name='pe_dump') #}
-
 integer err, im_x, im_y, scan_pos, line_pos;
-reg [`kFilteredDataLength-1:0] lb_val_d;
+reg [`kAddressLength-2:0] base_addr_d;
 
 always @(posedge clk)
-    lb_val_d <= lb_val;
+    base_addr_d <= base_addr;
 
 always @(posedge clk)
-    if (state == work_s)
+    if (write_en)
     begin
-        line_pos = base_addr / {# c['image_size'] #};
-        scan_pos = base_addr - {# c['image_size'] #} * line_pos;
+        line_pos = base_addr_d / {# c['image_size'] #};
+        scan_pos = base_addr_d - {# c['image_size'] #} * line_pos;
         line_pos = line_pos + pe_tap_offset;
-        if (sw_scan_mode == {# scan_mode.x #})
-        begin
-            im_x = scan_pos;
-            im_y = line_pos;
-        end
-        else
-        begin
-            im_x = line_pos;
-            im_y = scan_pos;
-        end
-        pe_dump_pixel(im_x, im_y, lb_val_d);
+        im_x = (sw_scan_mode == {# scan_mode.x #}) ? scan_pos : line_pos;
+        im_y = (sw_scan_mode == {# scan_mode.x #}) ? line_pos : scan_pos;
+        image_dump_pixel(im_x, im_y, lb_val);
     end
+{% end %}
+
+{% if 'domino_test' in c['target'] %}
+always @(state)
+    if (state == domino_start_s)
+        $display("domino: %d", pe_id);
 {% end %}
 
 endmodule
