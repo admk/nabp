@@ -215,14 +215,14 @@ end
 
 reg write_en;
 reg [`kAddressLength-1:0] write_addr;
-reg [`kCacheDataLength-1:0] write_val;
+wire [`kCacheDataLength-1:0] write_val;
 wire [`kCacheDataLength-1:0] read_val;
 
+assign write_val = read_val + lb_val;
 always @(posedge clk)
 begin:write_back_sync
     write_en <= (state == work_s);
     write_addr <= addr;
-    write_val <= read_val + lb_val;
 end
 
 always @(posedge clk)
