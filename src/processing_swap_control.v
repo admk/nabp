@@ -183,7 +183,7 @@ assign fr_next_angle = // only ask for next angle if has next angle
                          state != diverged_fill_and_shift_s &&
                          // and swb is ready to start with a new line and all
                          // lines are being processed for the current angle
-                         swb_next_itr && !has_next_line_itr));
+                         swa_swap && swb_next_itr && !has_next_line_itr));
 assign fr_done = // finish last part of work for a sinogram, state must be a
                  // final shift
                  (state == shift_s) &&
