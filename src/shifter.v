@@ -9,14 +9,10 @@
     fill_cnt_init = c['partition_scheme']['partitions'][-1]
     fill_cnt_width = bin_width(fill_cnt_init)
 
-    # shift count varies from the position of the last pixel to 0
-    shift_cnt_init = c['image_size'] - 1
+    # shift count varies from 1 to the position of the last pixel
+    # pixel 0 is not needed because it is the final pixel given by filling
+    shift_cnt_init = c['image_size'] - 2
     shift_cnt_width = bin_width(shift_cnt_init)
-
-    if shift_cnt_init < fill_cnt_init:
-        raise RuntimeError(
-                'Fill count (%d) should always be smaller or equal to shift'
-                'count (%d).' % (fill_cnt_init, shift_cnt_init))
 
     accu_fixed = c['tShiftAccuBase']
     accu_init_str = accu_fixed.verilog_repr()
@@ -55,26 +51,31 @@ module NABPShifter
 //
 //          clk _| ̅|_| ̅|_| ̅|_| ̅|_| ̅|       _| ̅|_| ̅|_| ̅|_| ̅|_| ̅|_
 //
-//   shift_kick _/ ̅ ̅ ̅\______________       _____________________
-//                   ↘
-//   shift_done ______↓̲_____________       _________/ ̅ ̅ ̅\_______
-//                    ↓                               ↑
-//        s_val _̅_̅_̅_̅_̅X_̅↘̲̅_̅X_̅_̅_̅X_̅_̅_̅X_̅_̅       _̅X_̅_̅_̅X_̅_̅_̅_̅_̅↑̲̅_̅_̅_̅_̅_̅_̅_̅_̅_̅
-//                      ↘                             ↑
-//          val _̅_̅_̅_̅_̅_̅_̅_̅_̅X_̅_̅_̅X_̅_̅_̅X_̅_̅  ...  _̅X_̅_̅_̅X_̅_̅_̅X_̅↑̲̅_̅_̅_̅_̅_̅_̅_̅_̅_̅
-//                        ↓↘                          ↑
-//  lb_shift_en _________/̲↓̲̅/̲̅↘̲̅/̲̅/̲̅/̲̅/̲̅/̲̅/̲̅/̲̅       /̲̅/̲̅/̲̅/̲̅/̲̅/̲̅/̲̅/̲̅/̲̅\̲_↑̲_________
-//                        ↓  ↘                        ↑
-//      pe_kick _________/ ̅ ̅ ̅\↓̲ ̲ ̲ ̲ ̲ ̲        ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲↑̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲
+//   shift_kick  ̅\__________________       _____________________
+//               ↘
+//   shift_done __↓̲__↘̲______________       _________/ ̅ ̅ ̅\_______
+//                ↓   ↓                               ↑
+//        s_val _̅_̅↓̲̅_̅_̅X_̅↘̲̅_̅X_̅_̅_̅X_̅_̅_̅X_̅_̅       _̅X_̅_̅_̅X_̅_̅_̅_̅_̅↑̲̅_̅_̅_̅_̅_̅_̅_̅_̅_̅
+//                ↓     ↘                             ↑
+//          val _̅_̅↓̲̅_̅_̅_̅_̅_̅_̅X_̅_̅_̅X_̅_̅_̅X_̅_̅  ...  _̅X_̅_̅_̅X_̅_̅_̅X_̅↑̲̅_̅_̅_̅_̅_̅_̅_̅_̅_̅
+//                ↓       ↓↘                          ↑
+//  lb_shift_en __↓̲______/̲/̲̅/̲̅↘̲̅/̲̅/̲̅/̲̅/̲̅/̲̅/̲̅/̲̅       /̲̅/̲̅/̲̅/̲̅/̲̅/̲̅/̲̅/̲̅/̲̅\̲_↑̲_________
+//                ↓          ↘                        ↑
+//      pe_kick _/ ̅ ̅ ̅\________↓̲ ̲ ̲ ̲ ̲ ̲        ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲↑̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲
 //                            ↓                       ↑
 //      pe_taps _̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅X_̅_̅_̅X_̅_̅       _̅X_̅_̅_̅X_̅_̅_̅X↗̲̅_̅_̅X_̅_̅_̅_̅_̅_̅_̅
 //
+//  [processing elements]
+//
+//  pe write_en  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲/ ̅ ̅ ̅ ̅ ̅ ̅ ̅ ̅ ̅ ̅        ̅ ̅ ̅ ̅ ̅ ̅ ̅ ̅ ̅ ̅ ̅ ̅ ̅ ̅ ̅ ̅ ̅\ ̲ ̲ ̲
+//
+//  [comments]
 //                           |--------------------------| cycles = shift count
 //                   |--------------------------|         cycles = shift count
+//                   ^ Note the current pe_taps value is intended for the
+//                     first scan pixel.
 {#
     var_delay_map = {
-            # sw_pe_kick $\delta$ s_val=>val=>taps
-            'sw_pe_kick':    ('', 1),
             # lb_shift_en $\delta$ s_val=>val
             'lb_shift_en':   ('', 1),
             # sc_fill_done $\delta$ s_val=>val=>taps->done
@@ -137,10 +138,14 @@ begin:transition
         state <= next_state;
 end
 
+reg sc_shift_kick_d;
+always @(posedge clk)
+    sc_shift_kick_d <= sc_shift_kick;
+
 // mealy outputs
 assign sc_fill_done_l  = (cnt == 0) && (state == fill_s);
 assign sc_shift_done_l = (cnt == 0) && (state == shift_s);
-assign sw_pe_kick_l = (sc_shift_kick);
+assign sw_pe_kick = sc_shift_kick_d;
 assign mp_kick = sc_fill_kick;
 assign mp_done = sc_shift_done;
 
@@ -155,7 +160,7 @@ begin:mealy_next_state
             if (sc_fill_done_l)
                 next_state <= fill_done_s;
         fill_done_s:
-            if (sc_shift_kick)
+            if (sc_shift_kick_d)
                 next_state <= shift_s;
         shift_s:
             if (sc_shift_done_l)
