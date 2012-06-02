@@ -16,11 +16,6 @@ module NABPReconstructionTest();
         raise RuntimeError('Must be in debug mode to perform this test.')
 #}
 
-initial
-begin
-    pe_dump_init();
-end
-
 reg kick;
 wire done;
 
@@ -35,11 +30,19 @@ begin:kick_handler
     kick = 0;
 end
 
+{% if 'reconstruction_test' in c['target'] %}
+{# include('templates/image_dump(image_name).v', image_name='pe_dump') #}
+initial
+    image_dump_init();
+always @(posedge clk)
+    if (done)
+        image_dump_finish();
+{% end %}
+
 always @(posedge clk)
 begin:done_handler
     if (done)
     begin
-        pe_dump_finish();
         @(posedge clk);
         @(posedge clk);
         $finish;
