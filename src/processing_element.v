@@ -293,28 +293,20 @@ pe_cache
 {# include('templates/image_dump(image_name).v', image_name='pe_dump') #}
 integer err;
 reg [`kImageSizeLength-1:0] im_x, im_y, scan_pos, line_pos;
-reg [`kFilteredDataLength-1:0] lb_val_d;
+reg [`kAddressLength-2:0] base_addr_d;
 
 always @(posedge clk)
-    lb_val_d <= lb_val;
+    base_addr_d <= base_addr;
 
 always @(posedge clk)
-    if (state == work_s)
+    if (write_en)
     begin
-        line_pos = base_addr / {# c['image_size'] #};
-        scan_pos = base_addr - {# c['image_size'] #} * line_pos;
+        line_pos = base_addr_d / {# c['image_size'] #};
+        scan_pos = base_addr_d - {# c['image_size'] #} * line_pos;
         line_pos = line_pos + pe_tap_offset;
-        if (sw_scan_mode == {# scan_mode.x #})
-        begin
-            im_x = scan_pos;
-            im_y = line_pos;
-        end
-        else
-        begin
-            im_x = line_pos;
-            im_y = scan_pos;
-        end
-        image_dump_pixel(im_x, im_y, lb_val_d);
+        im_x = (sw_scan_mode == {# scan_mode.x #}) ? scan_pos : line_pos;
+        im_y = (sw_scan_mode == {# scan_mode.x #}) ? line_pos : scan_pos;
+        image_dump_pixel(im_x, im_y, lb_val);
     end
 {% end %}
 
