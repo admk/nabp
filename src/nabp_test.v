@@ -50,6 +50,7 @@ end
 
 wire [`kDataLength-1:0] sg_val;
 wire [`kSinogramAddressLength-1:0] sg_addr;
+wire ir_addr_valid;
 wire [`kImageAddressLength-1:0] ir_addr;
 wire [`kCacheDataLength-1:0] ir_val;
 
@@ -72,6 +73,7 @@ NABP nabp_uut
     // outputs to image RAM
     .ir_kick(ir_kick),
     .ir_done(ir_done),
+    .ir_addr_valid(ir_addr_valid),
     .ir_addr(ir_addr),
     .ir_val(ir_val)
 );
@@ -97,6 +99,7 @@ NABPImageRAM image_ram
     // inputs from image addresser
     .ir_kick(ir_kick),
     .ir_done(ir_done),
+    .ir_addr_valid(ir_addr_valid),
     .ir_addr(ir_addr),
     .ir_val(ir_val),
     // output to image addresser & processing elements

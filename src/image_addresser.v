@@ -24,6 +24,9 @@ module NABPImageAddresser
     // outputs to image RAM
     output wire ir_kick,
     output wire ir_done,
+    output wire ir_addr_valid, // FIXME currently use valid signal to disable
+                               // invalid out of range pixel writes. Better to
+                               // skip those pixels to save cycles.
     output wire [`kImageAddressLength-1:0] ir_addr
 );
 
@@ -40,6 +43,16 @@ reg [`kPartitionSizeLength-1:0] line_pos;
 reg [`kImageAddressLength-1:0] ir_base_addr, addr_off_x, addr_off_y;
 assign ir_addr = ir_base_addr +
                  ((scan_mode == {# scan_mode.x #}) ? addr_off_x : addr_off_y);
+assign ir_addr_valid = // must be working
+                       (state == addressing_x_s || state == addressing_y_s) &&
+                       // scan position must be within image size
+                       (scan_pos < {# c['image_size'] #}) &&
+                       // line position must be within the boundary at the
+                       // last processing element.
+                       ((pe_pos != `kNoOfPartitions - 1) ||
+                        (line_pos <=
+                         {# (c['image_size'] -
+                             c['partition_scheme']['partitions'][-1] - 1) #}));
 always @(posedge clk)
 begin:ir_addr_update
     if (ir_enable)

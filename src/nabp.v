@@ -42,6 +42,7 @@ module NABP
     // outputs to image RAM
     output wire ir_kick,
     output wire ir_done,
+    output wire ir_addr_valid,
     output wire [`kImageAddressLength-1:0] ir_addr,
     output wire [`kCacheDataLength-1:0] ir_val
 );
@@ -195,6 +196,7 @@ NABPImageAddresser image_addresser
     // outputs to image RAM
     .ir_kick(ir_kick),
     .ir_done(ir_done),
+    .ir_addr_valid(ir_addr_valid),
     .ir_addr(ir_addr)
 );
 

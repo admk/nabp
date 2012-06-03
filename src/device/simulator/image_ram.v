@@ -13,6 +13,7 @@ module NABPImageRAM
     // inputs from image addresser
     input wire ir_kick,
     input wire ir_done,
+    input wire ir_addr_valid,
     input wire [`kImageAddressLength-1:0] ir_addr,
     input wire [`kCacheDataLength-1:0] ir_val,
     // output to image addresser & processing elements
@@ -58,7 +59,7 @@ integer im_x, im_y;
 
 always @(posedge clk)
 begin:image_ram_update
-    if (working && ir_addr < `kImageNoOfPixels)
+    if (working && ir_addr_valid)
     begin
         im_y = ir_addr / {# c['image_size'] #};
         im_x = ir_addr - {# c['image_size'] #} * im_y;
