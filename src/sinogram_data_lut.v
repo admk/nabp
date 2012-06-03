@@ -38,7 +38,11 @@ end
 
 integer sg_val_a;
 always @(sg_addr)
+    {% if 'processing_verify' in c['target'] %}
+    sg_val_a = $pyeval("sinogram_lookup(", sg_addr, ", True)");
+    {% else %}
     sg_val_a = $pyeval("sinogram_lookup(", sg_addr, ")");
+    {% end %}
 always @(posedge clk)
     sg_val <= sg_val_a;
 

@@ -116,6 +116,9 @@ NABPFilteredRAMSwapControl filtered_ram_swap_control
 
 wire pe_kick, pe_scan_mode, pe_scan_direction;
 wire [`kFilteredDataLength*`kNoOfPartitions-1:0] pe_taps;
+{% if c['debug'] %}
+wire [`kAngleLength-1:0] pe_angle;
+{% end %}
 NABPProcessingSwapControl processing_swap_control
 (
     // global signals
@@ -139,6 +142,9 @@ NABPProcessingSwapControl processing_swap_control
     .fr_prev_angle_release(pr_prev_angle_release),
     .fr0_s_val(pr0_s_val),
     .fr1_s_val(pr1_s_val)
+    {% if c['debug'] %},
+    .db_angle(pe_angle)
+    {% end %}
 );
 
 wire [`kFilteredDataLength-1:0] pe_tap_val[`kNoOfPartitions-1:0];
@@ -181,6 +187,9 @@ processing_element_{#i#}
     // outputs to the next PE
     .pe_domino_done(pe_domino[{#i+1#}]),
     .pe_out_val(pe_domino_val[{#i#}])
+    {% if c['debug'] %},
+    .pe_angle(pe_angle)
+    {% end %}
 );
 {% end %}
 

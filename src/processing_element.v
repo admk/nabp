@@ -77,6 +77,7 @@
     def to_base_addr(val):
         return dec_repr(val, base_addr_len)
 #}
+
 `define kAddressLength {# addr_len #}
 
 module NABPProcessingElement
@@ -98,6 +99,9 @@ module NABPProcessingElement
     // outputs to the next PE
     output wire pe_domino_done,
     output wire signed [`kCacheDataLength-1:0] pe_out_val
+    {% if c['debug'] %},
+    input wire [`kAngleLength-1:0] pe_angle
+    {% end %}
 );
 
 parameter integer pe_id = 'bz;
@@ -289,14 +293,25 @@ pe_cache
     .data_out_1(read_val)
 );
 
-{% if 'reconstruction_test' in c['target'] %}
-{# include('templates/image_dump(image_name).v', image_name='pe_dump') #}
-integer err, im_x, im_y, scan_pos, line_pos;
+{#
+    pe_verify = False
+
+    if 'processing_verify' in c['target']:
+        pe_verify = True
+        include('templates/processing_verify.v')
+
+    if 'reconstruction_test' in c['target']:
+        pe_verify = True
+        include('templates/image_dump(image_name).v', image_name='pe_dump')
+#}
+{% if pe_verify %}
+integer err, im_x, im_y, scan_pos, line_pos, expected_lb_val;
 reg [`kAddressLength-2:0] base_addr_d;
 
 always @(posedge clk)
     base_addr_d <= base_addr;
 
+integer dump_val;
 always @(posedge clk)
     if (write_en)
     begin
@@ -305,7 +320,19 @@ always @(posedge clk)
         line_pos = line_pos + pe_tap_offset;
         im_x = (sw_scan_mode == {# scan_mode.x #}) ? scan_pos : line_pos;
         im_y = (sw_scan_mode == {# scan_mode.x #}) ? line_pos : scan_pos;
-        image_dump_pixel(im_x, im_y, lb_val);
+        dump_val = lb_val;
+
+        {% if 'processing_verify' in c['target'] %}
+            expected_lb_val = expected_s_val(pe_angle, im_x, im_y);
+            {% if 'processing_addressing_verify' in c['target'] %}
+                dump_val = $pyeval("sinogram_lookup(",
+                    pe_angle / {# c['angle_step_size'] #} *
+                    `kProjectionLineSize + expected_lb_val, ")");
+            {% end %}
+        {% end %}
+        {% if 'reconstruction_test' in c['target'] %}
+            image_dump_pixel(im_x, im_y, dump_val);
+        {% end %}
     end
 {% end %}
 

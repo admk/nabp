@@ -7,10 +7,10 @@
 module NABPReconstructionTest();
 
 {#
+    include('templates/python_path_update.v')
     include('templates/global_signal_generate.v')
-    include('templates/dump_wave.v')
     include('templates/data_test_vals.v')
-    include('templates/pe_dump.v')
+    include('templates/dump_wave.v')
 
     if not c['debug']:
         raise RuntimeError('Must be in debug mode to perform this test.')
@@ -63,15 +63,15 @@ NABP nabp_uut
     // inputs from sinogram
     .sg_val(sg_val),
     // inputs from image RAM
-    .ir_kick(0),
     .ir_enable(0),
     // outputs to host
     .sg_done(done),
     // outputs to sinogram
     .sg_addr(sg_addr),
     // outputs to image RAM
-    .ir_kick_ack(),
+    .ir_kick(),
     .ir_done(),
+    .ir_addr_valid(),
     .ir_addr(),
     .ir_val()
 );

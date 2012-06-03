@@ -12,12 +12,16 @@ config = \
         #   True / False
         'debug': debug,
 
-        # Scons build targets.
-        # This specifies what build target to build.
+        # Test goals.
+        # This specifies what functionalities are tested.
         # Constraints:
-        #   A valid list of strings, each string represents an existing build
-        #   target that can be found in ``sources.scons``.
-        'target': ['domino_test', 'reconstruction_test'],
+        # A valid list of strings, each string represents a valid functionality
+        # test. FIXME currently these test goals are buried deep within the
+        # project, need to find a way to explicitly outline these.
+        'target': [
+                'domino_test',
+                'reconstruction_test',
+                'processing_verify', ],
 
         # Simulation clock period.
         # The clock period used for simulation, in nanoseconds.

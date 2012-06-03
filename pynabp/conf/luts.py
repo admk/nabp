@@ -2,7 +2,7 @@ import math
 import numpy
 from itertools import chain
 
-from pynabp.utils import bin_width_of_dec_vals, bin_width_of_dec, bin2dec
+from pynabp.utils import bin_width_of_dec_vals, bin_width_of_dec
 from pynabp.fixed_point_arith import FixedPoint
 
 from cat_py.phantom import phantom
@@ -173,9 +173,13 @@ def sinogram_defines():
     return {'tSinogram': _tSinogram, }
 
 
-def sinogram_lookup(address):
+def sinogram_lookup(address=None, pr_verify=False, angle=None, point=None):
     global _lutSinogram, _tSinogramBase, _projection_line_size
-    angle = address / _projection_line_size
-    point = address % _projection_line_size
+    if angle is None:
+        angle = address / _projection_line_size
+    if point is None:
+        point = address % _projection_line_size
+    if pr_verify:
+        return point
     val = _lutSinogram[point, angle]
     return int(val * _tSinogramBase + 0.5)
