@@ -182,4 +182,4 @@ def sinogram_lookup(address=None, pr_verify=False, angle=None, point=None):
     if pr_verify:
         return point
     val = _lutSinogram[point, angle]
-    return int(val * _tSinogramBase + 0.5)
+    return int(round(val * _tSinogramBase))
