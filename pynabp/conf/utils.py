@@ -14,7 +14,7 @@ def import_conf(path):
 
 
 def center(val):
-    return int((val - 1) / 2)
+    return (val - 1) / 2.0
 
 
 def filter_coefs(order, function):
