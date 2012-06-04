@@ -95,23 +95,30 @@ assign mp_accu_init_step_direction = (fr_angle < `kAngle90) ?
 //
 //        angle _̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅X_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅
 //
-//     lut vals _̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅X_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅
+// mp_accu_part _̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅X_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅
 //
-// mp_accu_init _̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅X_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅
+// mp_accu_init _̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅X_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅X_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅
 //
-//        state  ̲̅r̲̅e̲̅a̲̅d̲̅y̲̅_̲̅s̲̅ ̲̅ ̲̅ ̲̅X ̲̅s̲̅e̲̅t̲̅u̲̅p̲̅_̲̅1̲̅_̲̅s̲̅ ̲̅X ̲̅s̲̅e̲̅t̲̅u̲̅p̲̅_̲̅2̲̅_̲̅s̲̅ ̲̅X ̲̅s̲̅e̲̅t̲̅u̲̅p̲̅_̲̅3̲̅_̲̅s̲̅ ̲̅X ̲̅f̲̅i̲̅l̲̅l̲̅_̲̅s̲̅ ̲̅ ̲̅ ̲̅ ̲̅
+//        state  ̲̅ ̲̅r̲̅e̲̅a̲̅d̲̅y̲̅_̲̅s̲̅ ̲̅ ̲̅X ̲̅s̲̅e̲̅t̲̅u̲̅p̲̅_̲̅1̲̅_̲̅s̲̅ ̲̅X ̲̅s̲̅e̲̅t̲̅u̲̅p̲̅_̲̅2̲̅_̲̅s̲̅ ̲̅X ̲̅s̲̅e̲̅t̲̅u̲̅p̲̅_̲̅3̲̅_̲̅s̲̅ ̲̅X ̲̅ ̲̅f̲̅i̲̅l̲̅l̲̅_̲̅s̲̅ ̲̅ ̲̅ ̲̅
 //
-//   [comments]            ^ angle updated         ^ calculated mp_accu_init
-//                                     ^ mp_accu_part value    ^ safe to shift
+//   [comments]            ^ angle updated         ^ update mp_accu_init
+//                                                   equal to mp_accu_part
+//                                     ^                       ^
+//                                     mp_accu_part value    safe to shift,
+//                                                           calculates next
+//                                                           mp_accu_init
 always @(posedge clk)
 begin:accu_setup
     if (state == setup_2_s || state == angle_setup_2_s)
         // value looked up for the angle only becomes available in the 2nd
         // stage, mp_accu_init will be available in the 3rd stage
+        // mp_accu_init stores the same value as mp_accu_part
         mp_accu_init <= mp_accu_part;
-    else if (swap_ack)
-        // accumulate on swb_next_itr, which is the only swappable that wants
-        // new values
+    else if (swap_ack || state == setup_3_s)
+        // accumulates on swap or setup_3_s
+        // the starting swappable reads current mp_accu_init == mp_accu_part
+        // at the next cycle, updated mp_accu_init will become available for
+        // the next starting swappable
         if (mp_accu_init_step_direction == {# scan_direction.forward #})
             mp_accu_init <= mp_accu_init - mp_accu_base;
         else if (mp_accu_init_step_direction == {# scan_direction.reverse #})
