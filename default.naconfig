@@ -21,7 +21,8 @@ config = \
         'target': [
                 'domino_test',
                 'reconstruction_test',
-                'processing_verify', ],
+                # 'processing_verify',
+                ],
 
         # Simulation clock period.
         # The clock period used for simulation, in nanoseconds.

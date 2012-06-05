@@ -64,7 +64,7 @@ def derive(config):
     derived.update(map_lut_defines(config_n_derived))
 
     init_sinogram_defines(
-                    derived['projection_line_size'],
+                    derived['image_size'], derived['projection_line_size'],
                     config['angle_step_size'], derived['kNoOfAngles'],
                     config['kDataLength'])
     derived.update(sinogram_defines())
