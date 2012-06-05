@@ -25,12 +25,15 @@ def derive(config):
     dictionary.
     """
     # image size
-    if config['image_size'] is not None:
-        image_size = config['image_size']
-    else:
+    if config['image_size'] is None:
         image_size = int(config['projection_line_size'] / math.sqrt(2))
-        if image_size % 2 == 0:
-            image_size += 1
+    else:
+        image_size = config['image_size']
+    # projection line size
+    if config['projection_line_size'] is None:
+        projection_line_size = int(config['image_size'] * math.sqrt(2))
+    else:
+        projection_line_size = config['projection_line_size']
 
     derived = \
         {
@@ -38,8 +41,9 @@ def derive(config):
             'device': config['device'] if config['device'] else 'simulator',
             # null filling
             'image_size': image_size,
+            'projection_line_size': projection_line_size,
             # centers
-            'projection_line_center': center(config['projection_line_size']),
+            'projection_line_center': center(projection_line_size),
             'image_center': center(image_size),
             # filter
             'fir_coefs':
@@ -60,8 +64,9 @@ def derive(config):
     derived.update(map_lut_defines(config_n_derived))
 
     init_sinogram_defines(
-                    config['projection_line_size'], config['angle_step_size'],
-                    derived['kNoOfAngles'], config['kDataLength'])
+                    derived['image_size'], derived['projection_line_size'],
+                    config['angle_step_size'], derived['kNoOfAngles'],
+                    config['kDataLength'])
     derived.update(sinogram_defines())
 
     return derived

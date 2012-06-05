@@ -21,7 +21,8 @@ config = \
         'target': [
                 'domino_test',
                 'reconstruction_test',
-                'processing_verify', ],
+                # 'processing_verify',
+                ],
 
         # Simulation clock period.
         # The clock period used for simulation, in nanoseconds.
@@ -47,16 +48,18 @@ config = \
         'device': None,
 
         # How wide the projection line is.
+        # If not specified, then it defaults to the nearest integer value of
+        # image_size * sqrt(2)
         # Constraints:
-        #   Value must be an odd number to calculate an integer valued center
-        'projection_line_size': 179,
+        #   Value must be a positive integer
+        'projection_line_size': None,
 
         # The image size.
-        # If not specified, then it defaults to the nearest odd valued
+        # If not specified, then it defaults to the nearest integer value of
         # projection_line_size / sqrt(2)
         # Constraints:
-        #   Value must be an odd number to calculate an integer valued center
-        'image_size': None,
+        #   Value must be a positive integer
+        'image_size': 127,
 
         # Filter order.
         # Constraints:

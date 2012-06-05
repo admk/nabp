@@ -145,15 +145,15 @@ _tSinogram = None
 _tSinogramBase = None
 
 def init_sinogram_defines(
-        projection_line_size, angle_step_size, no_of_angles,
+        image_size, projection_line_size, angle_step_size, no_of_angles,
         data_length):
-    # phantom to be projection size / sqrt(2)
-    ph = phantom(int(projection_line_size / numpy.sqrt(2)))
+    """Initialise sinogram LUT and definitions"""
+    # create a phantom image
+    ph = phantom(image_size)
 
     # produce projections by radon transform (skimage.transform.radon
     # resize radon transformed sinogram to projection line size, i.e. multiply
     # by sqrt(2))
-    # FIXME: this is bad, because the sinogram RAM could be offsetted slightly
     sg_ram = radon(ph, numpy.arange(0, 180, angle_step_size))
 
     # auto determine the data value representation
@@ -169,17 +169,23 @@ def init_sinogram_defines(
 
 
 def sinogram_defines():
-    global _tSinogram
     return {'tSinogram': _tSinogram, }
 
 
 def sinogram_lookup(address=None, pr_verify=False, angle=None, point=None):
-    global _lutSinogram, _tSinogramBase, _projection_line_size
+    # addressing
     if angle is None:
         angle = address / _projection_line_size
     if point is None:
         point = address % _projection_line_size
     if pr_verify:
         return point
-    val = _lutSinogram[point, angle]
-    return int(val * _tSinogramBase + 0.5)
+
+    # linear interpolation
+    point *= _lutSinogram.shape[0] / _projection_line_size
+    interpolate_factor = point - math.floor(point)
+    floor_val = _lutSinogram[math.floor(point), angle]
+    ceil_val = _lutSinogram[math.ceil(point), angle]
+    val = floor_val * (1 - interpolate_factor) + ceil_val * interpolate_factor
+
+    return int(round(val * _tSinogramBase))

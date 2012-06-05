@@ -54,7 +54,7 @@ begin
             "    x = x - {# c['image_center'] #}\n",
             "    y = y - {# c['image_center'] #}\n",
             "    s = -x * sin(a) + y * cos(a)\n",
-            "    return int(s + {# c['projection_line_center'] #} + 0.5)\n");
+            "    return int(round(s + {# c['projection_line_center'] #}))\n");
 end
 
 reg [`kFilteredDataLength-1:0] tap_val_exp;
