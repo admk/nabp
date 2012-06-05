@@ -6,6 +6,7 @@
 module NABPProcessingTest();
 
 {#
+    include('templates/python_path_update.v')
     include('templates/global_signal_generate.v')
     include('templates/dump_wave.v')
     include('templates/data_test_vals.v')
@@ -35,6 +36,7 @@ wire [`kAngleLength-1:0] pe_angle;
 wire [`kPartitionSizeLength-1:0] pe_line_itr;
 wire [`kFilteredDataLength-1:0] fr0_val, fr1_val;
 wire [`kSLength-1:0] fr0_s_val, fr1_s_val;
+wire fr_next_angle;
 
 // unit under test
 NABPProcessingSwapControl uut
@@ -45,7 +47,8 @@ NABPProcessingSwapControl uut
     // inputs from filtered RAM swap control
     .fr_angle(hs_angle),
     .fr_has_next_angle(hs_has_next_angle),
-    .fr_next_angle_ack(hs_next_angle_ack),
+    .fr_next_angle_ack(fr_next_angle),
+    .fr_prev_angle_release_ack(hs_next_angle_ack),
     .fr0_val(fr0_val),
     .fr1_val(fr1_val),
     // output to processing elements
@@ -54,7 +57,8 @@ NABPProcessingSwapControl uut
     .pe_scan_direction(),
     .pe_taps(pe_taps),
     // output to RAM
-    .fr_next_angle(hs_next_angle),
+    .fr_next_angle(fr_next_angle),
+    .fr_prev_angle_release(hs_next_angle),
     .fr0_s_val(fr0_s_val),
     .fr1_s_val(fr1_s_val),
     // debug signals

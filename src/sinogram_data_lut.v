@@ -19,16 +19,32 @@ module NABPSinogramDataLUT
     output reg [`kDataLength-1:0] sg_val
 );
 
-always @(posedge clk)
+{# include('templates/python_path_update.v') #}
+
+integer err;
+initial
 begin
-    {# set_eat_blanklines(True) #}
-    case (sg_addr)
-        {% for key, val in c['lutSinogram'].iteritems() %}
-            {# key #}:
-                sg_val <= {# val #};
-        {% end %}
-    endcase
-    {# set_eat_blanklines(False) #}
+    python_path_update();
+    err = $pyeval(
+        "from pynabp.conf.luts ",
+        "import init_sinogram_defines, sinogram_lookup");
+    err = $pyeval(
+        "init_sinogram_defines(",
+        {# c['image_size'] #}, ",",
+        {# c['projection_line_size'] #}, ",",
+        {# c['angle_step_size'] #}, ",",
+        {# c['kNoOfAngles'] #}, ",",
+        {# c['kDataLength'] #}, ")");
 end
+
+integer sg_val_a;
+always @(sg_addr)
+    {% if 'processing_verify' in c['target'] %}
+    sg_val_a = $pyeval("sinogram_lookup(", sg_addr, ", True)");
+    {% else %}
+    sg_val_a = $pyeval("sinogram_lookup(", sg_addr, ")");
+    {% end %}
+always @(posedge clk)
+    sg_val <= sg_val_a;
 
 endmodule

@@ -76,8 +76,10 @@ class FixedPoint(object):
         """
         >>> FixedPoint(4, 4, True, value='110011101').verilog_repr()
         "9'b110011101"
+        >>> FixedPoint(4, 4, True, value=-1).verilog_repr()
+        "9'b111110000"
         >>> FixedPoint(4, 4, True, value=-6.37).verilog_repr()
-        "9'b110011011"
+        "9'b110011010"
         """
         repr_str = str(self.width()) + '\'b'
         if not value is None:
@@ -111,10 +113,10 @@ class FixedPoint(object):
     def bin_repr_of_value(self, value):
         """
         >>> FixedPoint(4, 4, True).bin_repr_of_value(-6.1875)
-        '110011110'
+        '110011101'
         """
         value *= 2 ** self.fractional_width
-        return dec2bin(int(value + .5), self.width())
+        return dec2bin(int(round(value)), self.width())
 
     def value_of_bin_repr(self, repr_str):
         """
@@ -124,6 +126,8 @@ class FixedPoint(object):
         0.0625
         >>> FixedPoint(4, 4, True).value_of_bin_repr('110011101')
         -6.1875
+        >>> FixedPoint(4, 4, True).value_of_bin_repr('110011010')
+        -6.375
         """
         if self.width() != len(repr_str):
             raise ValueError(
@@ -143,10 +147,10 @@ class FixedPoint(object):
         return self._value
 
     @value.setter
-    def set_value(self, value):
+    def value(self, value):
         """
         >>> FixedPoint(4, 4, True, value=-6.37).value
-        -6.3125
+        -6.375
         """
         if type(value) is float or type(value) is int:
             value = self.value_of_bin_repr(
@@ -164,7 +168,7 @@ class FixedPoint(object):
     def __str__(self):
         """
         >>> FixedPoint(4, 4, True, value=-6.37)
-        <FixedPoint: S(4).(4) = -6.3125>
+        <FixedPoint: S(4).(4) = -6.375>
         """
         return '<FixedPoint: %s = %s>' % (self.type_repr(), str(self.value))
 

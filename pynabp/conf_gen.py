@@ -5,20 +5,16 @@ from pynabp.conf.validate import PreValidatorCollate, PostValidatorCollate
 from pynabp.conf.partition import partition
 from pynabp.conf.utils import import_conf, center, filter_coefs, angle_defines
 from pynabp.conf.luts import shift_lut_defines, map_lut_defines, \
-        sinogram_defines
+        init_sinogram_defines, sinogram_defines
 
 
 # setup path for configuration file
-conf_env_var = 'NABP_CONFIG_PATH'
-conf_default_path = 'default.naconfig'
-
-if conf_env_var in os.environ:
-    path = os.environ[conf_env_var]
-else:
-    path = os.path.abspath(conf_default_path)
+conf_path = 'build/current.naconfig'
+if not os.path.exists(conf_path):
+    conf_path = 'default.naconfig'
 
 # import configuration
-config = import_conf(path)
+config = import_conf(os.path.abspath(conf_path))
 
 # validation
 PreValidatorCollate(config).perform_validations()
@@ -29,10 +25,15 @@ def derive(config):
     dictionary.
     """
     # image size
-    if config['image_size'] is not None:
-        image_size = config['image_size']
-    else:
+    if config['image_size'] is None:
         image_size = int(config['projection_line_size'] / math.sqrt(2))
+    else:
+        image_size = config['image_size']
+    # projection line size
+    if config['projection_line_size'] is None:
+        projection_line_size = int(config['image_size'] * math.sqrt(2))
+    else:
+        projection_line_size = config['projection_line_size']
 
     derived = \
         {
@@ -40,8 +41,9 @@ def derive(config):
             'device': config['device'] if config['device'] else 'simulator',
             # null filling
             'image_size': image_size,
+            'projection_line_size': projection_line_size,
             # centers
-            'projection_line_center': center(config['projection_line_size']),
+            'projection_line_center': center(projection_line_size),
             'image_center': center(image_size),
             # filter
             'fir_coefs':
@@ -61,12 +63,11 @@ def derive(config):
     derived.update(shift_lut_defines(config['kShiftAccuPrecision']))
     derived.update(map_lut_defines(config_n_derived))
 
-    # debug mode configurations
-    if config['debug']:
-        derived.update(sinogram_defines(
-                    config['image_size'], config['projection_line_size'],
+    init_sinogram_defines(
+                    derived['image_size'], derived['projection_line_size'],
                     config['angle_step_size'], derived['kNoOfAngles'],
-                    config['kDataLength']))
+                    config['kDataLength'])
+    derived.update(sinogram_defines())
 
     return derived
 

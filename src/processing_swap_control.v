@@ -51,6 +51,7 @@ module NABPProcessingSwapControl
     // output to RAM
     output wire fr_next_angle,
     output wire fr_prev_angle_release,
+    output wire fr_done,
     output wire signed [`kSLength-1:0] fr0_s_val,
     output wire signed [`kSLength-1:0] fr1_s_val
     {% if c['debug'] %},
@@ -88,30 +89,36 @@ wire mp_accu_init_step_direction;
 assign mp_accu_init_step_direction = (fr_angle < `kAngle90) ?
                                      {# scan_direction.forward #} :
                                      {# scan_direction.reverse #};
-// accumulator value set up
-// V̲a̲l̲u̲e̲ ̲T̲i̲m̲i̲n̲g̲ ̲D̲i̲a̲g̲r̲a̲m̲
+// A̲c̲c̲u̲m̲u̲l̲a̲t̲o̲r̲ ̲U̲p̲d̲a̲t̲e̲ ̲T̲i̲m̲i̲n̲g̲ ̲D̲i̲a̲g̲r̲a̲m̲
 //
 //          clk  ̅ ̅ ̅ ̅ ̅|_____| ̅ ̅ ̅ ̅ ̅|_____| ̅ ̅ ̅ ̅ ̅|_____| ̅ ̅ ̅ ̅ ̅|_____| ̅ ̅ ̅ ̅ ̅|_____
 //
 //        angle _̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅X_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅
 //
-//     lut vals _̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅X_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅
+// mp_accu_part _̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅X_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅
 //
-// mp_accu_init _̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅X_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅
+// mp_accu_init _̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅X_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅X_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅
 //
-//        state  ̲̅r̲̅e̲̅a̲̅d̲̅y̲̅_̲̅s̲̅ ̲̅ ̲̅ ̲̅X ̲̅s̲̅e̲̅t̲̅u̲̅p̲̅_̲̅1̲̅_̲̅s̲̅ ̲̅X ̲̅s̲̅e̲̅t̲̅u̲̅p̲̅_̲̅2̲̅_̲̅s̲̅ ̲̅X ̲̅s̲̅e̲̅t̲̅u̲̅p̲̅_̲̅3̲̅_̲̅s̲̅ ̲̅X ̲̅f̲̅i̲̅l̲̅l̲̅_̲̅s̲̅ ̲̅ ̲̅ ̲̅ ̲̅
+//        state  ̲̅ ̲̅r̲̅e̲̅a̲̅d̲̅y̲̅_̲̅s̲̅ ̲̅ ̲̅X ̲̅s̲̅e̲̅t̲̅u̲̅p̲̅_̲̅1̲̅_̲̅s̲̅ ̲̅X ̲̅s̲̅e̲̅t̲̅u̲̅p̲̅_̲̅2̲̅_̲̅s̲̅ ̲̅X ̲̅s̲̅e̲̅t̲̅u̲̅p̲̅_̲̅3̲̅_̲̅s̲̅ ̲̅X ̲̅ ̲̅f̲̅i̲̅l̲̅l̲̅_̲̅s̲̅ ̲̅ ̲̅ ̲̅
 //
-//   [comments]            ^ angle updated         ^ calculated mp_accu_init
-//                                     ^ mp_accu_part value    ^ safe to shift
+//   [comments]            ^ angle updated         ^ update mp_accu_init
+//                                                   equal to mp_accu_part
+//                                     ^                       ^
+//                                     mp_accu_part value    safe to shift,
+//                                                           calculates next
+//                                                           mp_accu_init
 always @(posedge clk)
 begin:accu_setup
     if (state == setup_2_s || state == angle_setup_2_s)
         // value looked up for the angle only becomes available in the 2nd
         // stage, mp_accu_init will be available in the 3rd stage
+        // mp_accu_init stores the same value as mp_accu_part
         mp_accu_init <= mp_accu_part;
-    else if (swap_ack)
-        // accumulate on swb_next_itr, which is the only swappable that wants
-        // new values
+    else if (swap_ack || state == setup_3_s)
+        // accumulates on swap or setup_3_s
+        // the starting swappable reads current mp_accu_init == mp_accu_part
+        // at the next cycle, updated mp_accu_init will become available for
+        // the next starting swappable
         if (mp_accu_init_step_direction == {# scan_direction.forward #})
             mp_accu_init <= mp_accu_init - mp_accu_base;
         else if (mp_accu_init_step_direction == {# scan_direction.reverse #})
@@ -183,7 +190,12 @@ assign fr_next_angle = // only ask for next angle if has next angle
                          state != diverged_fill_and_shift_s &&
                          // and swb is ready to start with a new line and all
                          // lines are being processed for the current angle
-                         swb_next_itr && !has_next_line_itr));
+                         swa_swap && swb_next_itr && !has_next_line_itr));
+assign fr_done = // finish last part of work for a sinogram, state must be a
+                 // final shift
+                 (state == shift_s) &&
+                 // and shifting is complete
+                 swb_next_itr;
 
 always @(posedge clk)
 begin:transition
@@ -248,9 +260,9 @@ begin:mealy_next_state
             if (swb_next_itr)
                 next_state <= ready_s;
         default:
-            $display(
-                "<NABPProcessingSwapControl> Invalid state encountered: %d",
-                state);
+            if (reset_n)
+                $display(
+                    "<NABPProcessingSwapControl> Invalid state: %d", state);
     endcase
 end
 
@@ -262,7 +274,7 @@ reg [`kAngleLength-1:0] pe_angle;
     wire [`kPartitionSizeLength-1:0] line_cnt_d;
 
     // line_cnt signal delay for debug
-    {# 
+    {#
         include('templates/signal_delay(delay_map).v',
                 delay_map={'line_cnt_d': ('[`kPartitionSizeLength-1:0]', 2)})
     #}
@@ -274,7 +286,7 @@ reg [`kAngleLength-1:0] pe_angle;
 
     // wiring
     assign db_line_itr = (pe_angle < `kAngle90) ?  db_line_cnt :
-                        {# to_l(c['partition_scheme']['size'] - 1) #} - 
+                        {# to_l(c['partition_scheme']['size'] - 1) #} -
                         db_line_cnt;
     assign db_angle = pe_angle;
 {% end %}

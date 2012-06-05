@@ -5,8 +5,11 @@
 
 module NABPProcessingSwappableTest();
 
-{# include('templates/global_signal_generate.v') #}
-{# include('templates/dump_wave.v') #}
+{#
+    include('templates/python_path_update.v')
+    include('templates/global_signal_generate.v')
+    include('templates/dump_wave.v')
+#}
 
 reg [`kAngleLength-1:0] hs_angle;
 wire {# c['tShiftAccuBase'].verilog_decl() #} sw_sh_accu_base;

@@ -1,4 +1,12 @@
-{# from pynabp.conf_gen import config #}
+{#
+    from pynabp.conf_gen import config
+
+    # set a default value for number of clock cycles
+    try:
+        clk_cycle_cnt
+    except:
+        clk_cycle_cnt = None
+#}
 // clock & reset generate
 parameter clk_delay = {# config['clock_period'] #} / 2;
 reg clk, reset;
@@ -23,9 +31,13 @@ integer clk_cnt;
 initial
 begin:clk_limit
     clk_cnt = 0;
-    while (clk_cnt < 400000)
+    {% if clk_cycle_cnt is not None %}
+    while (clk_cnt < {# clk_cycle_cnt #})
+    {% else %}
+    forever
+    {% end %}
     begin
-        @(posedge clk); 
+        @(posedge clk);
         clk_cnt = clk_cnt + 1;
     end
     $finish;

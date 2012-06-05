@@ -13,6 +13,13 @@ class PreRelationValidator(Validator):
 
     SUPPORTED_DEVICES = []
 
+    def validate_image_size_projection_line_size(self, config):
+        if config['image_size'] is None and \
+                config['projection_line_size'] is None:
+            raise RelationValidateError(
+                    'image_size and projection_line_size cannot be both '
+                    'unspecified.')
+
     def validate_device(self, config):
         if config['debug']:
             return
@@ -38,13 +45,14 @@ class PreConstraintsValidator(ConstraintsValidator):
         constraints = {
                     # key,               type,  None,   constraint functions
                     'debug':            (bool,  False,  None),
+                    'target':           (list,  True,   None),
                     'clock_period':     ((float, int),
                                                 False,  positive),
                     'time_precision':   (str,   False,  time_unit),
                     'device':           (str,   True,   None),
                     'projection_line_size':
-                                        (int,   False,  [odd, positive]),
-                    'image_size':       (int,   True,   [odd, positive]),
+                                        (int,   True,   positive),
+                    'image_size':       (int,   True,   positive),
                     'fir_order':        (int,   False,  [even, positive]),
                     'fir_function':     (func,  True,   function_arg_count(1)),
                     'no_of_processing_elements':
@@ -72,7 +80,6 @@ class PostRelationValidator(Validator):
         """Validate partition scheme by trying to partition
 
         It performs checks for partitioning efficiency.
-        Possible FIXME: override config to give a sensible partition scheme?
         """
         try:
             partition.validate(

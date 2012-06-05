@@ -80,9 +80,10 @@ begin:mealy_next_state
             if (sh_shift_done)
                 next_state <= ready_s;
         default:
-            $display(
-                "<NABPProcessingSwappableStateControl> Invalid state: %d",
-                state);
+            if (reset_n)
+                $display(
+                    "<NABPProcessingSwappableStateControl> Invalid state: %d",
+                    state);
     endcase
 end
 

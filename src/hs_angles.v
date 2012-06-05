@@ -18,17 +18,27 @@ module hs_angles
 
 parameter [`kAngleLength-1:0] hs_angle_step = `kAngleStep;
 
+reg initialised;
 assign hs_has_next_angle = (hs_angle < ({# to_a(180) #} - hs_angle_step));
 assign hs_next_angle_ack = hs_has_next_angle && hs_next_angle;
 
 always @(posedge clk)
 begin:hs_angle_iterate
     if (!reset_n)
+    begin
         hs_angle <= {# to_a(0) #};
+        initialised <= 0;
+    end
     else
     begin
         if (hs_next_angle && hs_has_next_angle)
-            hs_angle <= hs_angle + hs_angle_step;
+        begin
+            if (!initialised)
+                // do not accumulate first for angle 0
+                initialised <= 1;
+            else
+                hs_angle <= hs_angle + hs_angle_step;
+        end
     end
 end
 

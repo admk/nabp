@@ -6,6 +6,7 @@
 module NABPFilteredRAMTest();
 
 {#
+    include('templates/python_path_update.v')
     include('templates/global_signal_generate.v')
     include('templates/dump_wave.v')
     include('templates/data_test_vals.v')

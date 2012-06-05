@@ -5,7 +5,7 @@
 // Outputs available in 2 cycles
 // TODO reduce look-up table size by using symmetry
 
-{# 
+{#
     from pynabp.enums import mapper_states
     from pynabp.utils import xfrange
 

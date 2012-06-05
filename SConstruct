@@ -1,7 +1,16 @@
 import os
-os.environ['NABP_CONFIG_PATH'] = os.path.abspath('default.naconfig')
+import shutil
+
+AddOption(
+        '--naconfig',
+        dest='naconfig',
+        type='string',
+        action='store',
+        default='default.naconfig',
+        help='configuration file location')
 
 env = Environment()
+shutil.copyfile(GetOption('naconfig'), 'build/current.naconfig')
 
 SOURCE_DIR = 'src'
 Export('SOURCE_DIR')

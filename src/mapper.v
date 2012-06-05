@@ -69,6 +69,9 @@ begin:mealy_next_state
         mapping_s:
             if (sh_done)
                 next_state <= ready_s;
+        default:
+            if (reset_n)
+                $display("<NABPMapper> Invalid state: %d", state);
     endcase
 end
 

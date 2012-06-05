@@ -6,8 +6,8 @@
 {#
     from pynabp.enums import sinogram_addresser_states
     def to_sg_addr(val):
-        return dec_repr(
-                val, c['kNoOfAngles'] * c['projection_line_size'] - 1)
+        return dec_repr(val,
+                bin_width(c['kNoOfAngles'] * c['projection_line_size'] - 1))
 #}
 
 module NABPSinogramAddresser
@@ -61,6 +61,9 @@ begin:mealy_next_state
         work_s:
             if (hs_done)
                 next_state <= ready_s;
+        default:
+            if (reset_n)
+                $display("<NABPSinogramAddresser> Invalid state: %d", state);
     endcase
 end
 
@@ -70,26 +73,33 @@ assign fr_next_angle_ack = (state == work_s) &&
 
 reg [`kSinogramAddressLength-1:0] sg_base_addr;
 assign sg_addr = sg_base_addr + fr_s_val;
-reg [`kAngleLength-1:0] fr_angle_l;
+reg initialised;
 
 always @(posedge clk)
 begin:fr_angle_iterate
     if (!reset_n || state == ready_s)
     begin
+        initialised <= 0;
         fr_angle <= {# to_a(0) #};
-        fr_angle_l <= {# to_a(0) #};
         sg_base_addr <= {# to_sg_addr(0) #};
     end
     else if (fr_next_angle && fr_has_next_angle)
     begin
-        fr_angle <= fr_angle_l;
-        fr_angle_l <= fr_angle_l + hs_angle_step;
-        sg_base_addr <= sg_base_addr +
-                {# to_sg_addr(c['projection_line_size']) #};
-        {% if c['debug'] %}
-            $display("angle: %d", fr_angle);
-        {% end %}
+        if (!initialised)
+            // do not accumulate first for angle 0
+            initialised <= 1;
+        else
+        begin
+            fr_angle <= fr_angle + hs_angle_step;
+            sg_base_addr <= sg_base_addr +
+                    {# to_sg_addr(c['projection_line_size']) #};
+        end
     end
 end
+
+{% if c['debug'] %}
+always @(fr_angle)
+    $display("angle: %d", fr_angle);
+{% end %}
 
 endmodule

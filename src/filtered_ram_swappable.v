@@ -66,10 +66,14 @@ wire delay_done;
 assign hs_fill_done = (next_state == ready_s);
 assign hs_s_val = read_itr;
 assign write_enable = (state == fill_s);
-assign delay_done = (read_itr == {# to_s(c['fir_order'] / 2 - 1) #});
+// One cycle delay and one cycle advance, one because of synchronous read one
+// cycle delay never taken into account, the other one because of something I
+// can no longer recall (probably filter requires only
+// fir_order / 2 - 1 registers).
+assign delay_done = (read_itr == {# to_s(c['fir_order'] / 2) #});
 
 // mealy next state
-always @(state or hs_fill_kick or delay_done or write_itr)
+always @(*)
 begin:mealy_next_state
     next_state <= state;
     case (state) // synopsys parallel_case full_case
@@ -82,6 +86,9 @@ begin:mealy_next_state
         fill_s:
             if (write_itr == {# to_s(p_line_size - 1) #})
                 next_state <= ready_s;
+        default:
+            if (reset_n)
+                $display("<NABPFilterdRAMSwappable> Invalid state: %d", state);
     endcase
 end
 

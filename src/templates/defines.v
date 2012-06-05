@@ -14,6 +14,9 @@
         return dec_repr(val, bin_width(c['image_size']))
     def to_v(val):
         return dec_repr(val, c['kFilteredDataLength'])
+    def to_p(val):
+        return dec_repr(val,
+                bin_width(c['partition_scheme']['no_of_partitions']))
 
     __angle_defines = { k: v for k, v in c.iteritems() if 'kAngle' in k }
 #}
@@ -34,12 +37,14 @@
 `define kPartitionSizeLength {#
             bin_width(c['partition_scheme']['size']) #}
 
-`define kDelayLength {# c['fir_order'] / 2 #}
+`define kFIRDelayLength {# c['fir_order'] / 2 #}
 
 `define kProjectionLineSize {# c['projection_line_size'] #}
 `define kSLength {# bin_width(c['projection_line_size']) #}
 
 `define kImageSizeLength {# bin_width(c['image_size']) #}
+`define kImageNoOfPixels {# c['image_size'] ** 2 #}
+`define kImageAddressLength {# bin_width(c['image_size'] ** 2) #}
 
 `define kNoOfAngles {# c['kNoOfAngles'] #}
 `define kNoOfAnglesLength {# bin_width(c['kNoOfAngles']) #}

@@ -5,7 +5,7 @@
 // assign signal_0_l = < your expression here >;
 // and the output signal_0 will be the delayed version, with the number of
 // cycles specified in delay_map.
-{# 
+{#
     def var_name(base, delay):
         return base + '_' + str(delay)
 #}

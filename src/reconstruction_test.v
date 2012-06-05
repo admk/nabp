@@ -1,9 +1,10 @@
 {# include('templates/defines.v') #}
-// NABPTest
+// NABPReconstructionTest
 //     7 Mar 2012
-// This test bench tests the functionality of the top level NABP module
+// This test bench tests the reconstructed image output of the processing
+// elements with processing swap control providing values.
 
-module NABPTest();
+module NABPReconstructionTest();
 
 {#
     include('templates/python_path_update.v')
@@ -15,32 +16,32 @@ module NABPTest();
         raise RuntimeError('Must be in debug mode to perform this test.')
 #}
 
-reg sg_kick;
-wire sg_done, ir_kick, ir_done, ir_enable;
+reg kick;
+wire done;
+
+// control signals
+initial
+begin:kick_handler
+    @(posedge reset_n);
+    kick = 0;
+    @(posedge clk);
+    kick = 1;
+    @(posedge clk);
+    kick = 0;
+end
 
 {% if 'reconstruction_test' in c['target'] %}
 {# include('templates/image_dump(image_name).v', image_name='pe_dump') #}
 initial
     image_dump_init();
 always @(posedge clk)
-    if (sg_done)
+    if (done)
         image_dump_finish();
 {% end %}
 
-// control signals
-initial
-begin:kick_handler
-    @(posedge reset_n);
-    sg_kick = 0;
-    @(posedge clk);
-    sg_kick = 1;
-    @(posedge clk);
-    sg_kick = 0;
-end
-
 always @(posedge clk)
 begin:done_handler
-    if (ir_done)
+    if (done)
     begin
         @(posedge clk);
         @(posedge clk);
@@ -50,9 +51,6 @@ end
 
 wire [`kDataLength-1:0] sg_val;
 wire [`kSinogramAddressLength-1:0] sg_addr;
-wire ir_addr_valid;
-wire [`kImageAddressLength-1:0] ir_addr;
-wire [`kCacheDataLength-1:0] ir_val;
 
 // unit under test
 NABP nabp_uut
@@ -61,21 +59,21 @@ NABP nabp_uut
     .clk(clk),
     .reset_n(reset_n),
     // inputs from host
-    .sg_kick(sg_kick),
+    .sg_kick(kick),
     // inputs from sinogram
     .sg_val(sg_val),
     // inputs from image RAM
-    .ir_enable(ir_enable),
+    .ir_enable(0),
     // outputs to host
-    .sg_done(sg_done),
+    .sg_done(done),
     // outputs to sinogram
     .sg_addr(sg_addr),
     // outputs to image RAM
-    .ir_kick(ir_kick),
-    .ir_done(ir_done),
-    .ir_addr_valid(ir_addr_valid),
-    .ir_addr(ir_addr),
-    .ir_val(ir_val)
+    .ir_kick(),
+    .ir_done(),
+    .ir_addr_valid(),
+    .ir_addr(),
+    .ir_val()
 );
 
 // sinogram RAM
@@ -88,22 +86,6 @@ NABPSinogramDataLUT sinogram_lut
     .sg_addr(sg_addr),
     // outputs to nabp
     .sg_val(sg_val)
-);
-
-// image RAM
-NABPImageRAM image_ram
-(
-    // global signals
-    .clk(clk),
-    .reset_n(reset_n),
-    // inputs from image addresser
-    .ir_kick(ir_kick),
-    .ir_done(ir_done),
-    .ir_addr_valid(ir_addr_valid),
-    .ir_addr(ir_addr),
-    .ir_val(ir_val),
-    // output to image addresser & processing elements
-    .ir_enable(ir_enable)
 );
 
 endmodule
