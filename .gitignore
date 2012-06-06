@@ -20,3 +20,10 @@ build
 # MATLAB autosave files
 *.asv
 *.m~
+
+# quartus project folders & files
+db/
+*_tmp/
+*.rpt
+*.smsg
+*.summary
