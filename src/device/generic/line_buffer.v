@@ -37,7 +37,7 @@ generate
         assign taps_tp[pDataLength*(i+1)-1:pDataLength*i] = gen_taps[i];
         shift_register
         #(
-            .pDelayLength(pTapsWidth),
+            .pDelay(pTapsWidth),
             .pPtrLength(pPtrLength),
             .pDataLength(pDataLength)
         )

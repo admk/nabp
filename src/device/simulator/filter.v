@@ -17,7 +17,13 @@ assign filter_val_in = val_in;
 
 // shift register to model filtering
 // this is simply no filtering but a group delay
-shift_register fake_filter
+shift_register
+#(
+    .pDelay(`kFIRDelay),
+    .pPtrLength(`kFIRDelayLength),
+    .pDataLength(`kFilteredDataLength)
+)
+fake_filter
 (
     .clk(clk),
     .enable(enable),
