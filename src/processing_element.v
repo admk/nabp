@@ -171,7 +171,7 @@ assign work_overwrite_done = (sw_scan_mode == {# scan_mode.x #}) ?
                              work_overwrite_0_done : work_overwrite_1_done;
 always @(posedge clk)
 begin:work_overwrite_done_update
-    if (state == ready_s)
+    if (!reset_n || state == domino_finish_s)
     begin
         work_overwrite_0_done <= 0;
         work_overwrite_1_done <= 0;
