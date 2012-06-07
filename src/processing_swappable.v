@@ -113,7 +113,6 @@ line_buffer
 pe_line_buff
 (
     .clk(clk),
-    .clear(sh_lb_clear),
     .enable(sh_lb_shift_en),
     .shift_in(fr_val),
     .taps(pe_taps)

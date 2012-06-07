@@ -6,7 +6,6 @@ module NABPFilter
     input wire clk,
     // filter control
     input wire enable,
-    input wire clear,
     // filter data
     input wire [`kDataLength-1:0] val_in,
     output wire [`kFilteredDataLength-1:0] val_out
@@ -22,7 +21,6 @@ shift_register fake_filter
 (
     .clk(clk),
     .enable(enable),
-    .clear(clear),
     .val_in(filter_val_in),
     .val_out(val_out)
 );

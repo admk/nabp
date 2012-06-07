@@ -75,7 +75,6 @@ NABPFilter filter
 (
     .clk(clk),
     .enable(1'd1),
-    .clear(fr_sa_next_angle),
     .val_in(sg_val),
     .val_out(fl_fr_val)
 );
