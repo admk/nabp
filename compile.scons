@@ -3,7 +3,7 @@ import os
 Import('env derived_sources translate_filter_processes')
 
 # builders
-if env['PLATFORM'] == 'posix':
+if 'NABP_USE_MODELSIM' in env:
     vlib_path = os.path.join(Dir('.').abspath, 'work')
     os.system('vlib ' + vlib_path)
     os.system('vmap work ' + vlib_path)
