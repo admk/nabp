@@ -25,7 +25,7 @@ fir_core filter
     // filter control input
     .enable(enable),
     // filter inputs
-    .ast_sink_data(val_in),
+    .ast_sink_data(filter_val_in),
     .ast_sink_valid(1'b1),
     .ast_source_ready(1'b1),
     .ast_sink_error(2'b00),
