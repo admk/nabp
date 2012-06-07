@@ -362,6 +362,7 @@ always @(posedge clk)
         im_y = (sw_scan_mode == {# scan_mode.x #}) ? line_pos : scan_pos;
         dump_val = lb_val;
 
+        {% if c['debug'] %}
         {% if 'processing_verify' in c['target'] %}
             expected_lb_val = expected_s_val(pe_angle, im_x, im_y);
             {% if 'processing_addressing_verify' in c['target'] %}
@@ -372,6 +373,7 @@ always @(posedge clk)
         {% end %}
         {% if 'reconstruction_test' in c['target'] %}
             image_dump_pixel(im_x, im_y, dump_val);
+        {% end %}
         {% end %}
     end
 {% end %}
