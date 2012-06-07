@@ -29,13 +29,10 @@ assign taps = {taps_tp, tap_b1};
 
 altshift_taps
 #(
-    .intended_device_family("{# c['device'] #}"),
-    .number_of_taps(pNoTaps-1),
-    .power_up_state("CLEARED"),
-    .taps_distance(pTapsWidth),
-    .width(pDataLength),
-    .lpm_type("altshift_taps"),
-    .lpm_hint("unused")
+    .NUMBER_OF_TAPS(pNoTaps-1),
+    .POWER_UP_STATE("DONT_CARE"),
+    .TAP_DISTANCE(pTapsWidth),
+    .WIDTH(pDataLength)
 )
 pe_line_buff
 (
