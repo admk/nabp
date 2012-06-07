@@ -31,3 +31,4 @@ simulation/
 *.summary
 *.pin
 *.done
+*.log
