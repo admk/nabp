@@ -99,7 +99,6 @@ NABPDualPortRAM dual_port_ram
 (
     // globals
     .clk(clk),
-    .clear(0), // no need to clear, always overwritten
     // write enables
     .we_0(write_enable),
     .we_1(1'b0),

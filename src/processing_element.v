@@ -62,6 +62,25 @@
 // Address packing for the two scan modes won't have any effect, since -
 //     $\log_2{2il}=\log_2{il}+1$,
 // where $i$ is the image size, and $l$ is the line iteration
+//
+// C̲o̲m̲m̲e̲n̲t̲s̲ ̲o̲n̲ ̲s̲t̲a̲t̲e̲s̲ ̲s̲p̲a̲c̲e̲
+// Explanation of each states
+// ================ ===========================================================
+// State            Description
+// ================ ===========================================================
+// ready_s          The entry state, waits for signals to start.
+// ---------------- -----------------------------------------------------------
+// work_s           Instead of overwriting in scans, update entries with values 
+//                  read from the RAM.
+// ---------------- -----------------------------------------------------------
+// work_wait_s      Waits a few cycles between scans.
+// ---------------- -----------------------------------------------------------
+// domino_start_s   Setup for domino data out.
+// ---------------- -----------------------------------------------------------
+// domino_{0,1}_s   Domino output, where 0 or 1 selects the RAM sections.
+// ---------------- -----------------------------------------------------------
+// domino_finish_s  One last domino output.
+// ================ ===========================================================
 {#
     from pynabp.enums import scan_mode, scan_direction, \
             processing_element_states
@@ -115,7 +134,8 @@ parameter [`kImageSizeLength-1:0] pe_tap_offset = 'bz;
 wire [`kAddressLength-1:0] addr;
 reg [`kAddressLength-2:0] base_addr;
 reg [`kImageSizeLength-1:0] scan_cnt;
-wire done, scan_done, scan_domino_done, scan_domino_mode;
+reg done_d, work_overwrite_0_done, work_overwrite_1_done;
+wire done, scan_done, scan_domino_done, scan_domino_mode, work_overwrite_done;
 
 assign scan_domino_mode = (state == domino_start_s || state == domino_0_s) ?
                           0 : 1;
@@ -146,6 +166,28 @@ assign pe_domino_done = // all domino operations are complete
 assign pe_out_val = (state == domino_0_s ||
                      state == domino_1_s ||
                      state == domino_finish_s) ? read_val : pe_in_val_d;
+
+assign work_overwrite_done = (sw_scan_mode == {# scan_mode.x #}) ?
+                             work_overwrite_0_done : work_overwrite_1_done;
+always @(posedge clk)
+begin:work_overwrite_done_update
+    // delay one cycle, still has one pixel to write after work_s
+    done_d <= done;
+
+    if (!reset_n || state == domino_finish_s)
+    begin
+        work_overwrite_0_done <= 0;
+        work_overwrite_1_done <= 0;
+    end
+    else if (done_d)
+    begin
+        if (sw_scan_mode == {# scan_mode.x #})
+            work_overwrite_0_done <= 1;
+        else
+            work_overwrite_1_done <= 1;
+    end
+end
+
 reg [`kCacheDataLength-1:0] pe_in_val_d;
 always @(posedge clk)
     if (ir_domino_enable)
@@ -222,7 +264,7 @@ reg [`kAddressLength-1:0] write_addr;
 wire [`kCacheDataLength-1:0] write_val;
 wire [`kCacheDataLength-1:0] read_val;
 
-assign write_val = read_val + lb_val;
+assign write_val = work_overwrite_done ? (read_val + lb_val) : lb_val;
 always @(posedge clk)
 begin:write_back_sync
     write_en <= (state == work_s);
@@ -280,7 +322,6 @@ NABPDualPortRAM
 pe_cache
 (
     .clk(clk),
-    .clear(!reset_n), // TODO clear after domino complete
     // port 0 for writing
     .we_0(write_en),
     .addr_0(write_addr),
