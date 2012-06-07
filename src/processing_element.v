@@ -134,7 +134,7 @@ parameter [`kImageSizeLength-1:0] pe_tap_offset = 'bz;
 wire [`kAddressLength-1:0] addr;
 reg [`kAddressLength-2:0] base_addr;
 reg [`kImageSizeLength-1:0] scan_cnt;
-reg work_overwrite_0_done, work_overwrite_1_done;
+reg done_d, work_overwrite_0_done, work_overwrite_1_done;
 wire done, scan_done, scan_domino_done, scan_domino_mode, work_overwrite_done;
 
 assign scan_domino_mode = (state == domino_start_s || state == domino_0_s) ?
@@ -171,12 +171,15 @@ assign work_overwrite_done = (sw_scan_mode == {# scan_mode.x #}) ?
                              work_overwrite_0_done : work_overwrite_1_done;
 always @(posedge clk)
 begin:work_overwrite_done_update
+    // delay one cycle, still has one pixel to write after work_s
+    done_d <= done;
+
     if (!reset_n || state == domino_finish_s)
     begin
         work_overwrite_0_done <= 0;
         work_overwrite_1_done <= 0;
     end
-    else if (state == work_s && done)
+    else if (done_d)
     begin
         if (sw_scan_mode == {# scan_mode.x #})
             work_overwrite_0_done <= 1;
