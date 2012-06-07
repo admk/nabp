@@ -41,9 +41,9 @@ initial
         ram[i] <= 'dx;
 {% end %}
 
+{% for i in range(2) %}
 always @(posedge clk)
-begin:ram_update
-    {% for i in range(2) %}
+begin:port_{#i#}_update
     if (we_{#i#})
     begin
         ram[addr_{#i#}] <= data_in_{#i#};
@@ -51,7 +51,7 @@ begin:ram_update
     end
     else
         data_out_{#i#} <= ram[addr_{#i#}];
-    {% end %}
 end
+{% end %}
 
 endmodule
