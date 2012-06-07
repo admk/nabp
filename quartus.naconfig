@@ -18,11 +18,7 @@ config = \
         # A valid list of strings, each string represents a valid functionality
         # test. FIXME currently these test goals are buried deep within the
         # project, need to find a way to explicitly outline these.
-        'target': [
-                'domino_test',
-                'reconstruction_test',
-                # 'processing_verify',
-                ],
+        'target': [],
 
         # Simulation clock period.
         # The clock period used for simulation, in nanoseconds.
@@ -59,7 +55,7 @@ config = \
         # projection_line_size / sqrt(2)
         # Constraints:
         #   Value must be a positive integer
-        'image_size': 127,
+        'image_size': 512,
 
         # Filter order.
         # Constraints:
@@ -83,7 +79,7 @@ config = \
         #   value should also be sensible enough to ensure no processing
         #   elements are doing work for wasted pixels only (validator will
         #   check for this).
-        'no_of_processing_elements': 2,
+        'no_of_processing_elements': 100,
 
         # The angle step size.
         # This determines the difference of angle values between two projection
@@ -102,13 +98,13 @@ config = \
         # data point.
         # Constraints:
         #   Positive integers.
-        'kDataLength': 10,
+        'kDataLength': 8,
 
         # The decimal places (in binary) of data after filtering appended.
         # TODO actually make use of this precision.
         # Constraints:
         #   Natural integers.
-        'kFilteredDataPrecision': 3,
+        'kFilteredDataPrecision': 0,
 
         # The decimal places (in binary) of the angles' representation
         # precision.

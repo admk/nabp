@@ -37,7 +37,7 @@
 
 
 set_global_assignment -name FAMILY "Stratix IV"
-set_global_assignment -name DEVICE AUTO
+set_global_assignment -name DEVICE EP4SGX530NF45I4
 set_global_assignment -name TOP_LEVEL_ENTITY NABP
 set_global_assignment -name ORIGINAL_QUARTUS_VERSION 11.1
 set_global_assignment -name PROJECT_CREATION_TIME_DATE "18:00:39  JUNE 05, 2012"
@@ -91,4 +91,8 @@ set_global_assignment -name VERILOG_FILE ../derived_src/device/stratix_iv/line_b
 set_global_assignment -name VERILOG_SHOW_LMF_MAPPING_MESSAGES OFF
 set_global_assignment -name TIMEQUEST_MULTICORNER_ANALYSIS ON
 set_global_assignment -name TIMEQUEST_DO_CCPP_REMOVAL ON
+set_global_assignment -name MIN_CORE_JUNCTION_TEMP "-40"
+set_global_assignment -name MAX_CORE_JUNCTION_TEMP 100
+set_global_assignment -name POWER_PRESET_COOLING_SOLUTION "23 MM HEAT SINK WITH 200 LFPM AIRFLOW"
+set_global_assignment -name POWER_BOARD_THERMAL_MODEL "NONE (CONSERVATIVE)"
 set_instance_assignment -name PARTITION_HIERARCHY root_partition -to | -section_id Top
