@@ -1,13 +1,12 @@
 {# include('templates/defines.v') #}
 // NABPDualPortRAM
 //     5 Feb 2012
-// A simple dual port RAM. Preferably use it for simulation only, as Altera
-// tools could give a less efficient RAM with extra logic around the RAM.
+// A simple dual port RAM. Preferably use it for simulation only, and use
+// megafuction instead for real devices.
 
 module NABPDualPortRAM
 (
     clk,
-    clear,
     {% for i in range(2) %}
         we_{#i#},
         addr_{#i#},
@@ -22,7 +21,7 @@ parameter pRAMSize = `kProjectionLineSize;
 parameter pAddrLength = `kSLength; // log2(pRAMSize)
 
 // global signals
-input wire clk, clear;
+input wire clk;
 {% for i in range(2) %}
 // inputs for port {#i#}
 input wire we_{#i#};
@@ -35,15 +34,9 @@ output reg [pDataLength-1:0] data_out_{#i#};
 reg [pDataLength-1:0] ram[pRAMSize-1:0];
 
 integer i;
-{% for i in range(2) %}
 always @(posedge clk)
-begin:port_{#i#}_read_write
-    if (clear)
-    begin
-        ram[addr_{#i#}] <= {pDataLength{1'd0}};
-        for(i = 0; i < pRAMSize; i = i + 1)
-            ram[i] <= {pDataLength{1'd0}};
-    end
+begin:ram_update
+    {% for i in range(2) %}
     if (we_{#i#})
     begin
         ram[addr_{#i#}] <= data_in_{#i#};
@@ -51,7 +44,7 @@ begin:port_{#i#}_read_write
     end
     else
         data_out_{#i#} <= ram[addr_{#i#}];
+    {% end %}
 end
-{% end %}
 
 endmodule
