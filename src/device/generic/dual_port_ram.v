@@ -33,7 +33,14 @@ output reg [pDataLength-1:0] data_out_{#i#};
 
 reg [pDataLength-1:0] ram[pRAMSize-1:0];
 
+{% if c['debug'] %}
+// initialise RAM content to x
 integer i;
+initial
+    for (i = 0; i < pRAMSize; i = i + 1)
+        ram[i] <= 'dx;
+{% end %}
+
 always @(posedge clk)
 begin:ram_update
     {% for i in range(2) %}
