@@ -45,7 +45,7 @@ config = \
         # Constraints:
         #   A string specifying a valid device. The device string must be valid
         #   for release builds.
-        'device': None,
+        'device': 'simulator' if debug else 'stratix_iv',
 
         # How wide the projection line is.
         # If not specified, then it defaults to the nearest integer value of

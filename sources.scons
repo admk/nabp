@@ -46,6 +46,7 @@ device_specific = Split("""
         dual_port_ram.v
         filter.v
         image_ram.v
+        sinogram_data_lut.v
         """)
 
 # targets
@@ -89,6 +90,10 @@ sources = {
                 image_ram.v
                 nabp_test.v
                 """),
+        'nabp':
+            ingredients['filtered_ram'] +
+            ingredients['processing'] +
+            ingredients['nabp']
     }
 
 Import('SOURCE_DIR')

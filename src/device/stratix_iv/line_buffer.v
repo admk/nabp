@@ -5,7 +5,7 @@
 
 module line_buffer
 (
-    clk, clear, enable,
+    clk, reset_n, enable,
     shift_in, taps
 );
 
@@ -14,16 +14,12 @@ parameter pTapsWidth = `kPartitionSize;
 parameter pPtrLength = 0; // dummy parameter to mute compilation error
 parameter pDataLength = `kFilteredDataLength;
 
-input wire clk, clear, enable;
+input wire clk, reset_n, enable;
 input wire [pDataLength-1:0] shift_in;
 output wire [pDataLength*pNoTaps-1:0] taps;
 
-reg clear_r;
 reg signed [`kFilteredDataLength-1:0] tap_b1;
 wire [pDataLength*(pNoTaps-1)-1:0] taps_tp;
-
-always @(posedge clk)
-    clear_r <= clear;
 
 always @(posedge clk)
     if (enable)
@@ -43,7 +39,6 @@ altshift_taps
 )
 pe_line_buff
 (
-    .aclr(clear_r),
     .clken(enable),
     .clock(clk),
     .shiftin(tap_b1),

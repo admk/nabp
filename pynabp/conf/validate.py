@@ -11,7 +11,7 @@ class RelationValidateError(ValidateError):
 class PreRelationValidator(Validator):
     """Validate config relations"""
 
-    SUPPORTED_DEVICES = []
+    SUPPORTED_DEVICES = ['stratix_iv', ]
 
     def validate_image_size_projection_line_size(self, config):
         if config['image_size'] is None and \

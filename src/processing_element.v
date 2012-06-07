@@ -336,14 +336,13 @@ pe_cache
 
 {#
     pe_verify = False
-
-    if 'processing_verify' in c['target']:
-        pe_verify = True
-        include('templates/processing_verify.v')
-
-    if 'reconstruction_test' in c['target']:
-        pe_verify = True
-        include('templates/image_dump(image_name).v', image_name='pe_dump')
+    if c['debug']:
+        if 'processing_verify' in c['target']:
+            pe_verify = True
+            include('templates/processing_verify.v')
+        if 'reconstruction_test' in c['target']:
+            pe_verify = True
+            include('templates/image_dump(image_name).v', image_name='pe_dump')
 #}
 {% if pe_verify %}
 integer err, im_x, im_y, scan_pos, line_pos, expected_lb_val;
