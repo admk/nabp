@@ -52,7 +52,8 @@ def derive(config):
             'partition_scheme':
                     partition(image_size, config['no_of_processing_elements']),
             'kFilteredDataLength':
-                    config['kDataLength'] + config['kFilteredDataPrecision'],
+                    1 + config['kDataLength'] + \
+                            config['kFilteredDataPrecision'],
         }
 
     config_n_derived = dict(config)
