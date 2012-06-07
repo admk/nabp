@@ -5,7 +5,7 @@
 
 module line_buffer
 (
-    clk, enable,
+    clk, reset_n, enable,
     shift_in, taps
 );
 
@@ -15,7 +15,7 @@ parameter pPtrLength = {# bin_width(c['partition_scheme']['size']) #};
 
 parameter pDataLength = `kFilteredDataLength;
 
-input wire clk, enable;
+input wire clk, reset_n, enable;
 input wire [pDataLength-1:0] shift_in;
 output wire [pDataLength*pNoTaps-1:0] taps;
 
@@ -44,6 +44,7 @@ generate
         tap_sr
         (
             .clk(clk),
+            .reset_n(reset_n),
             .enable(enable),
             .val_in((i == 0) ? tap_b1 : gen_taps[i-1]),
             .val_out(gen_taps[i])

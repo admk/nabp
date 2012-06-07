@@ -4,6 +4,7 @@ module NABPFilter
 (
     // global signals
     input wire clk,
+    input wire reset_n,
     // filter control
     input wire enable,
     // filter data
@@ -26,6 +27,7 @@ shift_register
 fake_filter
 (
     .clk(clk),
+    .reset_n(reset_n),
     .enable(enable),
     .val_in(filter_val_in),
     .val_out(val_out)
