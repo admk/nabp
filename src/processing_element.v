@@ -378,7 +378,7 @@ always @(posedge clk)
     end
 {% end %}
 
-{% if 'domino_test' in c['target'] %}
+{% if c['debug'] and 'domino_test' in c['target'] %}
 always @(state)
     if (state == domino_start_s)
         $display("domino: %d", pe_id);
