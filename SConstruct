@@ -9,7 +9,7 @@ AddOption(
         default='default.naconfig',
         help='configuration file location')
 
-confg = GetOption('naconfig')
+config = GetOption('naconfig')
 if not config.endswith('.naconfig'):
     config += '.naconfig'
 
