@@ -66,7 +66,7 @@ def derive(config):
 
     init_sinogram_defines(
                     derived['image_size'], derived['projection_line_size'],
-                    config['angle_step_size'], derived['kNoOfAngles'],
+                    derived['angle_step_size'], derived['kNoOfAngles'],
                     config['kDataLength'])
     derived.update(sinogram_defines())
 

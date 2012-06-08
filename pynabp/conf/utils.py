@@ -37,6 +37,7 @@ def angle_defines(precision, angle_step_size):
     angle_step = fixed.verilog_repr(angle_step_size)
 
     defines = {
+            'angle_step_size': angle_step_size,
             'tAngle': fixed,
             'kAngleStep': angle_step,
             'kNoOfAngles': int(180.0 / angle_step_size),

@@ -156,7 +156,7 @@ def init_sinogram_defines(
     parameters = (str(val) for val in
                 (image_size, projection_line_size, angle_step_size,
                  no_of_angles, data_length))
-    file_name += '_'.join(parameters)
+    file_name += '_'.join(parameters) + '.pcl'
 
     # try to load from cache
     try:
