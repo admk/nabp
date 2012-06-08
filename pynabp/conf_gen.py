@@ -3,7 +3,8 @@ import math
 
 from pynabp.conf.validate import PreValidatorCollate, PostValidatorCollate
 from pynabp.conf.partition import partition
-from pynabp.conf.utils import import_conf, center, filter_coefs, angle_defines
+from pynabp.conf.utils import import_conf, recursive_update_dict, \
+        center, filter_coefs, angle_defines
 from pynabp.conf.luts import shift_lut_defines, map_lut_defines, \
         init_sinogram_defines, sinogram_defines
 
@@ -77,3 +78,9 @@ def derive(config):
 config.update(derive(config))
 
 PostValidatorCollate(config).perform_validations()
+
+# update config with forced values of parameters
+if config['force'] is not None:
+    force = dict(config['force'])
+    del config['force']
+    config = recursive_update_dict(config, force)

@@ -138,6 +138,17 @@ config = \
         #   Positive integers.
         #   Less than or equal to kMapAccuPrecision
         'kMapAccuPartPrecision': 8,
+
+        # Force assignment of values of parameters.
+        # The forced parameters will be used to override the parameters after
+        # configuration validation and generation. Using this is unsafe, and
+        # does not guarantee correct simulation behaviour. This should only be
+        # allowed to bypass some sanity checks to obtain accurate synthesis
+        # results.
+        # The corresponding values will be updated recursively.
+        # Constraints:
+        #   None value or a dictionary.
+        'force': None,
     }
 
 # vim: ft=python:

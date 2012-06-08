@@ -69,6 +69,7 @@ class PreConstraintsValidator(ConstraintsValidator):
                                         (int,   False,  positive),
                     'kMapAccuPartPrecision':
                                         (int,   False,  positive),
+                    'force':            (dict,  True,   None),
                 }
         self.add_constraints(constraints)
 

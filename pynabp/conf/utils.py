@@ -16,7 +16,18 @@ def import_conf(path):
 def export_conf(path, conf):
     """Export a configuration dictionary to path"""
     with open(path, 'w') as f:
-        f.write(repr(conf))
+        f.write('config = \\\n' + repr(conf))
+
+
+def recursive_update_dict(original_dict, update_dict):
+    """Update a dictionary recursively"""
+    new_dict = dict(original_dict)
+    for k, v in update_dict.iteritems():
+        if type(v) is dict:
+            new_dict[k] = recursive_update_dict(original_dict[k], v)
+        else:
+            new_dict[k] = v
+    return new_dict
 
 
 def center(val):
