@@ -1,4 +1,5 @@
 import math
+import pickle
 import numpy
 from itertools import chain
 
@@ -148,24 +149,43 @@ def init_sinogram_defines(
         image_size, projection_line_size, angle_step_size, no_of_angles,
         data_length):
     """Initialise sinogram LUT and definitions"""
-    # create a phantom image
-    ph = phantom(image_size)
 
-    # produce projections by radon transform (skimage.transform.radon
-    # resize radon transformed sinogram to projection line size, i.e. multiply
-    # by sqrt(2))
-    sg_ram = radon(ph, numpy.arange(0, 180, angle_step_size))
+    global _projection_line_size, _lutSinogram, _tSinogram, _tSinogramBase
 
-    # auto determine the data value representation
-    int_width = bin_width_of_dec(numpy.max(sg_ram))
-    frac_width = data_length - int_width
-    sg_fixed_point = FixedPoint(int_width, frac_width, False)
+    file_name = 'build/cached_sinogram_defines_'
+    parameters = (str(val) for val in
+                (image_size, projection_line_size, angle_step_size,
+                 no_of_angles, data_length))
+    file_name += '_'.join(parameters)
 
-    global _lutSinogram, _tSinogram, _tSinogramBase, _projection_line_size
-    _projection_line_size = projection_line_size
-    _lutSinogram = sg_ram
-    _tSinogram = sg_fixed_point
-    _tSinogramBase = 2 ** _tSinogram.fractional_width
+    # try to load from cache
+    try:
+        with open(file_name) as f:
+            _projection_line_size, _lutSinogram, _tSinogram, _tSinogramBase = \
+                    pickle.load(f)
+    except IOError:
+        # create a phantom image
+        ph = phantom(image_size)
+
+        # produce projections by radon transform (skimage.transform.radon
+        # resize radon transformed sinogram to projection line size, i.e. multiply
+        # by sqrt(2))
+        sg_ram = radon(ph, numpy.arange(0, 180, angle_step_size))
+
+        # auto determine the data value representation
+        int_width = bin_width_of_dec(numpy.max(sg_ram))
+        frac_width = data_length - int_width
+        sg_fixed_point = FixedPoint(int_width, frac_width, False)
+
+        _projection_line_size = projection_line_size
+        _lutSinogram = sg_ram
+        _tSinogram = sg_fixed_point
+        _tSinogramBase = 2 ** _tSinogram.fractional_width
+
+        # dump defines to cache
+        with open(file_name, 'w') as f:
+            pickle.dump((_projection_line_size, _lutSinogram, _tSinogram,
+                    _tSinogramBase), f)
 
 
 def sinogram_defines():
