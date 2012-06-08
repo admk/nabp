@@ -8,9 +8,11 @@ AddOption(
         action='store',
         default='default.naconfig',
         help='configuration file location')
-config = GetOption('naconfig')
+
+confg = GetOption('naconfig')
 if not config.endswith('.naconfig'):
     config += '.naconfig'
+
 shutil.copyfile(config, 'build/current.naconfig')
 
 env = Environment()

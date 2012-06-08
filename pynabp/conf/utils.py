@@ -13,6 +13,12 @@ def import_conf(path):
     return globs['config']
 
 
+def export_conf(path, conf):
+    """Export a configuration dictionary to path"""
+    with open(path, 'w') as f:
+        f.write(repr(conf))
+
+
 def center(val):
     return (val - 1) / 2.0
 
