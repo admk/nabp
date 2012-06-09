@@ -27,7 +27,7 @@ arch_num_mbs : 2
 arch_no_sym : 0
 num_bank_set : 1
 length : 64
-num_cycles : 1
+num_cycles : 2
 arch_pipeline : 1
 poly_type : 0
 poly_fact : 2

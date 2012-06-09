@@ -109,7 +109,7 @@ endmodule
 // Retrieval info:      <PRIVATE name = "device_family" value="Stratix IV"  type="STRING"  enable="1" />
 // Retrieval info:      <PRIVATE name = "structure" value="Distributed Arithmetic : Fully Parallel Filter"  type="STRING"  enable="1" />
 // Retrieval info:      <PRIVATE name = "pipeline_level" value="1"  type="INTEGER"  enable="1" />
-// Retrieval info:      <PRIVATE name = "clocks_to_compute" value="1"  type="INTEGER"  enable="0" />
+// Retrieval info:      <PRIVATE name = "clocks_to_compute" value="2"  type="INTEGER"  enable="0" />
 // Retrieval info:      <PRIVATE name = "number_of_serial_units" value="2"  type="INTEGER"  enable="0" />
 // Retrieval info:      <PRIVATE name = "data_storage" value="Auto"  type="STRING"  enable="1" />
 // Retrieval info:      <PRIVATE name = "coefficient_storage" value="Auto"  type="STRING"  enable="1" />
@@ -117,12 +117,12 @@ endmodule
 // Retrieval info:      <PRIVATE name = "force_non_symmetric_structure" value="0"  type="BOOLEAN"  enable="0" />
 // Retrieval info:      <PRIVATE name = "coefficients_reload" value="0"  type="BOOLEAN"  enable="1" />
 // Retrieval info:      <PRIVATE name = "coefficients_reload_sgl_clock" value="0"  type="BOOLEAN"  enable="1" />
-// Retrieval info:      <PRIVATE name = "max_clocks_to_compute" value="4"  type="INTEGER"  enable="1" />
+// Retrieval info:      <PRIVATE name = "max_clocks_to_compute" value="1"  type="INTEGER"  enable="1" />
 // Retrieval info:      <PRIVATE name = "set_1" value="Low Pass Set, Imported, /home/admko/Desktop/coefs64.txt, 0.0, -9.789193E-4, 0.0, -9.980503E-4, 0.0, -0.0010378356, 0.0, -0.0011015869, 0.0, -0.0011950153, 0.0, -0.0013273952, 0.0, -0.0015137163, 0.0, -0.0017787745, 0.0, -0.0021653683, 0.0, -0.0027519837, 0.0, -0.003694879, 0.0, -0.0053421473, 0.0, -0.008604472, 0.0, -0.01654087, 0.0, -0.045358576, 0.0, -0.4056104, 1.0, -0.4056104, 0.0, -0.045358576, 0.0, -0.01654087, 0.0, -0.008604472, 0.0, -0.0053421473, 0.0, -0.003694879, 0.0, -0.0027519837, 0.0, -0.0021653683, 0.0, -0.0017787745, 0.0, -0.0015137163, 0.0, -0.0013273952, 0.0, -0.0011950153, 0.0, -0.0011015869, 0.0, -0.0010378356, 0.0, -9.980503E-4, 0.0, -9.789193E-4"  type="STRING"  enable="1" />
 // Retrieval info:      <PRIVATE name = "number_of_sets" value="1"  type="INTEGER"  enable="1" />
 // Retrieval info:      <PRIVATE name = "output_full_bit_width" value="22"  type="INTEGER"  enable="1" />
 // Retrieval info:      <PRIVATE name = "output_full_bits_right_of_binary_point" value="12"  type="INTEGER"  enable="1" />
-// Retrieval info:      <PRIVATE name = "coefficient_reload_bit_width" value="11"  type="INTEGER"  enable="1" />
+// Retrieval info:      <PRIVATE name = "coefficient_reload_bit_width" value="16"  type="INTEGER"  enable="1" />
 // Retrieval info:      <PRIVATE name = "logic_cell" value="1477"  type="INTEGER"  enable="1" />
 // Retrieval info:      <PRIVATE name = "m512" value="0"  type="INTEGER"  enable="1" />
 // Retrieval info:      <PRIVATE name = "m4k" value="0"  type="INTEGER"  enable="1" />
@@ -149,7 +149,7 @@ endmodule
 // Retrieval info:     </NAMESPACE>
 // Retrieval info:     <NAMESPACE name = "quartus_settings">
 // Retrieval info:      <PRIVATE name = "WEB_BROWSER" value="/usr/bin/firefox"  type="STRING"  enable="1" />
-// Retrieval info:      <PRIVATE name = "DEVICE" value="AUTO"  type="STRING"  enable="1" />
+// Retrieval info:      <PRIVATE name = "DEVICE" value="EP4SGX530HH35C3"  type="STRING"  enable="1" />
 // Retrieval info:      <PRIVATE name = "FAMILY" value="Stratix IV"  type="STRING"  enable="1" />
 // Retrieval info:     </NAMESPACE>
 // Retrieval info:     <NAMESPACE name = "serializer"/>

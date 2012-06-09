@@ -18,13 +18,14 @@
 #
 # Quartus II 32-bit
 # Version 11.1 Build 173 11/01/2011 SJ Full Version
-# Date created = 18:00:38  June 05, 2012
+# Date created = 17:36:00  June 08, 2012
 #
 # -------------------------------------------------------------------------- #
 
 QUARTUS_VERSION = "11.1"
-DATE = "18:00:38  June 05, 2012"
+DATE = "17:36:00  June 08, 2012"
 
 # Revisions
 
 PROJECT_REVISION = "NABP"
+PROJECT_REVISION = "11"
