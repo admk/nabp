@@ -17,13 +17,11 @@ wire signed [`kDataLength:0] filter_val_in;
 assign filter_val_in = {1'd0, val_in};
 
 // actual filter
-fir_core filter
+fir_ramp filter
 (
     // global signals
     .clk(clk),
     .reset_n(reset_n),
-    // filter control input
-    .enable(enable),
     // filter inputs
     .ast_sink_data(filter_val_in),
     .ast_sink_valid(1'b1),
