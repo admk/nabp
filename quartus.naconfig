@@ -79,7 +79,7 @@ config = \
         #   value should also be sensible enough to ensure no processing
         #   elements are doing work for wasted pixels only (validator will
         #   check for this).
-        'no_of_processing_elements': 100,
+        'no_of_processing_elements': 16,
 
         # The angle step size.
         # This determines the difference of angle values between two projection
@@ -146,7 +146,7 @@ config = \
         #   None value or a dictionary.
         'force': {
                 'partition_scheme': {
-                    'no_of_partitions': None,
+                    'no_of_partitions': 16,
                     },
                 },
     }
