@@ -53,6 +53,8 @@ translate_filter_processes = [
 # generate only target alias
 env.Alias('gen_only', derived_sources['all'])
 env.Alias('tf_only', translate_filter_processes)
+for alias in derived_sources.iterkeys():
+    env.Alias(alias + '_gen', derived_sources[alias])
 
 Export('env derived_sources translate_filter_processes')
 

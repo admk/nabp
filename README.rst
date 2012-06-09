@@ -115,6 +115,8 @@ vpi_pyeval_            Minimal Verilog Procedual Interface Extension for Python
 GTKWave_               GTK+ based wave viewer for Unix, Win32, and Mac OSX
 ---------------------- -----------------------
 `PIL 1.1.7`_           Python Imaging Library
+---------------------- -----------------------
+PBS_                   A Python subprocess wrapper
 ====================== =======================
 
 
@@ -123,6 +125,7 @@ GTKWave_               GTK+ based wave viewer for Unix, Win32, and Mac OSX
 .. _Icarus Verilog 0.9: http://iverilog.icarus.com
 .. _GTKWave: http://gtkwave.sourceforge.net
 .. _PIL 1.1.7: http://www.pythonware.com/products/pil/
+.. _PBS: http://github.com/amoffat/pbs
 
 
 .. vim:tw=78:sw=4:ts=8:ft=rst:norl
