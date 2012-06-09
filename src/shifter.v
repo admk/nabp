@@ -8,6 +8,10 @@
     # fill count varies from the position of the last PE tap to 0
     fill_cnt_init = c['partition_scheme']['partitions'][-1]
     fill_cnt_width = bin_width(fill_cnt_init)
+    # FIXME has zero length with only 1 PE, not sure if it works correctly with
+    # only one PE
+    if fill_cnt_width == 0:
+        fill_cnt_width = 1
 
     # shift count varies from 1 to the position of the last pixel
     # pixel 0 is not needed because it is the final pixel given by filling
@@ -117,7 +121,7 @@ begin:counters
             end
         default:
         begin
-            cnt <= {# dec_repr(fill_cnt_init) #};
+            cnt <= {# dec_repr(fill_cnt_init, fill_cnt_width) #};
             // initialise accu with half of sc_accu_base. this is to deal
             // with aliasing effects caused by the shifting behaviour.
             // this is because shifting should happen when the accumulated
