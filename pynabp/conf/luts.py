@@ -1,3 +1,4 @@
+import os
 import math
 import pickle
 import numpy
@@ -140,30 +141,52 @@ def _map_accu_init_defines(conf):
     return defines
 
 
+def fir(b, x):
+    y = [0.0] * len(x)
+    for j in range(len(x)):
+        for i in range(len(b))[::-1]:
+            if j - i < 0:
+                continue
+            y[j] += b[i] * x[j - i]
+    return y
+
 _projection_line_size = None
 _lutSinogram = None
 _tSinogram = None
 _tSinogramBase = None
 
+
 def init_sinogram_defines(
-        image_size, projection_line_size, angle_step_size, no_of_angles,
-        data_length):
+        image_size=None,
+        projection_line_size=None,
+        angle_step_size=None,
+        no_of_angles=None,
+        data_length=None,
+        fir_coefs=None):
     """Initialise sinogram LUT and definitions"""
 
     global _projection_line_size, _lutSinogram, _tSinogram, _tSinogramBase
 
-    file_name = 'build/cached_sinogram_defines_'
-    parameters = (str(val) for val in
-                (image_size, projection_line_size, angle_step_size,
-                 no_of_angles, data_length))
-    file_name += '_'.join(parameters) + '.pcl'
+    file_name = 'build/cached_sinogram_defines.pcl'
 
     # try to load from cache
-    try:
+    if os.path.exists(file_name):
         with open(file_name) as f:
-            _projection_line_size, _lutSinogram, _tSinogram, _tSinogramBase = \
+            _image_size, _projection_line_size, _angle_step_size, \
+            _no_of_angles, _data_length, _fir_coefs, \
+            _lutSinogram, _tSinogram, _tSinogramBase = \
                     pickle.load(f)
-    except IOError:
+        if image_size == None:
+            # loading from cache
+            return
+        if image_size == _image_size and \
+           projection_line_size == _projection_line_size and \
+           angle_step_size == _angle_step_size and \
+           no_of_angles == _no_of_angles and \
+           data_length == _data_length and \
+           fir_coefs == _fir_coefs:
+               return
+    else:
         # create a phantom image
         ph = phantom(image_size)
 
@@ -171,6 +194,15 @@ def init_sinogram_defines(
         # resize radon transformed sinogram to projection line size, i.e. multiply
         # by sqrt(2))
         sg_ram = radon(ph, numpy.arange(0, 180, angle_step_size))
+        # filtering
+        group_delay = int(len(fir_coefs) / 2)
+        filtered_sg_ram = numpy.zeros(sg_ram.shape)
+        for angle in xrange(sg_ram.shape[1]):
+            projection_line = list(sg_ram[:, angle])
+            projection_line.extend([0.0] * group_delay)
+            filtered_projection_line = fir(fir_coefs, projection_line)
+            filtered_projection_line = filtered_projection_line[group_delay:]
+            filtered_sg_ram[:, angle] = filtered_projection_line
 
         # auto determine the data value representation
         int_width = bin_width_of_dec(numpy.max(sg_ram))
@@ -178,14 +210,16 @@ def init_sinogram_defines(
         sg_fixed_point = FixedPoint(int_width, frac_width, False)
 
         _projection_line_size = projection_line_size
-        _lutSinogram = sg_ram
+        _lutSinogram = filtered_sg_ram
         _tSinogram = sg_fixed_point
         _tSinogramBase = 2 ** _tSinogram.fractional_width
 
         # dump defines to cache
         with open(file_name, 'w') as f:
-            pickle.dump((_projection_line_size, _lutSinogram, _tSinogram,
-                    _tSinogramBase), f)
+            pickle.dump(
+                    (image_size, projection_line_size, angle_step_size, \
+                     no_of_angles, data_length, fir_coefs, \
+                     _lutSinogram, _tSinogram, _tSinogramBase), f)
 
 
 def sinogram_defines():

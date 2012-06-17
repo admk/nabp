@@ -360,7 +360,7 @@ always @(posedge clk)
         line_pos = line_pos + pe_tap_offset;
         im_x = (sw_scan_mode == {# scan_mode.x #}) ? scan_pos : line_pos;
         im_y = (sw_scan_mode == {# scan_mode.x #}) ? line_pos : scan_pos;
-        dump_val = lb_val;
+        dump_val = $signed(lb_val);
 
         {% if c['debug'] %}
         {% if 'processing_verify' in c['target'] %}
