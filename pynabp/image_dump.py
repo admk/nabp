@@ -1,4 +1,5 @@
 import numpy
+import pickle
 from PIL import Image
 
 _images = {}
@@ -17,7 +18,7 @@ def update(name, x, y, val):
 def dump(name):
     image = _images[name]
     # normalise values to range 0~255
-    image += image.min()
+    image -= image.min()
     image *= 255.0 / image.max()
     # show image
     i = Image.new('L', image.shape)
@@ -25,3 +26,6 @@ def dump(name):
         i.putpixel((x, y), val)
     i.save('build/%s.png' % name)
     i.show()
+    # dump pickle file
+    with open('build/%s.pcl' % name, 'w') as f:
+        pickle.dump(image, f)
