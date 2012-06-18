@@ -9,6 +9,8 @@ class FixedPoint(object):
     def __init__(
             self, integer_width, fractional_width,
             signed=False, value=None):
+        if integer_width < 0 or fractional_width < 0:
+            raise ValueError('negative widths')
         self.integer_width = integer_width
         self.fractional_width = fractional_width
         self.signed = signed

@@ -187,7 +187,7 @@ def init_sinogram_defines(
            fir_coefs == _fir_coefs:
                return
 
-    # create a phantom image
+    # not cached, create a phantom image
     ph = phantom(image_size)
 
     # produce projections by radon transform (skimage.transform.radon
@@ -206,7 +206,7 @@ def init_sinogram_defines(
         filtered_sg_ram[:, angle] = filtered_projection_line
 
     # auto determine the data value representation
-    int_width = bin_width_of_dec(numpy.max(sg_ram))
+    int_width = bin_width_of_dec(numpy.max(filtered_sg_ram)) + 1
     frac_width = data_length - int_width
     sg_fixed_point = FixedPoint(int_width, frac_width, False)
 
