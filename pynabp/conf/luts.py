@@ -186,40 +186,41 @@ def init_sinogram_defines(
            data_length == _data_length and \
            fir_coefs == _fir_coefs:
                return
-    else:
-        # create a phantom image
-        ph = phantom(image_size)
 
-        # produce projections by radon transform (skimage.transform.radon
-        # resize radon transformed sinogram to projection line size, i.e. multiply
-        # by sqrt(2))
-        sg_ram = radon(ph, numpy.arange(0, 180, angle_step_size))
-        # filtering
-        group_delay = int(len(fir_coefs) / 2)
-        filtered_sg_ram = numpy.zeros(sg_ram.shape)
-        for angle in xrange(sg_ram.shape[1]):
-            projection_line = list(sg_ram[:, angle])
-            projection_line.extend([0.0] * group_delay)
-            filtered_projection_line = fir(fir_coefs, projection_line)
-            filtered_projection_line = filtered_projection_line[group_delay:]
-            filtered_sg_ram[:, angle] = filtered_projection_line
+    # create a phantom image
+    ph = phantom(image_size)
 
-        # auto determine the data value representation
-        int_width = bin_width_of_dec(numpy.max(sg_ram))
-        frac_width = data_length - int_width
-        sg_fixed_point = FixedPoint(int_width, frac_width, False)
+    # produce projections by radon transform (skimage.transform.radon
+    # resize radon transformed sinogram to projection line size, i.e. multiply
+    # by sqrt(2))
+    sg_ram = radon(ph, numpy.arange(0, 180, angle_step_size))
+    # filtering
+    # FIXME validate the strange choice of the group delay
+    group_delay = int(len(fir_coefs) / 2) + 2
+    filtered_sg_ram = numpy.zeros(sg_ram.shape)
+    for angle in xrange(sg_ram.shape[1]):
+        projection_line = list(sg_ram[:, angle])
+        projection_line.extend([0.0] * group_delay)
+        filtered_projection_line = fir(fir_coefs, projection_line)
+        filtered_projection_line = filtered_projection_line[group_delay:]
+        filtered_sg_ram[:, angle] = filtered_projection_line
 
-        _projection_line_size = projection_line_size
-        _lutSinogram = filtered_sg_ram
-        _tSinogram = sg_fixed_point
-        _tSinogramBase = 2 ** _tSinogram.fractional_width
+    # auto determine the data value representation
+    int_width = bin_width_of_dec(numpy.max(sg_ram))
+    frac_width = data_length - int_width
+    sg_fixed_point = FixedPoint(int_width, frac_width, False)
 
-        # dump defines to cache
-        with open(file_name, 'w') as f:
-            pickle.dump(
-                    (image_size, projection_line_size, angle_step_size, \
-                     no_of_angles, data_length, fir_coefs, \
-                     _lutSinogram, _tSinogram, _tSinogramBase), f)
+    _projection_line_size = projection_line_size
+    _lutSinogram = filtered_sg_ram
+    _tSinogram = sg_fixed_point
+    _tSinogramBase = 2 ** _tSinogram.fractional_width
+
+    # dump defines to cache
+    with open(file_name, 'w') as f:
+        pickle.dump(
+                (image_size, projection_line_size, angle_step_size, \
+                    no_of_angles, data_length, fir_coefs, \
+                    _lutSinogram, _tSinogram, _tSinogramBase), f)
 
 
 def sinogram_defines():
