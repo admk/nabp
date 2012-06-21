@@ -14,7 +14,7 @@ Description   An efficient hardware implementation of parallelised back
 Current Simulation Result Image
 ===============================
 
-.. image:: http://f.cl.ly/items/3S043O2H1R0w0T0b1q3p/result.png
+.. image:: http://f.cl.ly/items/3n2O3g1s461O1O0e0s20/pe_dump_180.png
 
 Simulation Instructions
 =======================
