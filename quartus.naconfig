@@ -148,6 +148,8 @@ config = \
                 'partition_scheme': {
                     'no_of_partitions': 16,
                     },
+                # Some crazy modifications, too crazy to document.
+                'crazy': False,
                 },
     }
 
