@@ -1,6 +1,8 @@
 import os
 import shutil
 
+from pynabp.conf.utils import import_conf, export_conf, recursive_update_dict
+
 AddOption(
         '--naconfig',
         dest='naconfig',
@@ -9,8 +11,20 @@ AddOption(
         default='default.naconfig',
         help='configuration file location')
 
+config_file = GetOption('naconfig')
+if not config_file.endswith('.naconfig'):
+    config_file += '.naconfig'
+
+# update config with parameters
+config = import_conf(config_file)
+if config['force'] is None:
+    config['force'] = {}
+force_dict = {k: eval(v) for k, v in ARGUMENTS.iteritems()}
+config['force'] = recursive_update_dict(config['force'], force_dict)
+export_conf('build/current.naconfig', config)
+
+
 env = Environment()
-shutil.copyfile(GetOption('naconfig'), 'build/current.naconfig')
 
 SOURCE_DIR = 'src'
 Export('SOURCE_DIR')

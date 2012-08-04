@@ -1,0 +1,21 @@
+
+WORK > DEFAULT
+DEFAULT:                ./libraries/work/                  
+work:                   ./libraries/work/                  
+altera_ver:             ./libraries/altera_ver/            
+lpm_ver:                ./libraries/lpm_ver/               
+sgate_ver:              ./libraries/sgate_ver/             
+altera_mf_ver:          ./libraries/altera_mf_ver/         
+altera_lnsim_ver:       ./libraries/altera_lnsim_ver/      
+stratixiv_hssi_ver:     ./libraries/stratixiv_hssi_ver/    
+stratixiv_pcie_hip_ver: ./libraries/stratixiv_pcie_hip_ver/
+stratixiv_ver:          ./libraries/stratixiv_ver/         
+altera:                 ./libraries/altera/                
+lpm:                    ./libraries/lpm/                   
+sgate:                  ./libraries/sgate/                 
+altera_mf:              ./libraries/altera_mf/             
+altera_lnsim:           ./libraries/altera_lnsim/          
+stratixiv_hssi:         ./libraries/stratixiv_hssi/        
+stratixiv_pcie_hip:     ./libraries/stratixiv_pcie_hip/    
+stratixiv:              ./libraries/stratixiv/             
+LIBRARY_SCAN = TRUE

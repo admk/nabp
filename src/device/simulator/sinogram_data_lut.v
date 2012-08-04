@@ -28,13 +28,7 @@ begin
     err = $pyeval(
         "from pynabp.conf.luts ",
         "import init_sinogram_defines, sinogram_lookup");
-    err = $pyeval(
-        "init_sinogram_defines(",
-        {# c['image_size'] #}, ",",
-        {# c['projection_line_size'] #}, ",",
-        {# c['angle_step_size'] #}, ",",
-        {# c['kNoOfAngles'] #}, ",",
-        {# c['kDataLength'] #}, ")");
+    err = $pyeval("init_sinogram_defines()");
 end
 
 integer sg_val_a;

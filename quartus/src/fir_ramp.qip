@@ -1,0 +1,21 @@
+set_global_assignment -entity "fir_ramp" -library "lib_fir_ramp" -name IP_TOOL_NAME "altera_fir_compiler_ii"
+set_global_assignment -entity "fir_ramp" -library "lib_fir_ramp" -name IP_TOOL_VERSION "11.1"
+set_global_assignment -entity "fir_ramp" -library "lib_fir_ramp" -name IP_TOOL_ENV "mwpim"
+
+set_global_assignment -library "lib_fir_ramp" -name VERILOG_FILE [file join $::quartus(qip_path) fir_ramp.v]
+set_global_assignment -library "lib_fir_ramp" -name VERILOG_FILE [file join $::quartus(qip_path) fir_ramp/altera_avalon_sc_fifo.v]
+set_global_assignment -library "lib_fir_ramp" -name VHDL_FILE [file join $::quartus(qip_path) fir_ramp/auk_dspip_math_pkg_hpfir.vhd]
+set_global_assignment -library "lib_fir_ramp" -name VHDL_FILE [file join $::quartus(qip_path) fir_ramp/auk_dspip_lib_pkg_hpfir.vhd]
+set_global_assignment -library "lib_fir_ramp" -name VHDL_FILE [file join $::quartus(qip_path) fir_ramp/auk_dspip_avalon_streaming_controller_hpfir.vhd]
+set_global_assignment -library "lib_fir_ramp" -name VHDL_FILE [file join $::quartus(qip_path) fir_ramp/auk_dspip_avalon_streaming_sink_hpfir.vhd]
+set_global_assignment -library "lib_fir_ramp" -name VHDL_FILE [file join $::quartus(qip_path) fir_ramp/auk_dspip_avalon_streaming_source_hpfir.vhd]
+set_global_assignment -library "lib_fir_ramp" -name VHDL_FILE [file join $::quartus(qip_path) fir_ramp/auk_dspip_roundsat_hpfir.vhd]
+set_global_assignment -library "lib_fir_ramp" -name VHDL_FILE [file join $::quartus(qip_path) fir_ramp/fir_ramp_0002_rtl_wysiwyg.vhd]
+set_global_assignment -library "lib_fir_ramp" -name VHDL_FILE [file join $::quartus(qip_path) fir_ramp/fir_ramp_0002_rtl.vhd]
+set_global_assignment -library "lib_fir_ramp" -name VHDL_FILE [file join $::quartus(qip_path) fir_ramp/fir_ramp_0002_ast.vhd]
+set_global_assignment -library "lib_fir_ramp" -name VHDL_FILE [file join $::quartus(qip_path) fir_ramp/fir_ramp_0002.vhd]
+set_global_assignment -library "lib_fir_ramp" -name SDC_FILE [file join $::quartus(qip_path) fir_ramp/fir_ramp_0002.sdc]
+
+set_global_assignment -entity "fir_ramp_0002" -library "lib_fir_ramp" -name IP_TOOL_NAME "altera_fir_compiler_ii"
+set_global_assignment -entity "fir_ramp_0002" -library "lib_fir_ramp" -name IP_TOOL_VERSION "11.1"
+set_global_assignment -entity "fir_ramp_0002" -library "lib_fir_ramp" -name IP_TOOL_ENV "mwpim"

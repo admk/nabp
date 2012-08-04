@@ -45,7 +45,7 @@ config = \
         # Constraints:
         #   A string specifying a valid device. The device string must be valid
         #   for release builds.
-        'device': None,
+        'device': 'simulator' if debug else 'stratix_iv',
 
         # How wide the projection line is.
         # If not specified, then it defaults to the nearest integer value of
@@ -96,7 +96,7 @@ config = \
         # and $s$ is the projection offset.
         # Constraints:
         #   Positive numbers.
-        'angle_step_size': None if not debug else 10,
+        'angle_step_size': None if not debug else 5,
 
         # The bit length of the data representation for a single projection
         # data point.
@@ -122,14 +122,14 @@ config = \
         # This is used to generate a LUT in which values are of this precision.
         # Constraints:
         #   Positive integers.
-        'kShiftAccuPrecision': 12,
+        'kShiftAccuPrecision': 30,
 
         # The decimal places (in binary) of mapper's accumulating multiplicand.
         # This is used to generate a LUT in which values are of this precision.
         # Constraints:
         #   Positive integers.
         #   Greater than or equal to kMapAccuPartPrecision
-        'kMapAccuPrecision': 12,
+        'kMapAccuPrecision': 30,
 
         # The decimal places (in binary) of mapper's accumulator's initial
         # value.
@@ -137,7 +137,18 @@ config = \
         # Constraints:
         #   Positive integers.
         #   Less than or equal to kMapAccuPrecision
-        'kMapAccuPartPrecision': 8,
+        'kMapAccuPartPrecision': 30,
+
+        # Force assignment of values of parameters.
+        # The forced parameters will be used to override the parameters after
+        # configuration validation and generation. Using this is unsafe, and
+        # does not guarantee correct simulation behaviour. This should only be
+        # allowed to bypass some sanity checks to obtain accurate synthesis
+        # results.
+        # The corresponding values will be updated recursively.
+        # Constraints:
+        #   None value or a dictionary.
+        'force': None,
     }
 
 # vim: ft=python:

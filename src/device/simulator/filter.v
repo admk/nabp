@@ -14,7 +14,7 @@ module NABPFilter
 
 // pad val_in
 wire [`kFilteredDataLength-1:0] filter_val_in;
-assign filter_val_in = val_in;
+assign filter_val_in = $signed(val_in);
 
 // shift register to model filtering
 // this is simply no filtering but a group delay

@@ -158,10 +158,14 @@ assign ir_val = pe_domino_val[`kNoOfPartitions-1];
 {% for i in xrange(c['partition_scheme']['no_of_partitions']) %}
 assign pe_tap_val[{#i#}] = pe_taps[
         `kFilteredDataLength*{#i+1#}-1:`kFilteredDataLength*{#i#}];
+{#
+    # for forced number of PEs
+    offset_i = i % len(c['partition_scheme']['partitions'])
+#}
 NABPProcessingElement
 #(
     .pe_id({#i#}),
-    .pe_tap_offset({# c['partition_scheme']['partitions'][i] #})
+    .pe_tap_offset({# c['partition_scheme']['partitions'][offset_i] #})
 )
 processing_element_{#i#}
 (

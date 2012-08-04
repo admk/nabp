@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<simPackage>
+ <file path="fir_ramp_sim/altera_avalon_sc_fifo.v" type="VERILOG" />
+ <file path="fir_ramp_sim/auk_dspip_math_pkg_hpfir.vhd" type="VHDL" />
+ <file path="fir_ramp_sim/auk_dspip_lib_pkg_hpfir.vhd" type="VHDL" />
+ <file
+   path="fir_ramp_sim/auk_dspip_avalon_streaming_controller_hpfir.vhd"
+   type="VHDL" />
+ <file
+   path="fir_ramp_sim/auk_dspip_avalon_streaming_sink_hpfir.vhd"
+   type="VHDL" />
+ <file
+   path="fir_ramp_sim/auk_dspip_avalon_streaming_source_hpfir.vhd"
+   type="VHDL" />
+ <file path="fir_ramp_sim/auk_dspip_roundsat_hpfir.vhd" type="VHDL" />
+ <file path="fir_ramp_sim/fir_ramp_rtl_wysiwyg.vhd" type="VHDL" />
+ <file path="fir_ramp_sim/fir_ramp_rtl.vhd" type="VHDL" />
+ <file path="fir_ramp_sim/fir_ramp_ast.vhd" type="VHDL" />
+ <file path="fir_ramp_sim/fir_ramp.vhd" type="VHDL" />
+ <file path="fir_ramp_sim/fir_ramp_nativelink.tcl" type="OTHER" />
+ <file path="fir_ramp_sim/fir_ramp_msim.tcl" type="OTHER" />
+ <file path="fir_ramp_sim/fir_ramp_tb.vhd" type="VHDL" />
+ <file path="fir_ramp_sim/fir_ramp_mlab.m" type="OTHER" />
+ <file path="fir_ramp_sim/fir_ramp_model.m" type="OTHER" />
+ <file path="fir_ramp_sim/fir_ramp_coef_int.txt" type="OTHER" />
+ <file path="fir_ramp_sim/fir_ramp_input.txt" type="OTHER" />
+ <file path="fir_ramp_sim/fir_ramp_param.txt" type="OTHER" />
+ <topLevel name="fir_ramp" />
+ <deviceFamily name="stratixiv" />
+</simPackage>

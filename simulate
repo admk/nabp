@@ -1,8 +1,12 @@
-#!/bin/sh
+#!/bin/bash
 
 NABP_TARGET=$1_test
 VPI_MODULE_PATH=vpi_pyeval/build/vpi_pyeval
-VPI_MODULE=pyeval
+if [[ `uname` == 'Linux' ]]; then
+    VPI_MODULE=libpyeval
+else
+    VPI_MODULE=pyeval
+fi
 
 # build target
 scons $NABP_TARGET || exit 1

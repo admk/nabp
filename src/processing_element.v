@@ -86,6 +86,13 @@
             processing_element_states
 
     scan_mode_pixels = c['partition_scheme']['size'] * c['image_size']
+    if 'crazy' in c and c['crazy']:
+        import math
+        crazy_factor = 2
+        scan_mode_pixels = (c['image_size'] ** 2) / \
+                float(c['partition_scheme']['no_of_partitions'])
+        scan_mode_pixels /= crazy_factor
+        scan_mode_pixels = math.ceil(scan_mode_pixels)
 
     # two modes need an extra bit to address
     base_addr_len = bin_width(scan_mode_pixels - 1)
@@ -96,6 +103,10 @@
     def to_base_addr(val):
         return dec_repr(val, base_addr_len)
 #}
+{% if 'crazy' in c and c['crazy'] %}
+`undef kCacheDataLength
+`define kCacheDataLength 36
+{% end %}
 
 `define kAddressLength {# addr_len #}
 
@@ -138,7 +149,7 @@ reg done_d, work_overwrite_0_done, work_overwrite_1_done;
 wire done, scan_done, scan_domino_done, scan_domino_mode, work_overwrite_done;
 
 assign scan_domino_mode = (state == domino_start_s || state == domino_0_s) ?
-                          0 : 1;
+                          1'd0 : 1'd1;
 assign addr = {(state == work_s) ? sw_scan_mode : scan_domino_mode, base_addr};
 
 assign done = // PE must be working
@@ -176,15 +187,15 @@ begin:work_overwrite_done_update
 
     if (!reset_n || state == domino_finish_s)
     begin
-        work_overwrite_0_done <= 0;
-        work_overwrite_1_done <= 0;
+        work_overwrite_0_done <= 1'd0;
+        work_overwrite_1_done <= 1'd0;
     end
     else if (done_d)
     begin
         if (sw_scan_mode == {# scan_mode.x #})
-            work_overwrite_0_done <= 1;
+            work_overwrite_0_done <= 1'd1;
         else
-            work_overwrite_1_done <= 1;
+            work_overwrite_1_done <= 1'd1;
     end
 end
 
@@ -336,14 +347,13 @@ pe_cache
 
 {#
     pe_verify = False
-
-    if 'processing_verify' in c['target']:
-        pe_verify = True
-        include('templates/processing_verify.v')
-
-    if 'reconstruction_test' in c['target']:
-        pe_verify = True
-        include('templates/image_dump(image_name).v', image_name='pe_dump')
+    if c['debug']:
+        if 'processing_verify' in c['target']:
+            pe_verify = True
+            include('templates/processing_verify.v')
+        if 'reconstruction_test' in c['target']:
+            pe_verify = True
+            include('templates/image_dump(image_name).v', image_name='pe_dump')
 #}
 {% if pe_verify %}
 integer err, im_x, im_y, scan_pos, line_pos, expected_lb_val;
@@ -361,8 +371,9 @@ always @(posedge clk)
         line_pos = line_pos + pe_tap_offset;
         im_x = (sw_scan_mode == {# scan_mode.x #}) ? scan_pos : line_pos;
         im_y = (sw_scan_mode == {# scan_mode.x #}) ? line_pos : scan_pos;
-        dump_val = lb_val;
+        dump_val = $signed(lb_val);
 
+        {% if c['debug'] %}
         {% if 'processing_verify' in c['target'] %}
             expected_lb_val = expected_s_val(pe_angle, im_x, im_y);
             {% if 'processing_addressing_verify' in c['target'] %}
@@ -374,10 +385,11 @@ always @(posedge clk)
         {% if 'reconstruction_test' in c['target'] %}
             image_dump_pixel(im_x, im_y, dump_val);
         {% end %}
+        {% end %}
     end
 {% end %}
 
-{% if 'domino_test' in c['target'] %}
+{% if c['debug'] and 'domino_test' in c['target'] %}
 always @(state)
     if (state == domino_start_s)
         $display("domino: %d", pe_id);
