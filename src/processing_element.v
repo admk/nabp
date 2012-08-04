@@ -86,7 +86,7 @@
             processing_element_states
 
     scan_mode_pixels = c['partition_scheme']['size'] * c['image_size']
-    if c['crazy']:
+    if 'crazy' in c and c['crazy']:
         import math
         crazy_factor = 2
         scan_mode_pixels = (c['image_size'] ** 2) / \
@@ -103,7 +103,7 @@
     def to_base_addr(val):
         return dec_repr(val, base_addr_len)
 #}
-{% if c['crazy'] %}
+{% if 'crazy' in c and c['crazy'] %}
 `undef kCacheDataLength
 `define kCacheDataLength 36
 {% end %}
