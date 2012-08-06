@@ -94,6 +94,14 @@ end
 
 wire fill_done, fill_kick;
 
+// Multiplexer and demultiplexer scheme
+// ============ === === === ========================
+//  rotate_sel   0   1   2   Description
+// ------------ --- --- --- ------------------------
+//  Order of     0   2   1   <- fill from host
+//  buffers      1   0   2   -> fill to processing
+//               2   1   0   -> shift to processing
+// ============ === === === ========================
 always @(*)
 begin:rotate_sel_mux
     // default outputs
@@ -104,18 +112,58 @@ begin:rotate_sel_mux
     case (rotate_sel)
         2'd0:
         begin
-            fill_done = sw1_fill_done;
-            sw2_fill_kick = 1'b1;
+            // outputs to host
+            hs_s_val = sw0_hs_s_val;
+            // inputs from processing swappables
+            sw1_pr0_s_val = pr0_s_val;
+            sw1_pr1_s_val = 'bx;        // reserved
+            sw2_pr0_s_val = pr1_s_val;
+            sw2_pr1_s_val = 'bx;        // reserved
+            sw0_pr0_s_val = 'bx;        // filling, no processing inputs
+            sw0_pr1_s_val = 'bx;        // filling, no processing inputs
+            // outputs to processing swappables
+            pr0_val = sw1_pr0_val;
+            pr1_val = sw2_pr0_val;
+            // internal controls
+            fill_done = sw0_fill_done;
+            // fill kick starts before rotation, so iterator-1 mod 2
+            sw2_fill_kick = rotate;
         end
         2'd1:
         begin
+            // outputs to host
+            hs_s_val = sw2_hs_s_val;
+            // inputs from processing swappables
+            sw0_pr0_s_val = pr0_s_val;
+            sw0_pr1_s_val = 'bx;        // reserved
+            sw1_pr0_s_val = pr1_s_val;
+            sw1_pr1_s_val = 'bx;        // reserved
+            sw2_pr0_s_val = 'bx;        // filling, no processing inputs
+            sw2_pr1_s_val = 'bx;        // filling, no processing inputs
+            // outputs to processing swappables
+            pr0_val = sw0_pr0_val;
+            pr1_val = sw1_pr0_val;
+            // internal controls
             fill_done = sw2_fill_done;
-            sw0_fill_kick = 1'b1;
+            sw1_fill_kick = rotate;
         end
         2'd2:
         begin
-            fill_done = sw0_fill_done;
-            sw1_fill_kick = 1'b1;
+            // outputs to host
+            hs_s_val = sw1_hs_s_val;
+            // inputs from processing swappables
+            sw2_pr0_s_val = pr0_s_val;
+            sw2_pr1_s_val = 'bx;        // reserved
+            sw0_pr0_s_val = pr1_s_val;
+            sw0_pr1_s_val = 'bx;        // reserved
+            sw1_pr0_s_val = 'bx;        // filling, no processing inputs
+            sw1_pr1_s_val = 'bx;        // filling, no processing inputs
+            // outputs to processing swappables
+            pr0_val = sw2_pr0_val;
+            pr1_val = sw0_pr0_val;
+            // internal controls
+            fill_done = sw1_fill_done;
+            sw0_fill_kick = rotate;
         end
         default:
             if (reset_n)
@@ -124,19 +172,30 @@ begin:rotate_sel_mux
     endcase
 end
 
+assign pr_next_angle_ack = rotate;
+
 always @(*)
 begin:rotate_update
     rotate = 1'b0;
+    hs_next_angle = 1'b0;
     case (state)
         ready_s:
             if (hs_next_angle_ack)
                 rotate = 1'b1;
         fill_s:
             if (fill_done)
-                rotate = 1'b1;
+            begin
+                hs_next_angle = 1'b1;
+                if (hs_next_angle_ack) 
+                    rotate = 1'b1;
+            end
         fill_and_work_s, fill_and_work_repeat_s:
             if (fill_done && pr_next_angle)
-                rotate = 1'b1;
+            begin
+                hs_next_angle = hs_has_next_angle;
+                if (~hs_has_next_angle || hs_next_angle_ack)
+                    rotate = 1'b1;
+            end
         work_1_s:
             if (pr_next_angle)
                 rotate = 1'b1;
@@ -177,10 +236,6 @@ begin:mealy_next_state
 end
 
 {% for i in range(rotate) %}
-// signal wirings for swappable {#i#}
-assign sw{#i#}_pr0_s_val = pr0_s_val;
-assign sw{#i#}_pr1_s_val = pr1_s_val;
-assign sw{#i#}_hs_val = hs_val;
 
 // swappable {#i#} instantiation
 NABPFilteredRAMSwappable sw{#i#}
@@ -190,7 +245,7 @@ NABPFilteredRAMSwappable sw{#i#}
     .reset_n(reset_n),
     // inputs from host
     .hs_fill_kick(sw{#i#}_fill_kick),
-    .hs_val(sw{#i#}_hs_val),
+    .hs_val(hs_val),
     // inputs from processing swappables
     .pr0_s_val(sw{#i#}_pr0_s_val),
     .pr1_s_val(sw{#i#}_pr1_s_val),
