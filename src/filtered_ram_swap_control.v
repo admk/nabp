@@ -128,66 +128,42 @@ wire fill_done, fill_kick;
 always @(*)
 begin:rotate_sel_mux
     // default outputs
-    sw0_fill_kick = 1'b0;
-    sw1_fill_kick = 1'b0;
-    sw2_fill_kick = 1'b0;
+    {% for i in range(rotate) %}
+    sw{#i#}_fill_kick = 1'b0;
+    {% end %}
+    {#
+        rotates = []
+        rotate_list = range(rotate)
+        for _ in range(rotate):
+            rotates.append(rotate_list)
+            rotate_list = rotate_list[-1:] + rotate_list[:-1]
+    #}
     // multiplexers and demultiplexers
     case (rotate_sel)
-        2'd0:
+        {% for i, r in enumerate(rotates) %}
+        {# to_r(i) #}:
         begin
             // outputs to host
-            hs_s_val = sw0_hs_s_val;
+            hs_s_val = sw{#r[0]#}_hs_s_val;
             // inputs from processing swappables
-            sw1_pr0_s_val = pr0_s_val;
-            sw1_pr1_s_val = 'bx;        // reserved
-            sw2_pr0_s_val = pr1_s_val;
-            sw2_pr1_s_val = 'bx;        // reserved
-            sw0_pr0_s_val = 'bx;        // filling, no processing inputs
-            sw0_pr1_s_val = 'bx;        // filling, no processing inputs
+            // not used, filling buffer
+            sw{#r[0]#}_pr0_s_val = 'bx;
+            sw{#r[0]#}_pr1_s_val = 'bx;
+            // processing filling
+            sw{#r[1]#}_pr0_s_val = pr0_s_val;
+            sw{#r[1]#}_pr1_s_val = 'bx;     // reserved
+            // processing shifting
+            sw{#r[2]#}_pr0_s_val = pr1_s_val;
+            sw{#r[2]#}_pr1_s_val = 'bx;     // reserved
             // outputs to processing swappables
-            pr0_val = sw1_pr0_val;
-            pr1_val = sw2_pr0_val;
+            pr0_val = sw{#r[1]#}_pr0_val;
+            pr1_val = sw{#r[2]#}_pr0_val;
             // internal controls
-            fill_done = sw0_fill_done;
+            fill_done = sw{#r[0]#}_fill_done;
             // fill kick starts before rotation, so iterator-1 mod 2
-            sw2_fill_kick = rotate;
+            sw{#r[2]#}_fill_kick = rotate;
         end
-        2'd1:
-        begin
-            // outputs to host
-            hs_s_val = sw2_hs_s_val;
-            // inputs from processing swappables
-            sw0_pr0_s_val = pr0_s_val;
-            sw0_pr1_s_val = 'bx;        // reserved
-            sw1_pr0_s_val = pr1_s_val;
-            sw1_pr1_s_val = 'bx;        // reserved
-            sw2_pr0_s_val = 'bx;        // filling, no processing inputs
-            sw2_pr1_s_val = 'bx;        // filling, no processing inputs
-            // outputs to processing swappables
-            pr0_val = sw0_pr0_val;
-            pr1_val = sw1_pr0_val;
-            // internal controls
-            fill_done = sw2_fill_done;
-            sw1_fill_kick = rotate;
-        end
-        2'd2:
-        begin
-            // outputs to host
-            hs_s_val = sw1_hs_s_val;
-            // inputs from processing swappables
-            sw2_pr0_s_val = pr0_s_val;
-            sw2_pr1_s_val = 'bx;        // reserved
-            sw0_pr0_s_val = pr1_s_val;
-            sw0_pr1_s_val = 'bx;        // reserved
-            sw1_pr0_s_val = 'bx;        // filling, no processing inputs
-            sw1_pr1_s_val = 'bx;        // filling, no processing inputs
-            // outputs to processing swappables
-            pr0_val = sw2_pr0_val;
-            pr1_val = sw0_pr0_val;
-            // internal controls
-            fill_done = sw1_fill_done;
-            sw0_fill_kick = rotate;
-        end
+        {% end %}
         default:
             if (reset_n)
                 $display("<NABPFilteredRAMSwapControl>"
