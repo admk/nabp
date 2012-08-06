@@ -18,6 +18,11 @@
     shift_cnt_init = c['image_size'] - 2
     shift_cnt_width = bin_width(shift_cnt_init)
 
+    if shift_cnt_init + 1 < fill_cnt_init:
+        raise RuntimeError(
+                'Fill count (%d) should always be smaller or equal to shift'
+                'count (%d).' % (fill_cnt_init, shift_cnt_init))
+
     accu_fixed = c['tShiftAccuBase']
     accu_init_str = accu_fixed.verilog_repr()
     accu_floor_slice = accu_fixed.verilog_floor_slice()
