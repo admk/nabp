@@ -188,7 +188,7 @@ begin:rotate_update
                 if (hs_next_angle_ack) 
                     rotate = 1'b1;
             end
-        fill_and_work_s, fill_and_work_repeat_s:
+        fill_and_work_1_s, fill_and_work_2_s:
             if (fill_done && pr_next_angle)
             begin
                 hs_next_angle = hs_has_next_angle;
@@ -211,16 +211,16 @@ begin:mealy_next_state
                 next_state <= fill_s;
         fill_s:
             if (rotate)
-                next_state <= fill_and_work_s;
-        fill_and_work_s:
+                next_state <= fill_and_work_1_s;
+        fill_and_work_1_s:
             if (rotate)
-                next_state <= fill_and_work_repeat_s;
-        fill_and_work_repeat_s:
+                next_state <= fill_and_work_2_s;
+        fill_and_work_2_s:
             if (rotate)
                 if (hs_has_next_angle)
                     next_state <= work_1_s;
                 else
-                    next_state <= fill_and_work_repeat_s;
+                    next_state <= fill_and_work_2_s;
         work_1_s:
             if (rotate)
                 next_state <= work_2_s;
