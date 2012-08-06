@@ -38,7 +38,10 @@ module NABPFilteredRAMSwapControl
     output wire [`kSLength-1:0] hs_s_val,
     output wire hs_next_angle,
     // outputs to processing swappables
-    output reg [`kAngleLength-1:0] pr_angle,
+    output reg [`kAngleLength-1:0] pr0_angle,
+    output reg [`kAngleLength-1:0] pr1_angle,
+    output reg pr0_angle_valid,
+    output reg pr1_angle_valid,
     output wire pr_next_angle_ack,
     output wire signed [`kFilteredDataLength-1:0] pr0_val,
     output wire signed [`kFilteredDataLength-1:0] pr1_val
@@ -89,6 +92,26 @@ begin:transition
                 rotate_sel <= {# to_r(0) #};
             else
                 rotate_sel <= rotate_sel + {# to_r(1) #};
+    end
+end
+
+// angle update
+reg pr_angle_valid_d;
+always @(posedge clk)
+begin
+    if (!reset_n)
+    begin
+        pr_angle_valid_d <= 1'b0;
+        pr0_angle_valid <= 1'b0;
+        pr1_angle_valid <= 1'b0;
+    end
+    else if (rotate)
+    begin
+        pr_angle_valid_d <= hs_has_next_angle;
+        pr0_angle <= hs_angle;
+        pr1_angle <= pr0_angle;
+        pr0_angle_valid <= pr_angle_valid_d;
+        pr1_angle_valid <= pr0_angle_valid;
     end
 end
 
