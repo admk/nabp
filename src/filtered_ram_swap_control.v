@@ -17,6 +17,9 @@
 // Dual Port RAM ------> FilteredRAMSwappable -----> FilteredRAMSwapControl
 // FIR is not in NABPFilteredRAMSwapControl to make early testing easier.
 // Possible TODO: refactor FIR to be a part of NABPFilteredRAMSwapControl.
+{#
+    from pynabp.enums import filtered_ram_swap_control_states
+#}
 
 module NABPFilteredRAMSwapControl
 (
@@ -40,8 +43,8 @@ module NABPFilteredRAMSwapControl
     // outputs to processing swappables
     output reg [`kAngleLength-1:0] pr0_angle,
     output reg [`kAngleLength-1:0] pr1_angle,
-    output reg pr0_angle_valid,
-    output reg pr1_angle_valid,
+    output reg pr0_next_angle_valid,
+    output reg pr1_next_angle_valid,
     output wire pr_next_angle_ack,
     output wire signed [`kFilteredDataLength-1:0] pr0_val,
     output wire signed [`kFilteredDataLength-1:0] pr1_val
@@ -101,17 +104,17 @@ always @(posedge clk)
 begin
     if (!reset_n)
     begin
-        pr_angle_valid_d <= 1'b0;
-        pr0_angle_valid <= 1'b0;
-        pr1_angle_valid <= 1'b0;
+        pr_angle_valid_d <= `NO;
+        pr0_next_angle_valid <= `NO;
+        pr1_next_angle_valid <= `NO;
     end
     else if (rotate)
     begin
         pr_angle_valid_d <= hs_has_next_angle;
         pr0_angle <= hs_angle;
         pr1_angle <= pr0_angle;
-        pr0_angle_valid <= pr_angle_valid_d;
-        pr1_angle_valid <= pr0_angle_valid;
+        pr0_next_angle_valid <= hs_has_next_angle;
+        pr1_next_angle_valid <= pr0_next_angle_valid;
     end
 end
 
@@ -129,7 +132,7 @@ always @(*)
 begin:rotate_sel_mux
     // default outputs
     {% for i in range(rotate) %}
-    sw{#i#}_fill_kick = 1'b0;
+    sw{#i#}_fill_kick = `NO;
     {% end %}
     {#
         rotates = []
@@ -175,29 +178,29 @@ assign pr_next_angle_ack = rotate;
 
 always @(*)
 begin:rotate_update
-    rotate = 1'b0;
-    hs_next_angle = 1'b0;
+    rotate = `NO;
+    hs_next_angle = `NO;
     case (state)
         ready_s:
             if (hs_next_angle_ack)
-                rotate = 1'b1;
+                rotate = `YES;
         fill_s:
             if (fill_done)
             begin
-                hs_next_angle = 1'b1;
+                hs_next_angle = `YES;
                 if (hs_next_angle_ack) 
-                    rotate = 1'b1;
+                    rotate = `YES;
             end
         fill_and_work_1_s, fill_and_work_2_s:
             if (fill_done && pr_next_angle)
             begin
                 hs_next_angle = hs_has_next_angle;
                 if (~hs_has_next_angle || hs_next_angle_ack)
-                    rotate = 1'b1;
+                    rotate = `YES;
             end
         work_1_s:
             if (pr_next_angle)
-                rotate = 1'b1;
+                rotate = `YES;
     endcase
 end
 

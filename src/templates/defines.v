@@ -22,6 +22,9 @@
 #}
 `timescale 1ns/{# c['time_precision'] #}
 
+`define YES 1'b1
+`define NO 1'b0
+
 {% for key, val in __angle_defines.iteritems() %}
 `define {# key #} {# val #} {% end %}
 
