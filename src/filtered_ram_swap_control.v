@@ -110,7 +110,6 @@ begin
     end
     else if (rotate)
     begin
-        pr_angle_valid_d <= hs_has_next_angle;
         pr0_angle <= hs_angle;
         pr1_angle <= pr0_angle;
         pr0_next_angle_valid <= hs_has_next_angle;
@@ -174,8 +173,6 @@ begin:rotate_sel_mux
     endcase
 end
 
-assign pr_next_angle_ack = rotate;
-
 always @(*)
 begin:rotate_update
     rotate = `NO;
@@ -189,18 +186,27 @@ begin:rotate_update
             begin
                 hs_next_angle = `YES;
                 if (hs_next_angle_ack) 
+                begin
                     rotate = `YES;
+                    pr_next_angle_ack = `YES;
+                end
             end
         fill_and_work_1_s, fill_and_work_2_s:
             if (fill_done && pr_next_angle)
             begin
                 hs_next_angle = hs_has_next_angle;
                 if (~hs_has_next_angle || hs_next_angle_ack)
+                begin
                     rotate = `YES;
+                    pr_next_angle_ack = `YES;
+                end
             end
         work_1_s:
             if (pr_next_angle)
+            begin
                 rotate = `YES;
+                pr_next_angle_ack = `YES;
+            end
     endcase
 end
 
