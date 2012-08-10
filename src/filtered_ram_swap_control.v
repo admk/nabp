@@ -43,8 +43,7 @@ module NABPFilteredRAMSwapControl
     // outputs to processing swappables
     output reg [`kAngleLength-1:0] pr0_angle,
     output reg [`kAngleLength-1:0] pr1_angle,
-    output reg pr0_next_angle_valid,
-    output reg pr1_next_angle_valid,
+    output reg pr0_angle_valid,
     output wire pr_next_angle_ack,
     output wire signed [`kFilteredDataLength-1:0] pr0_val,
     output wire signed [`kFilteredDataLength-1:0] pr1_val
@@ -106,14 +105,13 @@ begin
     begin
         pr_angle_valid_d <= `NO;
         pr0_next_angle_valid <= `NO;
-        pr1_next_angle_valid <= `NO;
     end
     else if (rotate)
     begin
         pr0_angle <= hs_angle;
         pr1_angle <= pr0_angle;
-        pr0_next_angle_valid <= hs_has_next_angle;
-        pr1_next_angle_valid <= pr0_next_angle_valid;
+        pr_angle_valid_d <= hs_has_next_angle;
+        pr0_angle_valid <= pr_angle_valid_d;
     end
 end
 
