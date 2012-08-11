@@ -184,12 +184,6 @@ NABPProcessingSwappable sw{#i#}
 );
 {% end %}
 
-// F̲i̲l̲t̲e̲r̲e̲d̲ ̲R̲A̲M̲ ̲P̲o̲r̲t̲s̲ ̲<̲-̲>̲ ̲P̲r̲o̲c̲e̲s̲s̲i̲n̲g̲ ̲S̲w̲a̲p̲p̲a̲b̲l̲e̲s̲ ̲R̲o̲u̲t̲i̲n̲g̲ ̲T̲a̲b̲l̲e̲
-//   ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲
-// | ̲s̲w̲_̲s̲e̲l̲ ̲|̲ ̲f̲r̲0̲ ̲|̲ ̲f̲r̲1̲ ̲|
-// |      0 | sw0 | sw1 |
-// | ̲ ̲ ̲ ̲ ̲ ̲1̲ ̲|̲ ̲s̲w̲1̲ ̲|̲ ̲s̲w̲0̲ ̲|
-
 // look-up tables
 NABPMapperLUT mapper_lut
 (
