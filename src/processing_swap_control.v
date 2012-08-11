@@ -33,8 +33,7 @@ module NABPProcessingSwapControl
     output wire signed [`kSLength-1:0] fr1_s_val
     {% if c['debug'] %},
     // debug signals
-    output wire [`kAngleLength-1:0] db_angle,
-    output wire [`kPartitionSizeLength-1:0] db_line_itr
+    output wire [`kAngleLength-1:0] db_angle
     {% end %}
 );
 
@@ -61,16 +60,60 @@ begin:transition
     end
 end
 
+// swappable wirings
+{% for i in [0, 1] %}
+wire sw{#i#}_fill_kick, sw{#i#}_fill_done;
+wire sw{#i#}_shift_kick, sw{#i#}_shift_done;
+{% end %}
+// control signal multiplexers and demultiplexers
+wire fill_done, fill_kick, shift_done, shift_kick;
 always @(*)
-begin:swap_update
+begin:mux_and_demux
+    if (sel)
+    begin
+        // to swappables
+        sw0_fill_kick = `NO;
+        sw1_fill_kick = fill_kick;
+        sw0_shift_kick = shift_kick;
+        sw1_shift_kick = `NO;
+        // from swappables
+        fill_done = sw0_fill_done;
+        shift_done = sw1_shift_done;
+    end
+    else
+    begin
+        // to swappables
+        sw0_fill_kick = fill_kick;
+        sw1_fill_kick = `NO;
+        sw0_shift_kick = `NO;
+        sw1_shift_kick = shift_kick;
+        // from swappables
+        fill_done = sw1_fill_done;
+        shift_done = sw0_shift_done;
+    end
+end
+
+always @(*)
+begin:mealy_output_update_internal
     swap <= `NO;
     case (state)
-        ready_s:
-            if (fr_next_angle_ack)
-                swap <= `YES;
+        fill_and_shift_setup_2_s:
+            swap <= `YES;
+    endcase
+end
+
+assign fr_done = // finished all angles, return to ready state
+                 (next_state == ready_s);
+always @(*)
+begin:mealy_outputs_external
+    fr_next_angle = `NO;
+    case (state)
         fill_s:
-            if (fill_done && fr_next_angle_ack)
+            if (fill_done)
+                fr_next_angle = `YES;
         fill_and_shift_s:
+            if (fill_done && shift_done)
+                fr_next_angle = `YES;
     endcase
 end
 
@@ -79,24 +122,27 @@ begin:mealy_next_state
     next_state <= state;
     case (state) // synopsys parallel_case
         ready_s:
-            if (swap)
+            if (fr_next_angle_ack)
                 next_state <= setup_s;
         setup_1_s:
             next_state <= setup_2_s;
         setup_2_s:
             next_state <= fill_s;
         fill_s:
-            if (swap)
+            if (fr_next_angle_ack)
+                next_state <= fill_and_shift_setup_1_s;
+        fill_and_shift_setup_1_s:
+            next_state <= fill_and_shift_setup_2_s;
+        fill_and_shift_setup_2_s:
+            if (fr0_angle_valid)
                 next_state <= fill_and_shift_s;
-        // TODO need setup before new fills
+            else
+                next_state <= shift_s;
         fill_and_shift_s:
-            if (swap)
-                if ()
-                    next_state <= fill_and_shift_s;
-                else
-                    next_state <= shift_s;
+            if (fr_next_angle_ack)
+                next_state <= fill_and_shift_setup_1_s;
         shift_s:
-            if (swap)
+            if (shift_done)
                 next_state <= ready_s;
     endcase
 end
@@ -123,13 +169,13 @@ NABPProcessingSwappable sw{#i#}
     .sw_sh_accu_base(sw{#i#}_sh_accu_base),
     .sw_mp_accu_init(sw{#i#}_mp_accu_init),
     .sw_mp_accu_base(sw{#i#}_mp_accu_base),
-    .sw_swap_ack(sw{#i#}_swap_ack),
-    .sw_next_itr_ack(sw{#i#}_next_itr_ack),
+    .sw_swap_ack(sw{#i#}_shift_kick),
+    .sw_next_itr_ack(sw{#i#}_fill_kick),
     // inputs from Filtered RAM
     .fr_val(sw{#i#}_fr_val),
     // outputs to swap control
-    .sw_swap(sw{#i#}_swap),
-    .sw_next_itr(sw{#i#}_next_itr),
+    .sw_swap(sw{#i#}_fill_done),
+    .sw_next_itr(sw{#i#}_shift_done),
     .sw_pe_kick(sw{#i#}_pe_kick),
     // outputs to Filtered RAM
     .fr_s_val(sw{#i#}_fr_s_val),
