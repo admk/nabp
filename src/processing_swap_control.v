@@ -6,6 +6,8 @@
 {#
     from pynabp.enums import \
             processing_swap_control_states, scan_mode, scan_direction
+
+    swap = 2
 #}
 
 module NABPProcessingSwapControl
@@ -61,36 +63,58 @@ begin:transition
 end
 
 // swappable wirings
-{% for i in [0, 1] %}
+{% for i in range(swap) %}
 wire sw{#i#}_fill_kick, sw{#i#}_fill_done;
 wire sw{#i#}_shift_kick, sw{#i#}_shift_done;
+wire [`kSLength-1:0] sw{#i#}_fr_s_val;
+wire [`kFilteredDataLength-1:0] sw{#i#}_fr_val;
+wire [`kFilteredDataLength*`kNoOfPartitions-1:0] sw{#i#}_pe_taps;
 {% end %}
 // control signal multiplexers and demultiplexers
 wire fill_done, fill_kick, shift_done, shift_kick;
 always @(*)
 begin:mux_and_demux
-    if (sel)
-    begin
-        // to swappables
-        sw0_fill_kick = `NO;
-        sw1_fill_kick = fill_kick;
-        sw0_shift_kick = shift_kick;
-        sw1_shift_kick = `NO;
-        // from swappables
-        fill_done = sw0_fill_done;
-        shift_done = sw1_shift_done;
-    end
+    {#
+        swaps = []
+        swap_list = range(swap)
+        for _ in range(swap):
+            swaps.append(swap_list)
+            swap_list = swap_list[-1:] + swap_list[:-1]
+    #}
+    case (sel)
+        {% for i, r in enumerate(swap) %}
+        {# to_b(i) #}:
+        begin
+            // to swappables
+            sw{#r[0]#}_fill_kick = `NO;
+            sw{#r[1]#}_fill_kick = fill_kick;
+            sw{#r[0]#}_shift_kick = shift_kick;
+            sw{#r[1]#}_shift_kick = `NO;
+            sw{#r[0]#}_fr_val = fr{#r[0]#}_val;
+            sw{#r[1]#}_fr_val = fr{#r[1]#}_val;
+            // to PEs
+            pe_taps = sw{#r[1]#}_pe_taps;
+            pe_kick = sw{#r[1]#}_pe_kick;
+            // from swappables
+            fill_done = sw{#r[0]#}_fill_done;
+            shift_done = sw{#r[1]#}_shift_done;
+            fr{#r[0]#}_s_val = sw{#r[0]#}_fr_s_val;
+            fr{#r[1]#}_s_val = sw{#r[1]#}_fr_s_val;
+        end
+        {% end %}
+    endcase
+end
+
+always @(fr1_angle)
+begin:scan_modes_update
+    if (pe_angle < `kAngle45 || pe_angle >= `kAngle135)
+        pe_scan_mode = {# scan_mode.x #};
     else
-    begin
-        // to swappables
-        sw0_fill_kick = fill_kick;
-        sw1_fill_kick = `NO;
-        sw0_shift_kick = `NO;
-        sw1_shift_kick = shift_kick;
-        // from swappables
-        fill_done = sw1_fill_done;
-        shift_done = sw0_shift_done;
-    end
+        pe_scan_mode = {# scan_mode.y #};
+    if (pe_angle < `kAngle90)
+        pe_scan_direction = {# scan_direction.forward #};
+    else
+        pe_scan_direction = {# scan_direction.reverse #};
 end
 
 always @(*)
@@ -147,14 +171,11 @@ begin:mealy_next_state
     endcase
 end
 
-{% for i in [0, 1] %}
+{% for i in range(swap) %}
 // swappable {#i#}
 wire {# c['tShiftAccuBase'].verilog_decl() #} sw{#i#}_sh_accu_base;
 wire {# c['tMapAccuInit'].verilog_decl() #} sw{#i#}_mp_accu_init;
 wire {# c['tMapAccuBase'].verilog_decl() #} sw{#i#}_mp_accu_base;
-wire [`kSLength-1:0] sw{#i#}_fr_s_val;
-wire [`kFilteredDataLength-1:0] sw{#i#}_fr_val;
-wire [`kFilteredDataLength*`kNoOfPartitions-1:0] sw{#i#}_pe_taps;
 // wirings
 assign sw{#i#}_sh_accu_base = sh_accu_base;
 assign sw{#i#}_mp_accu_init = mp_accu_init;

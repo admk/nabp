@@ -17,6 +17,8 @@
     def to_p(val):
         return dec_repr(val,
                 bin_width(c['partition_scheme']['no_of_partitions']))
+    def to_b(val):
+        return '`YES' if val else '`NO'
 
     __angle_defines = { k: v for k, v in c.iteritems() if 'kAngle' in k }
 #}
