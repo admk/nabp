@@ -127,7 +127,7 @@ begin:mealy_output_update_internal
 end
 
 assign fr_done = // finished all angles, return to ready state
-                 (next_state == ready_s);
+                 (state != ready_s && next_state == ready_s);
 always @(*)
 begin:mealy_outputs_external
     fr_next_angle = `NO;
@@ -210,7 +210,7 @@ NABPMapperLUT mapper_lut
 (
     // inputs
     .clk(clk),
-    .mp_angle(fr_angle),
+    .mp_angle(fr1_angle),
     // outputs
     .mp_accu_part(mp_accu_part),
     .mp_accu_base(mp_accu_base)
@@ -219,9 +219,13 @@ NABPShifterLUT shifter_lut
 (
     // inputs
     .clk(clk),
-    .sh_angle(fr_angle),
+    .sh_angle(fr1_angle),
     // output
     .sh_accu_base(sh_accu_base)
 );
+
+{% if c['debug'] %}
+assign db_angle = fr1_angle;
+{% end %}
 
 endmodule
