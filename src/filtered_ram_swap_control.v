@@ -38,15 +38,16 @@ module NABPFilteredRAMSwapControl
     input wire pr_next_angle,
     input wire pr_done,
     // outputs to host RAM
-    output wire [`kSLength-1:0] hs_s_val,
-    output wire hs_next_angle,
+    output reg [`kSLength-1:0] hs_s_val,
+    output reg hs_next_angle,
     // outputs to processing swappables
     output reg [`kAngleLength-1:0] pr0_angle,
     output reg [`kAngleLength-1:0] pr1_angle,
     output reg pr0_angle_valid,
-    output wire pr_next_angle_ack,
-    output wire signed [`kFilteredDataLength-1:0] pr0_val,
-    output wire signed [`kFilteredDataLength-1:0] pr1_val
+    output reg pr1_angle_valid,
+    output reg pr_next_angle_ack,
+    output reg signed [`kFilteredDataLength-1:0] pr0_val,
+    output reg signed [`kFilteredDataLength-1:0] pr1_val
 );
 
 {#
@@ -63,15 +64,15 @@ module NABPFilteredRAMSwapControl
 `define kRotate {# rotate #}
 `define kRotateLength {# bin_width(rotate) #}
 
-wire rotate;
+reg rotate;
 reg [`kRotateLength-1:0] rotate_sel;
 
-{% for i in swap_list %}
+{% for i in range(rotate) %}
 // signal wirings for swappable {#i#}
 // inputs
-wire sw{#i#}_fill_kick;
-wire [`kSLength-1:0] sw{#i#}_pr0_s_val, sw{#i#}_pr1_s_val;
-wire signed [`kFilteredDataLength-1:0] sw{#i#}_hs_val;
+reg sw{#i#}_fill_kick;
+reg [`kSLength-1:0] sw{#i#}_pr0_s_val, sw{#i#}_pr1_s_val;
+reg signed [`kFilteredDataLength-1:0] sw{#i#}_hs_val;
 // outputs
 wire sw{#i#}_fill_done;
 wire [`kSLength-1:0] sw{#i#}_hs_s_val;
@@ -104,7 +105,8 @@ begin
     if (!reset_n)
     begin
         pr_angle_valid_d <= `NO;
-        pr0_next_angle_valid <= `NO;
+        pr0_angle_valid <= `NO;
+        pr1_angle_valid <= `NO;
     end
     else if (rotate)
     begin
@@ -112,10 +114,11 @@ begin
         pr1_angle <= pr0_angle;
         pr_angle_valid_d <= hs_has_next_angle;
         pr0_angle_valid <= pr_angle_valid_d;
+        pr1_angle_valid <= pr0_angle_valid;
     end
 end
 
-wire fill_done, fill_kick;
+reg fill_done, fill_kick;
 
 // Multiplexer and demultiplexer scheme
 // ============ === === === ========================
@@ -127,6 +130,8 @@ wire fill_done, fill_kick;
 // ============ === === === ========================
 always @(*)
 begin:rotate_sel_mux
+    // initialisations
+    fill_kick = rotate;
     // default outputs
     {% for i in range(rotate) %}
     sw{#i#}_fill_kick = `NO;
@@ -161,12 +166,12 @@ begin:rotate_sel_mux
             // internal controls
             fill_done = sw{#r[0]#}_fill_done;
             // fill kick starts before rotation, so iterator-1 mod 2
-            sw{#r[2]#}_fill_kick = rotate;
+            sw{#r[2]#}_fill_kick = fill_kick;
         end
         {% end %}
         default:
             if (reset_n)
-                $display("<NABPFilteredRAMSwapControl>"
+                $display("<NABPFilteredRAMSwapControl>",
                     "Unrecognised rotate_sel: %d", rotate_sel);
     endcase
 end
