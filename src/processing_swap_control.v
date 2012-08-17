@@ -74,34 +74,46 @@ wire [`kFilteredDataLength*`kNoOfPartitions-1:0] sw{#i#}_pe_taps;
 reg fill_done, fill_kick, shift_done, shift_kick;
 
 // control signal multiplexers and demultiplexers
+{#
+    swaps = []
+    swap_list = range(swap)
+    for _ in range(swap):
+        swaps.append(swap_list)
+        swap_list = swap_list[-1:] + swap_list[:-1]
+#}
 always @(*)
 begin:mux_and_demux
-    {#
-        swaps = []
-        swap_list = range(swap)
-        for _ in range(swap):
-            swaps.append(swap_list)
-            swap_list = swap_list[-1:] + swap_list[:-1]
-    #}
+    // initialisations
+    {% for i in range(swap) %}
+    sw{#i#}_fill_kick <= 1'bx;
+    sw{#i#}_shift_kick <= 1'bx;
+    sw{#i#}_fr_val <= 'bx;
+    {% end %}
+    pe_taps <= 'bx;
+    pe_kick <= 1'bx;
+    fill_done <= 1'bx;
+    shift_done <= 1'bx;
+    fr0_s_val <= 'bx;
+    fr1_s_val <= 'bx;
     case (sel)
         {% for i, r in enumerate(swaps) %}
         {# to_b(i) #}:
         begin
             // to swappables
-            sw{#r[0]#}_fill_kick = `NO;
-            sw{#r[1]#}_fill_kick = fill_kick;
-            sw{#r[0]#}_shift_kick = shift_kick;
-            sw{#r[1]#}_shift_kick = `NO;
-            sw{#r[0]#}_fr_val = fr0_val;
-            sw{#r[1]#}_fr_val = fr1_val;
+            sw{#r[0]#}_fill_kick <= `NO;
+            sw{#r[1]#}_fill_kick <= fill_kick;
+            sw{#r[0]#}_shift_kick <= shift_kick;
+            sw{#r[1]#}_shift_kick <= `NO;
+            sw{#r[0]#}_fr_val <= fr0_val;
+            sw{#r[1]#}_fr_val <= fr1_val;
             // to PEs
-            pe_taps = sw{#r[1]#}_pe_taps;
-            pe_kick = sw{#r[1]#}_pe_kick;
+            pe_taps <= sw{#r[1]#}_pe_taps;
+            pe_kick <= sw{#r[1]#}_pe_kick;
             // from swappables
-            fill_done = sw{#r[0]#}_fill_done;
-            shift_done = sw{#r[1]#}_shift_done;
-            fr0_s_val = sw{#r[0]#}_fr_s_val;
-            fr1_s_val = sw{#r[1]#}_fr_s_val;
+            fill_done <= sw{#r[0]#}_fill_done;
+            shift_done <= sw{#r[1]#}_shift_done;
+            fr0_s_val <= sw{#r[0]#}_fr_s_val;
+            fr1_s_val <= sw{#r[1]#}_fr_s_val;
         end
         {% end %}
     endcase
@@ -109,6 +121,10 @@ end
 
 always @(fr1_angle)
 begin:scan_modes_update
+    // initialisation
+    pe_scan_mode <= 'bx;
+    pe_scan_direction <= 'bx;
+    // assignments
     if (fr1_angle < `kAngle45 || fr1_angle >= `kAngle135)
         pe_scan_mode <= {# scan_mode.x #};
     else

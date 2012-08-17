@@ -139,6 +139,16 @@ assign fill_kick = rotate;
 #}
 always @(*)
 begin:rotate_sel_mux
+    // initialisations (prevent latches)
+    hs_s_val <= 'bx;
+    pr0_val <= 'bx;
+    pr1_val <= 'bx;
+    fill_done <= `NO;
+    {% for i in range(rotate) %}
+    sw{#i#}_pr0_s_val <= 'bx;
+    sw{#i#}_pr1_s_val <= 'bx;
+    sw{#i#}_fill_kick <= `NO;
+    {% end %}
     // multiplexers and demultiplexers
     case (rotate_sel)
         {% for i, r in enumerate(rotates) %}
