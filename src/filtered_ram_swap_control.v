@@ -67,18 +67,6 @@ module NABPFilteredRAMSwapControl
 reg rotate;
 reg [`kRotateLength-1:0] rotate_sel;
 
-{% for i in range(rotate) %}
-// signal wirings for swappable {#i#}
-// inputs
-reg sw{#i#}_fill_kick;
-reg [`kSLength-1:0] sw{#i#}_pr0_s_val, sw{#i#}_pr1_s_val;
-reg signed [`kFilteredDataLength-1:0] sw{#i#}_hs_val;
-// outputs
-wire sw{#i#}_fill_done;
-wire [`kSLength-1:0] sw{#i#}_hs_s_val;
-wire signed [`kFilteredDataLength-1:0] sw{#i#}_pr0_val, sw{#i#}_pr1_val;
-{% end %}
-
 // mealy state transition
 always @(posedge clk)
 begin:transition
@@ -118,8 +106,6 @@ begin
     end
 end
 
-reg fill_done, fill_kick;
-
 // Multiplexer and demultiplexer scheme
 // ============ === === === ========================
 //  rotate_sel   0   1   2   Description
@@ -128,45 +114,55 @@ reg fill_done, fill_kick;
 //  buffers      1   0   2   -> fill to processing
 //               2   1   0   -> shift to processing
 // ============ === === === ========================
+{% for i in range(rotate) %}
+// signal wirings for swappable {#i#}
+// inputs
+reg sw{#i#}_fill_kick;
+reg [`kSLength-1:0] sw{#i#}_pr0_s_val, sw{#i#}_pr1_s_val;
+reg signed [`kFilteredDataLength-1:0] sw{#i#}_hs_val;
+// outputs
+wire sw{#i#}_fill_done;
+wire [`kSLength-1:0] sw{#i#}_hs_s_val;
+wire signed [`kFilteredDataLength-1:0] sw{#i#}_pr0_val, sw{#i#}_pr1_val;
+{% end %}
+
+reg fill_done;
+wire fill_kick;
+assign fill_kick = rotate;
+
+{#
+    rotates = []
+    rotate_list = range(rotate)
+    for _ in range(rotate):
+        rotates.append(rotate_list)
+        rotate_list = rotate_list[-1:] + rotate_list[:-1]
+#}
 always @(*)
 begin:rotate_sel_mux
-    // initialisations
-    fill_kick = rotate;
-    // default outputs
-    {% for i in range(rotate) %}
-    sw{#i#}_fill_kick = `NO;
-    {% end %}
-    {#
-        rotates = []
-        rotate_list = range(rotate)
-        for _ in range(rotate):
-            rotates.append(rotate_list)
-            rotate_list = rotate_list[-1:] + rotate_list[:-1]
-    #}
     // multiplexers and demultiplexers
     case (rotate_sel)
         {% for i, r in enumerate(rotates) %}
         {# to_r(i) #}:
         begin
             // outputs to host
-            hs_s_val = sw{#r[0]#}_hs_s_val;
+            hs_s_val <= sw{#r[0]#}_hs_s_val;
             // inputs from processing swappables
             // not used, filling buffer
-            sw{#r[0]#}_pr0_s_val = 'bx;
-            sw{#r[0]#}_pr1_s_val = 'bx;
+            sw{#r[0]#}_pr0_s_val <= 'bx;
+            sw{#r[0]#}_pr1_s_val <= 'bx;
             // processing filling
-            sw{#r[1]#}_pr0_s_val = pr0_s_val;
-            sw{#r[1]#}_pr1_s_val = 'bx;     // reserved
+            sw{#r[1]#}_pr0_s_val <= pr0_s_val;
+            sw{#r[1]#}_pr1_s_val <= 'bx;     // reserved
             // processing shifting
-            sw{#r[2]#}_pr0_s_val = pr1_s_val;
-            sw{#r[2]#}_pr1_s_val = 'bx;     // reserved
+            sw{#r[2]#}_pr0_s_val <= pr1_s_val;
+            sw{#r[2]#}_pr1_s_val <= 'bx;     // reserved
             // outputs to processing swappables
-            pr0_val = sw{#r[1]#}_pr0_val;
-            pr1_val = sw{#r[2]#}_pr0_val;
+            pr0_val <= sw{#r[1]#}_pr0_val;
+            pr1_val <= sw{#r[2]#}_pr0_val;
             // internal controls
-            fill_done = sw{#r[0]#}_fill_done;
+            fill_done <= sw{#r[0]#}_fill_done;
             // fill kick starts before rotation, so iterator-1 mod 2
-            sw{#r[2]#}_fill_kick = fill_kick;
+            sw{#r[2]#}_fill_kick <= fill_kick;
         end
         {% end %}
         default:
@@ -178,37 +174,41 @@ end
 
 always @(*)
 begin:rotate_update
-    rotate = `NO;
-    hs_next_angle = `NO;
+    rotate <= `NO;
+    hs_next_angle <= `NO;
+    pr_next_angle_ack <= `NO;
     case (state)
         ready_s:
+        begin
+            hs_next_angle <= `YES;
             if (hs_next_angle_ack)
-                rotate = `YES;
+                rotate <= `YES;
+        end
         fill_s:
             if (fill_done)
             begin
-                hs_next_angle = `YES;
+                hs_next_angle <= `YES;
                 if (hs_next_angle_ack) 
                 begin
-                    rotate = `YES;
-                    pr_next_angle_ack = `YES;
+                    rotate <= `YES;
+                    pr_next_angle_ack <= `YES;
                 end
             end
         fill_and_work_1_s, fill_and_work_2_s:
             if (fill_done && pr_next_angle)
             begin
-                hs_next_angle = hs_has_next_angle;
+                hs_next_angle <= hs_has_next_angle;
                 if (~hs_has_next_angle || hs_next_angle_ack)
                 begin
-                    rotate = `YES;
-                    pr_next_angle_ack = `YES;
+                    rotate <= `YES;
+                    pr_next_angle_ack <= `YES;
                 end
             end
         work_1_s:
             if (pr_next_angle)
             begin
-                rotate = `YES;
-                pr_next_angle_ack = `YES;
+                rotate <= `YES;
+                pr_next_angle_ack <= `YES;
             end
     endcase
 end

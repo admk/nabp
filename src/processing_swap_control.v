@@ -110,16 +110,16 @@ end
 always @(fr1_angle)
 begin:scan_modes_update
     if (fr1_angle < `kAngle45 || fr1_angle >= `kAngle135)
-        pe_scan_mode = {# scan_mode.x #};
+        pe_scan_mode <= {# scan_mode.x #};
     else
-        pe_scan_mode = {# scan_mode.y #};
+        pe_scan_mode <= {# scan_mode.y #};
     if (fr1_angle < `kAngle90)
-        pe_scan_direction = {# scan_direction.forward #};
+        pe_scan_direction <= {# scan_direction.forward #};
     else
-        pe_scan_direction = {# scan_direction.reverse #};
+        pe_scan_direction <= {# scan_direction.reverse #};
 end
 
-always @(*)
+always @(state)
 begin:mealy_output_update_internal
     swap <= `NO;
     case (state)
@@ -132,25 +132,27 @@ assign fr_done = // finished all angles, return to ready state
                  (state != ready_s && next_state == ready_s);
 always @(*)
 begin:mealy_outputs_external
-    fr_next_angle = `NO;
+    fr_next_angle <= `NO;
     case (state)
+        ready_s:
+            fr_next_angle <= `YES;
         fill_s:
             if (fill_done)
-                fr_next_angle = `YES;
+                fr_next_angle <= `YES;
         fill_and_shift_s:
             if (fill_done && shift_done)
-                fr_next_angle = `YES;
+                fr_next_angle <= `YES;
     endcase
 end
 
 always @(*)
 begin:mealy_outputs_internal
-    fill_kick = `NO;
-    shift_kick = `NO;
+    fill_kick <= `NO;
+    shift_kick <= `NO;
     if (state == setup_2_s || state == fill_and_shift_setup_2_s)
     begin
-        fill_kick = fr0_angle_valid;
-        shift_kick = fr1_angle_valid;
+        fill_kick <= fr0_angle_valid;
+        shift_kick <= fr1_angle_valid;
     end
 end
 
