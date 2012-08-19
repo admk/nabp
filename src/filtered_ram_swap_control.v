@@ -139,7 +139,7 @@ assign fill_kick = rotate;
 #}
 always @(*)
 begin:rotate_sel_mux
-    // initialisations (prevent latches)
+    // prevent latches
     hs_s_val <= 'bx;
     pr0_val <= 'bx;
     pr1_val <= 'bx;
@@ -157,21 +157,16 @@ begin:rotate_sel_mux
             // outputs to host
             hs_s_val <= sw{#r[0]#}_hs_s_val;
             // inputs from processing swappables
-            // not used, filling buffer
-            sw{#r[0]#}_pr0_s_val <= 'bx;
-            sw{#r[0]#}_pr1_s_val <= 'bx;
-            // processing filling
+            // processing filling, pr1 reserved
             sw{#r[1]#}_pr0_s_val <= pr0_s_val;
-            sw{#r[1]#}_pr1_s_val <= 'bx;     // reserved
-            // processing shifting
+            // processing shifting, pr1 reserved
             sw{#r[2]#}_pr0_s_val <= pr1_s_val;
-            sw{#r[2]#}_pr1_s_val <= 'bx;     // reserved
             // outputs to processing swappables
             pr0_val <= sw{#r[1]#}_pr0_val;
             pr1_val <= sw{#r[2]#}_pr0_val;
             // internal controls
             fill_done <= sw{#r[0]#}_fill_done;
-            // fill kick starts before rotation, so iterator-1 mod 2
+            // fill kick starts before rotation, so iterator-1 mod rotates
             sw{#r[2]#}_fill_kick <= fill_kick;
         end
         {% end %}
@@ -220,6 +215,12 @@ begin:rotate_update
                 rotate <= `YES;
                 pr_next_angle_ack <= `YES;
             end
+        default:
+        begin
+            rotate <= `NO;
+            hs_next_angle <= `NO;
+            pr_next_angle_ack <= `NO;
+        end
     endcase
 end
 
@@ -257,7 +258,6 @@ begin:mealy_next_state
 end
 
 {% for i in range(rotate) %}
-
 // swappable {#i#} instantiation
 NABPFilteredRAMSwappable sw{#i#}
 (

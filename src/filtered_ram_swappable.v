@@ -63,7 +63,10 @@ end
 // mealy outputs
 wire write_enable;
 wire delay_done;
-assign hs_fill_done = (next_state == ready_s);
+wire write_itr_done;
+assign write_itr_done = write_itr == {# to_s(p_line_size - 1) #};
+assign hs_fill_done = (state == ready_s) ||
+                      (state == fill_s && write_itr_done);
 assign hs_s_val = read_itr;
 assign write_enable = (state == fill_s);
 // One cycle delay and one cycle advance, one because of synchronous read one
@@ -84,7 +87,7 @@ begin:mealy_next_state
             if (delay_done)
                 next_state <= fill_s;
         fill_s:
-            if (write_itr == {# to_s(p_line_size - 1) #})
+            if (write_itr_done)
                 next_state <= ready_s;
         default:
             if (reset_n)

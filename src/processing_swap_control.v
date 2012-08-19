@@ -51,7 +51,7 @@ begin:transition
     if (!reset_n)
     begin
         state <= ready_s;
-        sel <= 1'b0;
+        sel <= `NO;
     end
     else
     begin
@@ -85,14 +85,14 @@ always @(*)
 begin:mux_and_demux
     // initialisations
     {% for i in range(swap) %}
-    sw{#i#}_fill_kick <= 1'bx;
-    sw{#i#}_shift_kick <= 1'bx;
+    sw{#i#}_fill_kick <= `NO;
+    sw{#i#}_shift_kick <= `NO;
     sw{#i#}_fr_val <= 'bx;
     {% end %}
     pe_taps <= 'bx;
-    pe_kick <= 1'bx;
-    fill_done <= 1'bx;
-    shift_done <= 1'bx;
+    pe_kick <= `NO;
+    fill_done <= `NO;
+    shift_done <= `NO;
     fr0_s_val <= 'bx;
     fr1_s_val <= 'bx;
     case (sel)
@@ -100,10 +100,8 @@ begin:mux_and_demux
         {# to_b(i) #}:
         begin
             // to swappables
-            sw{#r[0]#}_fill_kick <= `NO;
             sw{#r[1]#}_fill_kick <= fill_kick;
             sw{#r[0]#}_shift_kick <= shift_kick;
-            sw{#r[1]#}_shift_kick <= `NO;
             sw{#r[0]#}_fr_val <= fr0_val;
             sw{#r[1]#}_fr_val <= fr1_val;
             // to PEs
@@ -116,6 +114,10 @@ begin:mux_and_demux
             fr1_s_val <= sw{#r[1]#}_fr_s_val;
         end
         {% end %}
+        default:
+            if (reset_n)
+                $display("<NABPProcessingSwapControl>",
+                    "Unrecognised sel: %d", sel);
     endcase
 end
 
@@ -199,6 +201,10 @@ begin:mealy_next_state
         shift_s:
             if (shift_done)
                 next_state <= ready_s;
+        default:
+            if (reset_n)
+                $display("<NABPProcessingSwapControl>",
+                    "Unrecognised state: %d", state);
     endcase
 end
 
