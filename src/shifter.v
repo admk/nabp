@@ -51,6 +51,8 @@ module NABPShifter
     output wire sw_pe_kick
 );
 
+{# include('templates/state_decl(states).v', states=shifter_states()) #}
+
 // S̲i̲g̲n̲a̲l̲ ̲D̲e̲l̲a̲y̲s̲
 // Handled by this module rather than higher level modules
 // 2 cycles delay for output control signals to state control
@@ -136,8 +138,6 @@ begin:counters
         end
     endcase
 end
-
-{# include('templates/state_decl(states).v', states=shifter_states()) #}
 
 always @(posedge clk)
 begin:transition

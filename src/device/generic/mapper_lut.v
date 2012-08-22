@@ -30,7 +30,12 @@ module NABPMapperLUT
 );
 
 reg {# accu_part_fixed.verilog_decl() #} accu_part;
-assign mp_accu_part = {accu_part, {# dec_repr(0, mp_accu_part_shift) #}};
+assign mp_accu_part =
+    {% if mp_accu_part_shift > 0 %}
+    {accu_part, {# dec_repr(0, mp_accu_part_shift) #}}
+    {% else %}
+    accu_part
+    {% end %};
 
 always @(posedge clk)
 begin

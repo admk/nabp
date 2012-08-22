@@ -145,8 +145,13 @@ parameter [`kImageSizeLength-1:0] pe_tap_offset = 'bz;
 wire [`kAddressLength-1:0] addr;
 reg [`kAddressLength-2:0] base_addr;
 reg [`kImageSizeLength-1:0] scan_cnt;
+wire [`kCacheDataLength-1:0] read_val;
 reg done_d, work_overwrite_0_done, work_overwrite_1_done;
 wire done, scan_done, scan_domino_done, scan_domino_mode, work_overwrite_done;
+reg [`kCacheDataLength-1:0] pe_in_val_d;
+always @(posedge clk)
+    if (ir_domino_enable)
+        pe_in_val_d <= pe_in_val;
 
 assign scan_domino_mode = (state == domino_start_s || state == domino_0_s) ?
                           1'd0 : 1'd1;
@@ -198,11 +203,6 @@ begin:work_overwrite_done_update
             work_overwrite_1_done <= 1'd1;
     end
 end
-
-reg [`kCacheDataLength-1:0] pe_in_val_d;
-always @(posedge clk)
-    if (ir_domino_enable)
-        pe_in_val_d <= pe_in_val;
 
 // T̲i̲m̲i̲n̲g̲ ̲D̲i̲a̲g̲r̲a̲m̲ ̲f̲o̲r̲ ̲P̲r̲o̲c̲e̲s̲s̲i̲n̲g̲ ̲E̲l̲e̲m̲e̲n̲t̲ ̲D̲o̲m̲i̲n̲o̲ ̲C̲h̲a̲i̲n̲
 // [ext]
@@ -273,7 +273,6 @@ end
 reg write_en;
 reg [`kAddressLength-1:0] write_addr;
 wire [`kCacheDataLength-1:0] write_val;
-wire [`kCacheDataLength-1:0] read_val;
 
 assign write_val = work_overwrite_done ? (read_val + lb_val) : lb_val;
 always @(posedge clk)
