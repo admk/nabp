@@ -53,9 +53,11 @@ class processing_swap_control_states(enum):
         self.ready = None
         self.setup_1 = None
         self.setup_2 = None
+        self.setup_3 = None
         self.fill = None
         self.fill_and_shift_setup_1 = None
         self.fill_and_shift_setup_2 = None
+        self.fill_and_shift_setup_3 = None
         self.fill_and_shift = None
         self.shift = None
         super(processing_swap_control_states, self).__init__()

@@ -139,7 +139,7 @@ always @(state)
 begin:mealy_output_update_internal
     swap <= `NO;
     case (state)
-        setup_2_s, fill_and_shift_setup_2_s:
+        setup_3_s, fill_and_shift_setup_3_s:
             swap <= `YES;
     endcase
 end
@@ -165,7 +165,7 @@ always @(*)
 begin:mealy_outputs_internal
     fill_kick <= `NO;
     shift_kick <= `NO;
-    if (state == setup_2_s || state == fill_and_shift_setup_2_s)
+    if (state == setup_3_s || state == fill_and_shift_setup_3_s)
     begin
         fill_kick <= fr0_angle_valid;
         shift_kick <= fr1_angle_valid;
@@ -182,6 +182,8 @@ begin:mealy_next_state
         setup_1_s:
             next_state <= setup_2_s;
         setup_2_s:
+            next_state <= setup_3_s;
+        setup_3_s:
             next_state <= fill_s;
         fill_s:
             if (fr_next_angle_ack)
@@ -189,6 +191,8 @@ begin:mealy_next_state
         fill_and_shift_setup_1_s:
             next_state <= fill_and_shift_setup_2_s;
         fill_and_shift_setup_2_s:
+            next_state <= fill_and_shift_setup_3_s;
+        fill_and_shift_setup_3_s:
             if (fr0_angle_valid)
                 next_state <= fill_and_shift_s;
             else
