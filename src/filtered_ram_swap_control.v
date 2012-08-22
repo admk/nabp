@@ -242,9 +242,9 @@ begin:mealy_next_state
         fill_and_work_2_s:
             if (rotate)
                 if (hs_has_next_angle)
-                    next_state <= work_1_s;
-                else
                     next_state <= fill_and_work_2_s;
+                else
+                    next_state <= work_1_s;
         work_1_s:
             if (rotate)
                 next_state <= work_2_s;
