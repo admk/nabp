@@ -126,9 +126,11 @@ wire [`kSLength-1:0] sw{#i#}_hs_s_val;
 wire signed [`kFilteredDataLength-1:0] sw{#i#}_pr0_val, sw{#i#}_pr1_val;
 {% end %}
 
-reg fill_done;
-wire fill_kick;
-assign fill_kick = rotate;
+reg fill_done, fill_kick;
+always @(posedge clk)
+begin:fill_kick_update
+    fill_kick <= rotate;
+end
 
 {#
     rotates = []
@@ -165,9 +167,8 @@ begin:rotate_sel_mux
             pr0_val <= sw{#r[1]#}_pr0_val;
             pr1_val <= sw{#r[2]#}_pr0_val;
             // internal controls
-            fill_done <= sw{#r[0]#}_fill_done;
-            // fill kick starts before rotation, so iterator-1 mod rotates
-            sw{#r[2]#}_fill_kick <= fill_kick;
+            fill_done <= sw{#r[0]#}_fill_done && !fill_kick;
+            sw{#r[0]#}_fill_kick <= fill_kick;
         end
         {% end %}
         default:

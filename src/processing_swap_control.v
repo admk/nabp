@@ -31,8 +31,8 @@ module NABPProcessingSwapControl
     // output to RAM
     output reg fr_next_angle,
     output wire fr_done,
-    output reg signed [`kSLength-1:0] fr0_s_val,
-    output reg signed [`kSLength-1:0] fr1_s_val
+    output wire signed [`kSLength-1:0] fr0_s_val,
+    output wire signed [`kSLength-1:0] fr1_s_val
     {% if c['debug'] %},
     // debug signals
     output wire [`kAngleLength-1:0] db_angle
@@ -67,12 +67,11 @@ reg sw{#i#}_fill_kick, sw{#i#}_shift_kick;
 wire sw{#i#}_pe_kick;
 wire sw{#i#}_shift_done, sw{#i#}_fill_done;
 wire [`kSLength-1:0] sw{#i#}_fr_s_val;
-reg [`kFilteredDataLength-1:0] sw{#i#}_fr_val;
+wire [`kFilteredDataLength-1:0] sw{#i#}_fr_val;
 wire [`kFilteredDataLength*`kNoOfPartitions-1:0] sw{#i#}_pe_taps;
 {% end %}
 
 reg fill_done, fill_kick, shift_done, shift_kick;
-
 // control signal multiplexers and demultiplexers
 {#
     swaps = []
@@ -87,14 +86,11 @@ begin:mux_and_demux
     {% for i in range(swap) %}
     sw{#i#}_fill_kick <= `NO;
     sw{#i#}_shift_kick <= `NO;
-    sw{#i#}_fr_val <= 'bx;
     {% end %}
     pe_taps <= 'bx;
     pe_kick <= `NO;
     fill_done <= `NO;
     shift_done <= `NO;
-    fr0_s_val <= 'bx;
-    fr1_s_val <= 'bx;
     case (sel)
         {% for i, r in enumerate(swaps) %}
         {# to_b(i) #}:
@@ -102,16 +98,12 @@ begin:mux_and_demux
             // to swappables
             sw{#r[1]#}_fill_kick <= fill_kick;
             sw{#r[0]#}_shift_kick <= shift_kick;
-            sw{#r[0]#}_fr_val <= fr0_val;
-            sw{#r[1]#}_fr_val <= fr1_val;
             // to PEs
             pe_taps <= sw{#r[1]#}_pe_taps;
             pe_kick <= sw{#r[1]#}_pe_kick;
             // from swappables
             fill_done <= sw{#r[0]#}_fill_done;
             shift_done <= sw{#r[1]#}_shift_done;
-            fr0_s_val <= sw{#r[0]#}_fr_s_val;
-            fr1_s_val <= sw{#r[1]#}_fr_s_val;
         end
         {% end %}
         default:
@@ -120,6 +112,12 @@ begin:mux_and_demux
                     "Unrecognised sel: %d", sel);
     endcase
 end
+
+// datapath muxing & demuxing
+assign fr0_s_val = (sel == {# to_b(0) #}) ? sw0_fr_s_val : sw1_fr_s_val;
+assign fr1_s_val = (sel == {# to_b(0) #}) ? sw1_fr_s_val : sw0_fr_s_val;
+assign sw0_fr_val = (sel == {# to_b(0) #}) ? fr0_val : fr1_val;
+assign sw1_fr_val = (sel == {# to_b(0) #}) ? fr1_val : fr0_val;
 
 always @(fr1_angle)
 begin:scan_modes_update
@@ -141,7 +139,7 @@ always @(state)
 begin:mealy_output_update_internal
     swap <= `NO;
     case (state)
-        fill_and_shift_setup_2_s:
+        setup_2_s, fill_and_shift_setup_2_s:
             swap <= `YES;
     endcase
 end
