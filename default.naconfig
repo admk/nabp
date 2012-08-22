@@ -83,7 +83,10 @@ config = \
         #   value should also be sensible enough to ensure no processing
         #   elements are doing work for wasted pixels only (validator will
         #   check for this).
-        'no_of_processing_elements': 20,
+        #   FIXME In this new implementation, this value must equal to image
+        #   size. Future implementations will incorporate concurrent
+        #   subdivision to allow further increase of the value.
+        'no_of_processing_elements': 127,
 
         # The angle step size.
         # This determines the difference of angle values between two projection
