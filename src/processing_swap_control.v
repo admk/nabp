@@ -253,7 +253,7 @@ NABPMapperLUT mapper_lut
 (
     // inputs
     .clk(clk),
-    .mp_angle(fr1_angle),
+    .mp_angle(fr0_angle),
     // outputs
     .mp_accu_part(mp_accu_part),
     .mp_accu_base(mp_accu_base)
@@ -262,7 +262,7 @@ NABPShifterLUT shifter_lut
 (
     // inputs
     .clk(clk),
-    .sh_angle(fr1_angle),
+    .sh_angle(fr0_angle),
     // output
     .sh_accu_base(sh_accu_base)
 );
