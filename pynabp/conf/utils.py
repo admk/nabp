@@ -1,3 +1,5 @@
+import os
+
 from pynabp.utils import bin_width_of_dec
 from pynabp.fixed_point_arith import FixedPoint
 from pynabp.conf.ramp_filter import ramp_filter
@@ -15,6 +17,9 @@ def import_conf(path):
 
 def export_conf(path, conf):
     """Export a configuration dictionary to path"""
+    directory = os.path.split(path)[0]
+    if not os.path.exists(directory):
+        os.mkdir(directory)
     with open(path, 'w') as f:
         f.write('config = \\\n' + repr(conf))
 
