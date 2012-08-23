@@ -7,7 +7,7 @@ ingredients = {
             shift_register.v
             """),
         'filtered_ram': Split("""
-            dual_port_ram.v
+            dual_clock_simple_dual_port_ram.v
             filtered_ram_swappable.v
             filtered_ram_swap_control.v
             """),
@@ -21,6 +21,7 @@ ingredients = {
             processing_swappable.v
             """),
         'nabp': Split("""
+            dual_port_ram.v
             nabp.v
             sinogram_addresser.v
             processing_swap_control.v
@@ -44,6 +45,7 @@ device_specific = Split("""
         line_buffer.v
         shift_register.v
         dual_port_ram.v
+        dual_clock_simple_dual_port_ram.v
         filter.v
         image_ram.v
         sinogram_data_lut.v
