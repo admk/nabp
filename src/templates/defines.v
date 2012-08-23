@@ -17,10 +17,15 @@
     def to_p(val):
         return dec_repr(val,
                 bin_width(c['partition_scheme']['no_of_partitions']))
+    def to_b(val):
+        return '`YES' if val else '`NO'
 
     __angle_defines = { k: v for k, v in c.iteritems() if 'kAngle' in k }
 #}
 `timescale 1ns/{# c['time_precision'] #}
+
+`define YES 1'b1
+`define NO 1'b0
 
 {% for key, val in __angle_defines.iteritems() %}
 `define {# key #} {# val #} {% end %}

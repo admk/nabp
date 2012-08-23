@@ -48,7 +48,7 @@ begin:transition
         state <= ready_s;
     else
         state <= next_state;
-    if (sw_next_itr)
+    if (state == ready_s)
     begin
         mp_accu_base <= sw_mp_accu_base;
         sh_accu_base <= sw_sh_accu_base;

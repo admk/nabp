@@ -19,7 +19,6 @@
 // Possible TODO: refactor FIR to be a part of NABPFilteredRAMSwapControl.
 {#
     from pynabp.enums import filtered_ram_swap_control_states
-    swap_list = range(2)
 #}
 
 module NABPFilteredRAMSwapControl
@@ -37,166 +36,36 @@ module NABPFilteredRAMSwapControl
     input wire [`kSLength-1:0] pr0_s_val,
     input wire [`kSLength-1:0] pr1_s_val,
     input wire pr_next_angle,
-    input wire pr_prev_angle_release,
     input wire pr_done,
     // outputs to host RAM
-    output wire [`kSLength-1:0] hs_s_val,
-    output wire hs_next_angle,
+    output reg [`kSLength-1:0] hs_s_val,
+    output reg hs_next_angle,
     // outputs to processing swappables
-    output reg [`kAngleLength-1:0] pr_angle,
-    output reg pr_has_next_angle,
-    output wire pr_next_angle_ack,
-    output wire pr_prev_angle_release_ack,
-    output wire signed [`kFilteredDataLength-1:0] pr0_val,
-    output wire signed [`kFilteredDataLength-1:0] pr1_val
+    output reg [`kAngleLength-1:0] pr0_angle,
+    output reg [`kAngleLength-1:0] pr1_angle,
+    output reg pr0_angle_valid,
+    output reg pr1_angle_valid,
+    output reg pr_next_angle_ack,
+    output reg signed [`kFilteredDataLength-1:0] pr0_val,
+    output reg signed [`kFilteredDataLength-1:0] pr1_val
 );
 
 {#
+    # TODO update states
     include('templates/state_decl(states).v',
             states=filtered_ram_swap_control_states())
+
+    rotate = 3
+
+    def to_r(val):
+        return dec_repr(val, bin_width(rotate))
 #}
 
-// swappable mux & demux select signal
-//     S̲e̲l̲e̲c̲t̲ ̲T̲a̲b̲l̲e̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲
-//    | ̲s̲w̲_̲s̲e̲l̲ ̲|̲ ̲ ̲ ̲ ̲ ̲s̲w̲0̲ ̲|̲ ̲ ̲ ̲ ̲ ̲s̲w̲1̲ ̲|
-//    |      0 | working | filling |
-//    | ̲ ̲ ̲ ̲ ̲ ̲1̲ ̲|̲ ̲f̲i̲l̲l̲i̲n̲g̲ ̲|̲ ̲w̲o̲r̲k̲i̲n̲g̲ ̲|
-reg sw_sel;
+`define kRotate {# rotate #}
+`define kRotateLength {# bin_width(rotate) #}
 
-{% for i in swap_list %}
-// signal wirings for swappable {#i#}
-// inputs
-wire sw{#i#}_fill_kick;
-wire [`kSLength-1:0] sw{#i#}_pr0_s_val, sw{#i#}_pr1_s_val;
-wire signed [`kFilteredDataLength-1:0] sw{#i#}_hs_val;
-// outputs
-wire sw{#i#}_fill_done;
-wire [`kSLength-1:0] sw{#i#}_hs_s_val;
-wire signed [`kFilteredDataLength-1:0] sw{#i#}_pr0_val, sw{#i#}_pr1_val;
-{% end %}
-
-wire fill_done, fill_kick;
-assign fill_done = sw_sel ? sw0_fill_done : sw1_fill_done;
-assign sw0_fill_kick = sw_sel ? 0 : fill_kick;
-assign sw1_fill_kick = sw_sel ? fill_kick : 0;
-assign hs_s_val = sw_sel ? sw0_hs_s_val : sw1_hs_s_val;
-
-reg swap_prev;
-wire swap, swap_curr;
-assign swap = (!swap_prev && swap_curr);
-always @(posedge clk)
-begin:swap_pulse
-    if (!reset_n)
-        swap_prev <= 0;
-    else
-        swap_prev <= swap_curr;
-end
-// angle update
-always @(posedge clk)
-    if (!reset_n)
-    begin
-        // must have some angle for processing
-        pr_has_next_angle <= 1;
-    end
-    else if (pr_next_angle_ack || pr_prev_angle_release_ack)
-    begin
-        pr_angle <= hs_angle;
-        pr_has_next_angle <= hs_has_next_angle;
-    end
-
-// F̲i̲l̲t̲e̲r̲e̲d̲ ̲R̲A̲M̲ ̲S̲w̲a̲p̲p̲a̲b̲l̲e̲ ̲<̲-̲>̲ ̲P̲r̲o̲c̲e̲s̲s̲i̲n̲g̲ ̲S̲w̲a̲p̲p̲a̲b̲l̲e̲ ̲D̲a̲t̲a̲ ̲P̲a̲t̲h̲ ̲R̲o̲u̲t̲i̲n̲g̲ ̲S̲c̲h̲e̲m̲e̲
-// Diverging allows two processing swappables to work on two different angles
-// simultaneously. It happens after p̲r̲_̲n̲e̲x̲t̲_̲a̲n̲g̲l̲e̲_̲a̲c̲k̲ response, and then
-// allowed to continue after p̲r̲_̲p̲r̲e̲v̲_̲a̲n̲g̲l̲e̲_̲r̲e̲l̲e̲a̲s̲e̲_̲a̲c̲k̲. The routing is handled
-// by processing swappable, filtered RAM swappable only cares about how buffer
-// swapping should be handled.
-//
-//    [A]< ̶* ̶>[0]   / [A]< ̶*  [0]
-//         |       /       |
-//    [B]< ̶*  [1] /   [B]< ̶* ̶>[1]
-//     (sw_sel)       (!sw_sel)
-//       {fill_and_work_s}
-//
-// after pr_next_angle_ack -
-//
-//    [A]< ̶ ̶ ̶>[0]   / [A]< ̶x ̶>[0]
-//                 /       |      (swapped)
-//    [B]< ̶ ̶ ̶>[1] /   [B]< ̶x ̶>[1]
-//
-//        {diverged_work_s}
-//
-// after pr_prev_angle_release_ack -
-//
-//    [A]< ̶*  [0]   / [A]< ̶* ̶>[0]
-//         |       /       |
-//    [B]< ̶* ̶>[1] /   [B]< ̶*  [1]
-//     (!sw_sel)      (sw_sel)
-//        {fill_and_work_s}
-//
-//    [A/B]: Processing swappables
-//    [0/1]: Filtered swappables
-//
-// D̲i̲v̲e̲r̲g̲e̲d̲ ̲D̲a̲t̲a̲ ̲P̲a̲t̲h̲ ̲P̲r̲o̲t̲o̲c̲o̲l̲
-// In f̲i̲l̲l̲_̲a̲n̲d̲_̲s̲h̲i̲f̲t̲_̲s̲, both processing swappables are reading off from the
-// same filtered RAM swappable, and the filling and working swappables
-// swapping are handled by the filtered RAM swap control.
-//
-//    [A] ̶* ̶>[0]   / [A] ̶*  [0]
-//        |       /      |
-//    [B] ̶*  [1] /   [B] ̶* ̶>[1]
-//     (sw_sel)       (!sw_sel)
-//       {fill_and_work_s}
-//
-// In d̲i̲v̲e̲r̲g̲e̲d̲_̲w̲o̲r̲k̲_̲s̲, filtered RAM swap control makes the ports p̲r̲0̲_̲s̲_̲v̲a̲l̲ and
-// p̲r̲0̲_̲v̲a̲l̲ provide data paths for the current angle being shifted, while
-// p̲r̲1̲_̲s̲_̲v̲a̲l̲ and p̲r̲1̲_̲v̲a̲l̲ provide the next angle to fill the processing
-// swappable. Processing swap control will figure out how to handle routing
-// with this protocol. See S̲e̲l̲e̲c̲t̲ ̲&̲ ̲D̲i̲v̲e̲r̲g̲e̲d̲ ̲T̲a̲b̲l̲e̲.
-
-// mealy outputs
-// to processing
-wire prev_angle_release, diverged;
-assign diverged = // data path diverged when in diverged_work_s state
-                  (state == diverged_work_s);
-assign prev_angle_release = // release oldest angle if want next angle and
-                            pr_prev_angle_release &&
-                            // fill done
-                            fill_done &&
-                            // only when advancing, not diverging
-                            (// if filling then discard dirty working buffer
-                             // to fill immediately after fill done
-                             (state == fill_s) ||
-                             // if diverging done then we need the next buffer
-                             // to become the current main buffer, and fill the
-                             // old buffer
-                             (state == diverged_work_s));
-assign pr_prev_angle_release_ack = (state != ready_s) &&
-                                   // acknowledgement happens when needed and
-                                   pr_prev_angle_release &&
-                                   // swap happens because prev_angle_release
-                                   swap;
-assign pr_next_angle_ack = (state != ready_s) &&
-                           (// acknowledgement happens when either swapped
-                            (// or ready to get into diverge state when needed
-                             // because the next buffer is done filling
-                             pr_next_angle && fill_done &&
-                             // and the only state when diverging is possible
-                             (state == fill_and_work_s)));
-// to host
-assign hs_next_angle = // request for the next angle when ready or
-                       (reset_n && state == ready_s) ||
-                       // requested by release signal
-                       prev_angle_release;
-// internal
-assign fill_kick = // kicks when wanted to swap and
-                   swap &&
-                   // has next angle to start with
-                   hs_has_next_angle;
-assign swap_curr = hs_has_next_angle ?
-                   // swap when host responds for next angle request
-                   hs_next_angle_ack :
-                   // or no new angle available, simply wait for release
-                   prev_angle_release;
+reg rotate;
+reg [`kRotateLength-1:0] rotate_sel;
 
 // mealy state transition
 always @(posedge clk)
@@ -204,40 +73,182 @@ begin:transition
     if (!reset_n)
     begin
         state <= ready_s;
-        sw_sel <= 0;
+        rotate_sel <= {# to_r(0) #};
     end
     else
     begin
         state <= next_state;
-        if (swap)
-            sw_sel <= !sw_sel;
+        if (rotate)
+            if (rotate_sel == {# to_r(rotate - 1) #})
+                rotate_sel <= {# to_r(0) #};
+            else
+                rotate_sel <= rotate_sel + {# to_r(1) #};
     end
+end
+
+// angle update
+reg pr_angle_valid_d;
+always @(posedge clk)
+begin
+    if (!reset_n)
+    begin
+        pr_angle_valid_d <= `NO;
+        pr0_angle_valid <= `NO;
+        pr1_angle_valid <= `NO;
+    end
+    else if (rotate)
+    begin
+        pr0_angle <= hs_angle;
+        pr1_angle <= pr0_angle;
+        pr_angle_valid_d <= hs_has_next_angle;
+        pr0_angle_valid <= pr_angle_valid_d;
+        pr1_angle_valid <= pr0_angle_valid;
+    end
+end
+
+// Multiplexer and demultiplexer scheme
+// ============ === === === ========================
+//  rotate_sel   0   1   2   Description
+// ------------ --- --- --- ------------------------
+//  Order of     0   2   1   <- fill from host
+//  buffers      1   0   2   -> fill to processing
+//               2   1   0   -> shift to processing
+// ============ === === === ========================
+{% for i in range(rotate) %}
+// signal wirings for swappable {#i#}
+// inputs
+reg sw{#i#}_fill_kick;
+reg [`kSLength-1:0] sw{#i#}_pr0_s_val, sw{#i#}_pr1_s_val;
+reg signed [`kFilteredDataLength-1:0] sw{#i#}_hs_val;
+// outputs
+wire sw{#i#}_fill_done;
+wire [`kSLength-1:0] sw{#i#}_hs_s_val;
+wire signed [`kFilteredDataLength-1:0] sw{#i#}_pr0_val, sw{#i#}_pr1_val;
+{% end %}
+
+reg fill_done, fill_kick;
+always @(posedge clk)
+begin:fill_kick_update
+    fill_kick <= rotate;
+end
+
+{#
+    rotates = []
+    rotate_list = range(rotate)
+    for _ in range(rotate):
+        rotates.append(rotate_list)
+        rotate_list = rotate_list[-1:] + rotate_list[:-1]
+#}
+always @(*)
+begin:rotate_sel_mux
+    // prevent latches
+    hs_s_val <= 'bx;
+    pr0_val <= 'bx;
+    pr1_val <= 'bx;
+    fill_done <= `NO;
+    {% for i in range(rotate) %}
+    sw{#i#}_pr0_s_val <= 'bx;
+    sw{#i#}_pr1_s_val <= 'bx;
+    sw{#i#}_fill_kick <= `NO;
+    {% end %}
+    // multiplexers and demultiplexers
+    case (rotate_sel)
+        {% for i, r in enumerate(rotates) %}
+        {# to_r(i) #}:
+        begin
+            // outputs to host
+            hs_s_val <= sw{#r[0]#}_hs_s_val;
+            // inputs from processing swappables
+            // processing filling, pr1 reserved
+            sw{#r[1]#}_pr0_s_val <= pr0_s_val;
+            // processing shifting, pr1 reserved
+            sw{#r[2]#}_pr0_s_val <= pr1_s_val;
+            // outputs to processing swappables
+            pr0_val <= sw{#r[1]#}_pr0_val;
+            pr1_val <= sw{#r[2]#}_pr0_val;
+            // internal controls
+            fill_done <= sw{#r[0]#}_fill_done && !fill_kick;
+            sw{#r[0]#}_fill_kick <= fill_kick;
+        end
+        {% end %}
+        default:
+            if (reset_n)
+                $display("<NABPFilteredRAMSwapControl>",
+                    "Unrecognised rotate_sel: %d", rotate_sel);
+    endcase
+end
+
+always @(*)
+begin:rotate_update
+    rotate <= `NO;
+    hs_next_angle <= `NO;
+    pr_next_angle_ack <= `NO;
+    case (state)
+        ready_s:
+        begin
+            hs_next_angle <= `YES;
+            if (hs_next_angle_ack)
+                rotate <= `YES;
+        end
+        fill_s:
+            if (fill_done)
+            begin
+                hs_next_angle <= `YES;
+                if (hs_next_angle_ack) 
+                begin
+                    rotate <= `YES;
+                    pr_next_angle_ack <= `YES;
+                end
+            end
+        fill_and_work_1_s, fill_and_work_2_s:
+            if (fill_done && pr_next_angle)
+            begin
+                hs_next_angle <= hs_has_next_angle;
+                if (~hs_has_next_angle || hs_next_angle_ack)
+                begin
+                    rotate <= `YES;
+                    pr_next_angle_ack <= `YES;
+                end
+            end
+        work_1_s:
+            if (pr_next_angle)
+            begin
+                rotate <= `YES;
+                pr_next_angle_ack <= `YES;
+            end
+        default:
+        begin
+            rotate <= `NO;
+            hs_next_angle <= `NO;
+            pr_next_angle_ack <= `NO;
+        end
+    endcase
 end
 
 // mealy next state
 always @(*)
 begin:mealy_next_state
     next_state <= state;
-    case (state) // synopsys parallel_case full_case
+    case (state) // synopsys parallel_case
         ready_s:
-            if (hs_next_angle_ack)
+            if (rotate)
                 next_state <= fill_s;
         fill_s:
-            if (swap)
+            if (rotate)
+                next_state <= fill_and_work_1_s;
+        fill_and_work_1_s:
+            if (rotate)
+                next_state <= fill_and_work_2_s;
+        fill_and_work_2_s:
+            if (rotate)
                 if (hs_has_next_angle)
-                    next_state <= fill_and_work_s;
+                    next_state <= fill_and_work_2_s;
                 else
-                    next_state <= work_s;
-        fill_and_work_s:
-            if (pr_next_angle_ack)
-                next_state <= diverged_work_s;
-        diverged_work_s:
-            if (pr_prev_angle_release_ack)
-                if (hs_has_next_angle)
-                    next_state <= fill_and_work_s;
-                else
-                    next_state <= work_s;
-        work_s:
+                    next_state <= work_1_s;
+        work_1_s:
+            if (rotate)
+                next_state <= work_2_s;
+        work_2_s:
             if (pr_done)
                 next_state <= ready_s;
         default:
@@ -247,12 +258,7 @@ begin:mealy_next_state
     endcase
 end
 
-{% for i in swap_list %}
-// signal wirings for swappable {#i#}
-assign sw{#i#}_pr0_s_val = pr0_s_val;
-assign sw{#i#}_pr1_s_val = pr1_s_val;
-assign sw{#i#}_hs_val = hs_val;
-
+{% for i in range(rotate) %}
 // swappable {#i#} instantiation
 NABPFilteredRAMSwappable sw{#i#}
 (
@@ -261,7 +267,7 @@ NABPFilteredRAMSwappable sw{#i#}
     .reset_n(reset_n),
     // inputs from host
     .hs_fill_kick(sw{#i#}_fill_kick),
-    .hs_val(sw{#i#}_hs_val),
+    .hs_val(hs_val),
     // inputs from processing swappables
     .pr0_s_val(sw{#i#}_pr0_s_val),
     .pr1_s_val(sw{#i#}_pr1_s_val),
@@ -273,14 +279,5 @@ NABPFilteredRAMSwappable sw{#i#}
     .pr1_val(sw{#i#}_pr1_val)
 );
 {% end %}
-
-//     S̲e̲l̲e̲c̲t̲ ̲&̲ ̲D̲i̲v̲e̲r̲g̲e̲d̲ ̲T̲a̲b̲l̲e̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲
-//    | ̲s̲w̲_̲s̲e̲l̲ ̲|̲ ̲d̲i̲v̲e̲r̲g̲e̲d̲ ̲|̲ ̲ ̲ ̲ ̲ ̲s̲w̲0̲ ̲|̲ ̲ ̲ ̲ ̲ ̲s̲w̲1̲ ̲|̲ ̲p̲r̲0̲ ̲|̲ ̲p̲r̲1̲ ̲|
-//    |      0 |        0 | working | filling | sw0 | sw0 |
-//    |      0 |        1 | working | working | sw0 | sw1 |
-//    |      1 |        0 | filling | working | sw1 | sw1 |
-//    | ̲ ̲ ̲ ̲ ̲ ̲1̲ ̲|̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲1̲ ̲|̲ ̲w̲o̲r̲k̲i̲n̲g̲ ̲|̲ ̲w̲o̲r̲k̲i̲n̲g̲ ̲|̲ ̲s̲w̲1̲ ̲|̲ ̲s̲w̲0̲ ̲|
-assign pr0_val = sw_sel ? sw1_pr0_val : sw0_pr0_val;
-assign pr1_val = (sw_sel ^ diverged) ? sw1_pr1_val : sw0_pr1_val;
 
 endmodule

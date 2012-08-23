@@ -1,24 +1,25 @@
 [*]
 [*] GTKWave Analyzer v3.3.31 (w)1999-2012 BSI
-[*] Sun Jun  3 17:38:36 2012
+[*] Wed Aug 22 14:35:29 2012
 [*]
 [dumpfile] "/Users/admko/Documents/Sorcery/NABP/build/reconstruction_test.v.lxt"
-[dumpfile_mtime] "Sun Jun  3 17:37:52 2012"
-[dumpfile_size] 373831
+[dumpfile_mtime] "Wed Aug 22 14:34:29 2012"
+[dumpfile_size] 627799
 [savefile] "/Users/admko/Documents/Sorcery/NABP/wave/reconstruction_test_wave.gtkw"
-[timestart] 3260000
-[size] 1920 1036
+[timestart] 0
+[size] 1440 852
 [pos] 0 44
-*-23.000000 26610000 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+*-23.000000 8690000 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
 [treeopen] NABPReconstructionTest.
 [treeopen] NABPReconstructionTest.nabp_uut.
+[treeopen] NABPReconstructionTest.nabp_uut.processing_element_1.
 [treeopen] NABPReconstructionTest.nabp_uut.processing_swap_control.
 [treeopen] NABPReconstructionTest.nabp_uut.processing_swap_control.sw0.
 [treeopen] NABPReconstructionTest.nabp_uut.processing_swap_control.sw1.
 [sst_width] 198
 [signals_width] 305
 [sst_expanded] 1
-[sst_vpaned_height] 454
+[sst_vpaned_height] 275
 @c00200
 -host
 @28
@@ -43,7 +44,7 @@ NABPReconstructionTest.nabp_uut.sinogram_addresser.state[1:0]
 @24
 [color] 7
 NABPReconstructionTest.nabp_uut.sinogram_addresser.fr_angle[7:0]
-@8024
+@8420
 [color] 3
 NABPReconstructionTest.sinogram_lut.sg_val[9:0]
 @20000
@@ -61,33 +62,23 @@ NABPReconstructionTest.nabp_uut.filtered_ram_swap_control.hs_next_angle[0]
 [color] 7
 ^2 /Users/admko/Documents/Sorcery/NABP/wave/../derived_src/filtered_ram_swap_control.vxtf
 NABPReconstructionTest.nabp_uut.filtered_ram_swap_control.state[2:0]
-@28
-[color] 7
-NABPReconstructionTest.nabp_uut.filtered_ram_swap_control.sw_sel[0]
 @1000200
 -filtered ram
-@800200
+@800201
 -processing
-@c00200
 -control
-@28
-[color] 2
-NABPReconstructionTest.nabp_uut.processing_swap_control.fr_has_next_angle[0]
+@29
 [color] 2
 NABPReconstructionTest.nabp_uut.processing_swap_control.fr_next_angle[0]
 [color] 2
 NABPReconstructionTest.nabp_uut.processing_swap_control.fr_next_angle_ack[0]
-[color] 2
-NABPReconstructionTest.nabp_uut.processing_swap_control.fr_prev_angle_release[0]
-[color] 2
-NABPReconstructionTest.nabp_uut.processing_swap_control.fr_prev_angle_release_ack[0]
-@1401200
+@1000201
 -control
-@2024
+@2025
 [color] 7
 ^3 /Users/admko/Documents/Sorcery/NABP/wave/../derived_src/processing_swap_control.vxtf
 NABPReconstructionTest.nabp_uut.processing_swap_control.state[3:0]
-@800200
+@c00201
 -sw0
 @28
 [color] 5
@@ -98,14 +89,9 @@ NABPReconstructionTest.nabp_uut.processing_swap_control.sw0.state_control.sw_swa
 [color] 5
 ^4 /Users/admko/Documents/Sorcery/NABP/wave/../derived_src/processing_swappable_state_control.vxtf
 NABPReconstructionTest.nabp_uut.processing_swap_control.sw0.state_control.state[2:0]
-@8024
-[color] 5
-NABPReconstructionTest.nabp_uut.processing_swap_control.sw0.fr_val[12:0]
-@20000
--
-@1000200
+@1401201
 -sw0
-@800200
+@c00201
 -sw1
 @28
 [color] 5
@@ -116,46 +102,46 @@ NABPReconstructionTest.nabp_uut.processing_swap_control.sw1.state_control.sw_swa
 [color] 5
 ^4 /Users/admko/Documents/Sorcery/NABP/wave/../derived_src/processing_swappable_state_control.vxtf
 NABPReconstructionTest.nabp_uut.processing_swap_control.sw1.state_control.state[2:0]
-@8024
-[color] 5
-NABPReconstructionTest.nabp_uut.processing_swap_control.sw1.fr_val[12:0]
-@20000
--
-@1000200
+@1401201
 -sw1
-@24
-[color] 7
-NABPReconstructionTest.nabp_uut.processing_swap_control.line_cnt[2:0]
-@28
-[color] 7
-NABPReconstructionTest.nabp_uut.processing_swap_control.sw_sel[0]
-@1000200
+@1000201
 -processing
 @800200
 -processing element 0
+@24
+NABPReconstructionTest.nabp_uut.processing_element_1.pe_angle[7:0]
 @28
 NABPReconstructionTest.nabp_uut.processing_element_0.sw_kick[0]
 NABPReconstructionTest.nabp_uut.processing_element_0.sw_scan_direction[0]
 NABPReconstructionTest.nabp_uut.processing_element_0.sw_scan_mode[0]
-@24
-[color] 7
-NABPReconstructionTest.nabp_uut.processing_swap_control.pe_angle[7:0]
 @2024
 [color] 7
 ^5 /Users/admko/Documents/Sorcery/NABP/wave/../derived_src/processing_element.vxtf
 NABPReconstructionTest.nabp_uut.processing_element_0.state[2:0]
-@8024
-[color] 3
-NABPReconstructionTest.nabp_uut.processing_element_0.lb_val[12:0]
+@c08420
+NABPReconstructionTest.nabp_uut.processing_element_0.lb_val[13:0]
+@28
+(0)NABPReconstructionTest.nabp_uut.processing_element_0.lb_val[13:0]
+(1)NABPReconstructionTest.nabp_uut.processing_element_0.lb_val[13:0]
+(2)NABPReconstructionTest.nabp_uut.processing_element_0.lb_val[13:0]
+(3)NABPReconstructionTest.nabp_uut.processing_element_0.lb_val[13:0]
+(4)NABPReconstructionTest.nabp_uut.processing_element_0.lb_val[13:0]
+(5)NABPReconstructionTest.nabp_uut.processing_element_0.lb_val[13:0]
+(6)NABPReconstructionTest.nabp_uut.processing_element_0.lb_val[13:0]
+(7)NABPReconstructionTest.nabp_uut.processing_element_0.lb_val[13:0]
+(8)NABPReconstructionTest.nabp_uut.processing_element_0.lb_val[13:0]
+(9)NABPReconstructionTest.nabp_uut.processing_element_0.lb_val[13:0]
+(10)NABPReconstructionTest.nabp_uut.processing_element_0.lb_val[13:0]
+(11)NABPReconstructionTest.nabp_uut.processing_element_0.lb_val[13:0]
+(12)NABPReconstructionTest.nabp_uut.processing_element_0.lb_val[13:0]
+(13)NABPReconstructionTest.nabp_uut.processing_element_0.lb_val[13:0]
+@1401200
+-group_end
 @20000
 -
 @8024
-NABPReconstructionTest.nabp_uut.processing_element_0.expected_lb_val[31:0]
-@20001
--
-@8024
-[color] 7
-NABPReconstructionTest.nabp_uut.processing_element_0.addr[10:0]
+NABPReconstructionTest.nabp_uut.processing_element_0.im_x[31:0]
+NABPReconstructionTest.nabp_uut.processing_element_0.im_y[31:0]
 @1000200
 -processing element 0
 [pattern_trace] 1

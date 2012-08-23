@@ -3,32 +3,11 @@
 //     24 Jan 2012
 // Provides control for the swappables
 // Handles swapping between the swappable instances
-// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-//
-// S̲w̲a̲p̲p̲a̲b̲l̲e̲ ̲M̲u̲x̲ ̲&̲ ̲D̲e̲m̲u̲x̲ ̲S̲c̲h̲e̲m̲e̲
-//
-// inputs                                      outputs
-//         /|          _____          |\
-// 0  ̶ ̶/̶ ̶ ̶| | ̶/̶ ̶[a] ̶/̶ ̶| FSM | ̶/̶ ̶[a] ̶/̶ ̶| | ̶ ̶/̶ ̶ ̶ 0
-// 1  ̶ ̶/̶ ̶ ̶| | ̶/̶ ̶[b] ̶/̶ ̶|_____| ̶/̶ ̶[b] ̶/̶ ̶| | ̶ ̶/̶ ̶ ̶ 1
-//         \|                         |/
-//         |                           |
-// sw_sel -*---------------------------*
-//
-// S̲e̲l̲e̲c̲t̲ ̲R̲o̲u̲t̲i̲n̲g̲ ̲T̲a̲b̲l̲e̲
-//  ______________________
-// | ̲s̲w̲_̲s̲e̲l̲ ̲|̲ ̲ ̲ ̲ ̲ ̲r̲o̲u̲t̲i̲n̲g̲ ̲|
-// |      0 | 0<->a 1<->b |
-// | ̲ ̲ ̲ ̲ ̲ ̲1̲ ̲|̲ ̲0̲<̲-̲>̲b̲ ̲1̲<̲-̲>̲a̲ ̲|
-//
-// S̲w̲a̲p̲p̲a̲b̲l̲e̲ ̲S̲t̲a̲t̲e̲s̲ ̲T̲a̲b̲l̲e̲
-//   ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲
-// | ̲s̲w̲_̲s̲e̲l̲ ̲|̲ ̲ ̲ ̲ ̲s̲w̲0̲ ̲ ̲ ̲|̲ ̲ ̲ ̲ ̲s̲w̲1̲ ̲ ̲ ̲|
-// |    0   |  filling | shifting |
-// | ̲ ̲ ̲ ̲1̲ ̲ ̲ ̲|̲ ̲s̲h̲i̲f̲t̲i̲n̲g̲ ̲|̲ ̲ ̲f̲i̲l̲l̲i̲n̲g̲ ̲|
 {#
     from pynabp.enums import \
             processing_swap_control_states, scan_mode, scan_direction
+
+    swap = 2
 #}
 
 module NABPProcessingSwapControl
@@ -37,27 +16,26 @@ module NABPProcessingSwapControl
     input wire clk,
     input wire reset_n,
     // inputs from filtered RAM swap control
-    input wire [`kAngleLength-1:0] fr_angle,
-    input wire fr_has_next_angle,
+    input wire [`kAngleLength-1:0] fr0_angle,
+    input wire [`kAngleLength-1:0] fr1_angle,
+    input wire fr0_angle_valid,
+    input wire fr1_angle_valid,
     input wire fr_next_angle_ack,
-    input wire fr_prev_angle_release_ack,
     input wire signed [`kFilteredDataLength-1:0] fr0_val,
     input wire signed [`kFilteredDataLength-1:0] fr1_val,
     // output to processing elements
-    output wire pe_kick,
-    output wire pe_scan_mode,
-    output wire pe_scan_direction,
-    output wire [`kFilteredDataLength*`kNoOfPartitions-1:0] pe_taps,
+    output reg pe_kick,
+    output reg pe_scan_mode,
+    output reg pe_scan_direction,
+    output reg [`kFilteredDataLength*`kNoOfPartitions-1:0] pe_taps,
     // output to RAM
-    output wire fr_next_angle,
-    output wire fr_prev_angle_release,
+    output reg fr_next_angle,
     output wire fr_done,
     output wire signed [`kSLength-1:0] fr0_s_val,
     output wire signed [`kSLength-1:0] fr1_s_val
     {% if c['debug'] %},
     // debug signals
-    output wire [`kAngleLength-1:0] db_angle,
-    output wire [`kPartitionSizeLength-1:0] db_line_itr
+    output wire [`kAngleLength-1:0] db_angle
     {% end %}
 );
 
@@ -66,274 +44,184 @@ module NABPProcessingSwapControl
             states=processing_swap_control_states())
 #}
 
-// line iteration
-reg [`kPartitionSizeLength-1:0] line_cnt;
-wire has_next_line_itr;
-assign has_next_line_itr = (line_cnt !=
-                            {# to_l(c['partition_scheme']['size'] - 1) #});
-always @(posedge clk)
-begin:line_itr_update
-    if (state == ready_s ||
-        state == setup_1_s || state == setup_2_s || state == setup_3_s ||
-        state == angle_setup_1_s ||
-        state == angle_setup_2_s ||
-        state == angle_setup_3_s)
-        line_cnt <= {# to_l(0) #};
-    else if (swap_ack)
-        line_cnt <= line_cnt + {# to_l(1) #};
-end
-
-// mapper mp_accu_init ascending or descending
-// reverse the line order for reverse scan direction, simplifies PE
-wire mp_accu_init_step_direction;
-assign mp_accu_init_step_direction = (fr_angle < `kAngle90) ?
-                                     {# scan_direction.forward #} :
-                                     {# scan_direction.reverse #};
-// A̲c̲c̲u̲m̲u̲l̲a̲t̲o̲r̲ ̲U̲p̲d̲a̲t̲e̲ ̲T̲i̲m̲i̲n̲g̲ ̲D̲i̲a̲g̲r̲a̲m̲
-//
-//          clk  ̅ ̅ ̅ ̅ ̅|_____| ̅ ̅ ̅ ̅ ̅|_____| ̅ ̅ ̅ ̅ ̅|_____| ̅ ̅ ̅ ̅ ̅|_____| ̅ ̅ ̅ ̅ ̅|_____
-//
-//        angle _̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅X_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅
-//
-// mp_accu_part _̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅X_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅
-//
-// mp_accu_init _̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅X_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅X_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅_̅
-//
-//        state  ̲̅ ̲̅r̲̅e̲̅a̲̅d̲̅y̲̅_̲̅s̲̅ ̲̅ ̲̅X ̲̅s̲̅e̲̅t̲̅u̲̅p̲̅_̲̅1̲̅_̲̅s̲̅ ̲̅X ̲̅s̲̅e̲̅t̲̅u̲̅p̲̅_̲̅2̲̅_̲̅s̲̅ ̲̅X ̲̅s̲̅e̲̅t̲̅u̲̅p̲̅_̲̅3̲̅_̲̅s̲̅ ̲̅X ̲̅ ̲̅f̲̅i̲̅l̲̅l̲̅_̲̅s̲̅ ̲̅ ̲̅ ̲̅
-//
-//   [comments]            ^ angle updated         ^ update mp_accu_init
-//                                                   equal to mp_accu_part
-//                                     ^                       ^
-//                                     mp_accu_part value    safe to shift,
-//                                                           calculates next
-//                                                           mp_accu_init
-always @(posedge clk)
-begin:accu_setup
-    if (state == setup_2_s || state == angle_setup_2_s)
-        // value looked up for the angle only becomes available in the 2nd
-        // stage, mp_accu_init will be available in the 3rd stage
-        // mp_accu_init stores the same value as mp_accu_part
-        mp_accu_init <= mp_accu_part;
-    else if (swap_ack || state == setup_3_s)
-        // accumulates on swap or setup_3_s
-        // the starting swappable reads current mp_accu_init == mp_accu_part
-        // at the next cycle, updated mp_accu_init will become available for
-        // the next starting swappable
-        if (mp_accu_init_step_direction == {# scan_direction.forward #})
-            mp_accu_init <= mp_accu_init - mp_accu_base;
-        else if (mp_accu_init_step_direction == {# scan_direction.reverse #})
-            mp_accu_init <= mp_accu_init + mp_accu_base;
-end
-
-// inputs from swappables
-wire sw0_swap, sw1_swap;
-wire sw0_next_itr, sw1_next_itr;
-wire sw0_pe_kick, sw1_pe_kick;
-// outputs to swappables
-//   sw_sel - selects swappable
-reg sw_sel;
-wire sw0_swap_ack, sw1_swap_ack;
-wire sw0_next_itr_ack, sw1_next_itr_ack;
-
-// mealy outputs
-// swapping multiplexers & demultiplexers
-wire swa_swap;
-wire swa_next_itr, swb_next_itr;
-wire swa_next_itr_ack, swb_next_itr_ack;
-wire swap_ack;
-assign swa_swap = sw_sel ? sw1_swap : sw0_swap;
-assign swa_next_itr = sw_sel ? sw1_next_itr : sw0_next_itr;
-assign swb_next_itr = sw_sel ? sw0_next_itr : sw1_next_itr;
-assign sw0_next_itr_ack = sw_sel ? swb_next_itr_ack : swa_next_itr_ack;
-assign sw1_next_itr_ack = sw_sel ? swa_next_itr_ack : swb_next_itr_ack;
-assign sw0_swap_ack = sw_sel ? 0 : swap_ack;
-assign sw1_swap_ack = sw_sel ? swap_ack : 0;
-// internal
-wire diverged;
-assign diverged = (state == diverged_fill_and_shift_s);
-// initial kick to start swapping
-assign swa_next_itr_ack = (state == setup_3_s);
-// swap_ack to the correct swappable
-// immediately swap swappables after swap_ack
-assign swap_ack = // if wants next angle, then wish to insert angle setup
-                  // bubble, swap when setup is done. Both swappable are
-                  // guaranteed to be waiting when entering this state
-                  (state == angle_setup_3_s) ||
-                  (// else if not wanting next angle
-                   !fr_next_angle &&
-                   (// proceed without delay when swa fill done
-                    (state == fill_s && swa_swap) ||
-                    // or swa fill done and swb shift done
-                    (swa_swap && swb_next_itr &&
-                     ((state == fill_and_shift_s) ||
-                      (state == diverged_fill_and_shift_s &&
-                       // if diverged wait for release ack
-                       fr_prev_angle_release_ack)))));
-// kicks the other swappable
-assign swb_next_itr_ack = // if we want to swap
-                          swap_ack &&
-                          // and still has pending iterations
-                          (fr_has_next_angle || has_next_line_itr);
-// external
-assign fr_prev_angle_release = // release old angle when ready
-                               (reset_n && (state == ready_s)) ||
-                               (// or done for diverged data path
-                                swa_swap && swb_next_itr &&
-                                (state == diverged_fill_and_shift_s));
-assign fr_next_angle = // only ask for next angle if has next angle
-                       reset_n && fr_has_next_angle &&
-                       (// it's not already starting a new angle
-                        (state != angle_setup_1_s &&
-                         state != angle_setup_2_s &&
-                         state != angle_setup_3_s &&
-                         // already in diverge path, can't diverge any more
-                         state != diverged_fill_and_shift_s &&
-                         // and swb is ready to start with a new line and all
-                         // lines are being processed for the current angle
-                         swa_swap && swb_next_itr && !has_next_line_itr));
-assign fr_done = // finish last part of work for a sinogram, state must be a
-                 // final shift
-                 (state == shift_s) &&
-                 // and shifting is complete
-                 swb_next_itr;
+reg sel, swap;
 
 always @(posedge clk)
 begin:transition
     if (!reset_n)
     begin
         state <= ready_s;
-        sw_sel <= 0;
+        sel <= `NO;
     end
     else
     begin
         state <= next_state;
-        if (swap_ack)
-            sw_sel <= !sw_sel;
+        if (swap)
+            sel <= !sel;
+    end
+end
+
+// swappable wirings
+{% for i in range(swap) %}
+reg sw{#i#}_fill_kick, sw{#i#}_shift_kick;
+wire sw{#i#}_pe_kick;
+wire sw{#i#}_shift_done, sw{#i#}_fill_done;
+wire [`kSLength-1:0] sw{#i#}_fr_s_val;
+wire [`kFilteredDataLength-1:0] sw{#i#}_fr_val;
+wire [`kFilteredDataLength*`kNoOfPartitions-1:0] sw{#i#}_pe_taps;
+{% end %}
+
+reg fill_done, fill_kick, shift_done, shift_kick;
+// control signal multiplexers and demultiplexers
+{#
+    swaps = []
+    swap_list = range(swap)
+    for _ in range(swap):
+        swaps.append(swap_list)
+        swap_list = swap_list[-1:] + swap_list[:-1]
+#}
+always @(*)
+begin:mux_and_demux
+    // initialisations
+    {% for i in range(swap) %}
+    sw{#i#}_fill_kick <= `NO;
+    sw{#i#}_shift_kick <= `NO;
+    {% end %}
+    pe_taps <= 'bx;
+    pe_kick <= `NO;
+    fill_done <= `NO;
+    shift_done <= `NO;
+    case (sel)
+        {% for i, r in enumerate(swaps) %}
+        {# to_b(i) #}:
+        begin
+            // to swappables
+            sw{#r[1]#}_fill_kick <= fill_kick;
+            sw{#r[0]#}_shift_kick <= shift_kick;
+            // to PEs
+            pe_taps <= sw{#r[1]#}_pe_taps;
+            pe_kick <= sw{#r[1]#}_pe_kick;
+            // from swappables
+            fill_done <= sw{#r[0]#}_fill_done;
+            shift_done <= sw{#r[1]#}_shift_done;
+        end
+        {% end %}
+        default:
+            if (reset_n)
+                $display("<NABPProcessingSwapControl>",
+                    "Unrecognised sel: %d", sel);
+    endcase
+end
+
+// datapath muxing & demuxing
+assign fr0_s_val = (sel == {# to_b(0) #}) ? sw0_fr_s_val : sw1_fr_s_val;
+assign fr1_s_val = (sel == {# to_b(0) #}) ? sw1_fr_s_val : sw0_fr_s_val;
+assign sw0_fr_val = (sel == {# to_b(0) #}) ? fr0_val : fr1_val;
+assign sw1_fr_val = (sel == {# to_b(0) #}) ? fr1_val : fr0_val;
+
+always @(fr1_angle)
+begin:scan_modes_update
+    // initialisation
+    pe_scan_mode <= 'bx;
+    pe_scan_direction <= 'bx;
+    // assignments
+    if (fr1_angle < `kAngle45 || fr1_angle >= `kAngle135)
+        pe_scan_mode <= {# scan_mode.x #};
+    else
+        pe_scan_mode <= {# scan_mode.y #};
+    if (fr1_angle < `kAngle90)
+        pe_scan_direction <= {# scan_direction.forward #};
+    else
+        pe_scan_direction <= {# scan_direction.reverse #};
+end
+
+always @(state)
+begin:mealy_output_update_internal
+    swap <= `NO;
+    case (state)
+        setup_3_s, fill_and_shift_setup_3_s:
+            swap <= `YES;
+    endcase
+end
+
+assign fr_done = // finished all angles, return to ready state
+                 (state != ready_s && next_state == ready_s);
+always @(*)
+begin:mealy_outputs_external
+    fr_next_angle <= `NO;
+    case (state)
+        ready_s:
+            fr_next_angle <= `YES;
+        fill_s:
+            if (fill_done)
+                fr_next_angle <= `YES;
+        fill_and_shift_s:
+            if (fill_done && shift_done)
+                fr_next_angle <= `YES;
+    endcase
+end
+
+always @(*)
+begin:mealy_outputs_internal
+    fill_kick <= `NO;
+    shift_kick <= `NO;
+    if (state == setup_3_s || state == fill_and_shift_setup_3_s)
+    begin
+        fill_kick <= fr0_angle_valid;
+        shift_kick <= fr1_angle_valid;
     end
 end
 
 always @(*)
 begin:mealy_next_state
     next_state <= state;
-    case (state) // synopsys parallel_case full_case
+    case (state) // synopsys parallel_case
         ready_s:
-            if (fr_prev_angle_release_ack)
+            if (fr_next_angle_ack)
                 next_state <= setup_1_s;
         setup_1_s:
             next_state <= setup_2_s;
         setup_2_s:
             next_state <= setup_3_s;
         setup_3_s:
-            if (swa_next_itr)
-                next_state <= fill_s;
+            next_state <= fill_s;
         fill_s:
-            if (swa_swap)
-            begin
-                if (!fr_has_next_angle)
-                    next_state <= shift_s;
-                else if (!fr_next_angle)
-                    next_state <= fill_and_shift_s;
-                else if (fr_next_angle && fr_next_angle_ack)
-                    next_state <= angle_setup_1_s;
-            end
-        fill_and_shift_s:
-            if (swa_swap && swb_next_itr)
-            begin
-                // no more angles, and no more lines to scan besides one last
-                // shift!
-                if (!fr_has_next_angle && !has_next_line_itr)
-                    next_state <= shift_s;
-                // wait for next angle
-                else if (fr_next_angle_ack)
-                    next_state <= angle_setup_1_s;
-            end
-        angle_setup_1_s:
-            next_state <= angle_setup_2_s;
-        angle_setup_2_s:
-            next_state <= angle_setup_3_s;
-        angle_setup_3_s:
-            next_state <= diverged_fill_and_shift_s;
-        diverged_fill_and_shift_s:
-            if (fr_prev_angle_release_ack)
+            if (fr_next_angle_ack)
+                next_state <= fill_and_shift_setup_1_s;
+        fill_and_shift_setup_1_s:
+            next_state <= fill_and_shift_setup_2_s;
+        fill_and_shift_setup_2_s:
+            next_state <= fill_and_shift_setup_3_s;
+        fill_and_shift_setup_3_s:
+            if (fr0_angle_valid)
                 next_state <= fill_and_shift_s;
+            else
+                next_state <= shift_s;
+        fill_and_shift_s:
+            if (fr_next_angle_ack)
+                next_state <= fill_and_shift_setup_1_s;
         shift_s:
-            if (swb_next_itr)
+            if (shift_done)
                 next_state <= ready_s;
         default:
             if (reset_n)
-                $display(
-                    "<NABPProcessingSwapControl> Invalid state: %d", state);
+                $display("<NABPProcessingSwapControl>",
+                    "Unrecognised state: %d", state);
     endcase
 end
 
-reg [`kAngleLength-1:0] pe_angle;
-
-{% if c['debug'] %}
-    // debug signals
-    reg [`kPartitionSizeLength-1:0] db_line_cnt;
-    wire [`kPartitionSizeLength-1:0] line_cnt_d;
-
-    // line_cnt signal delay for debug
-    {#
-        include('templates/signal_delay(delay_map).v',
-                delay_map={'line_cnt_d': ('[`kPartitionSizeLength-1:0]', 2)})
-    #}
-    assign line_cnt_d_l = line_cnt;
-
-    always @(posedge clk)
-        if (swap_ack)
-            db_line_cnt <= line_cnt_d;
-
-    // wiring
-    assign db_line_itr = (pe_angle < `kAngle90) ?  db_line_cnt :
-                        {# to_l(c['partition_scheme']['size'] - 1) #} -
-                        db_line_cnt;
-    assign db_angle = pe_angle;
-{% end %}
-
-// delay signals for PEs
-wire [`kAngleLength-1:0] fr_angle_d;
-{#
-    var_delay_map = {
-        'fr_angle_d': ('[`kAngleLength-1:0]', 3),
-    }
-    include('templates/signal_delay(delay_map).v', delay_map=var_delay_map)
-#}
-assign fr_angle_d_l = fr_angle;
-
-// decode angle and generate pe control outputs
-always @(posedge clk)
-    // updates angle for PE with the current swappable ready for shifting
-    if (swap_ack)
-        pe_angle <= fr_angle_d;
-
-// PE signals
-// multiplexers & demultiplexers - always give the output using pe_taps
-assign pe_taps = sw_sel ? sw0_pe_taps : sw1_pe_taps;
-assign pe_kick = sw_sel ? sw0_pe_kick : sw1_pe_kick;
-// decode angle to give PE control signals
-assign pe_scan_mode = (pe_angle < `kAngle45 || pe_angle >= `kAngle135) ?
-                      {# scan_mode.x #} : {# scan_mode.y #};
-assign pe_scan_direction = (pe_angle < `kAngle90) ?
-                           {# scan_direction.forward #} :
-                           {# scan_direction.reverse #};
-
-// lut vals
 wire {# c['tShiftAccuBase'].verilog_decl() #} sh_accu_base;
-reg {# c['tMapAccuInit'].verilog_decl() #} mp_accu_init;
-wire {# c['tMapAccuBase'].verilog_decl() #} mp_accu_base;
 wire {# c['tMapAccuPart'].verilog_decl() #} mp_accu_part;
+wire {# c['tMapAccuBase'].verilog_decl() #} mp_accu_base;
 
-{% for i in [0, 1] %}
+{% for i in range(swap) %}
 // swappable {#i#}
 wire {# c['tShiftAccuBase'].verilog_decl() #} sw{#i#}_sh_accu_base;
 wire {# c['tMapAccuInit'].verilog_decl() #} sw{#i#}_mp_accu_init;
 wire {# c['tMapAccuBase'].verilog_decl() #} sw{#i#}_mp_accu_base;
-wire [`kSLength-1:0] sw{#i#}_fr_s_val;
-wire [`kFilteredDataLength-1:0] sw{#i#}_fr_val;
-wire [`kFilteredDataLength*`kNoOfPartitions-1:0] sw{#i#}_pe_taps;
+// wirings
 assign sw{#i#}_sh_accu_base = sh_accu_base;
-assign sw{#i#}_mp_accu_init = mp_accu_init;
+assign sw{#i#}_mp_accu_init = mp_accu_part;
 assign sw{#i#}_mp_accu_base = mp_accu_base;
 // module instantiation
 NABPProcessingSwappable sw{#i#}
@@ -345,13 +233,13 @@ NABPProcessingSwappable sw{#i#}
     .sw_sh_accu_base(sw{#i#}_sh_accu_base),
     .sw_mp_accu_init(sw{#i#}_mp_accu_init),
     .sw_mp_accu_base(sw{#i#}_mp_accu_base),
-    .sw_swap_ack(sw{#i#}_swap_ack),
-    .sw_next_itr_ack(sw{#i#}_next_itr_ack),
+    .sw_swap_ack(sw{#i#}_shift_kick),
+    .sw_next_itr_ack(sw{#i#}_fill_kick),
     // inputs from Filtered RAM
     .fr_val(sw{#i#}_fr_val),
     // outputs to swap control
-    .sw_swap(sw{#i#}_swap),
-    .sw_next_itr(sw{#i#}_next_itr),
+    .sw_swap(sw{#i#}_fill_done),
+    .sw_next_itr(sw{#i#}_shift_done),
     .sw_pe_kick(sw{#i#}_pe_kick),
     // outputs to Filtered RAM
     .fr_s_val(sw{#i#}_fr_s_val),
@@ -360,24 +248,12 @@ NABPProcessingSwappable sw{#i#}
 );
 {% end %}
 
-// F̲i̲l̲t̲e̲r̲e̲d̲ ̲R̲A̲M̲ ̲P̲o̲r̲t̲s̲ ̲<̲-̲>̲ ̲P̲r̲o̲c̲e̲s̲s̲i̲n̲g̲ ̲S̲w̲a̲p̲p̲a̲b̲l̲e̲s̲ ̲R̲o̲u̲t̲i̲n̲g̲ ̲T̲a̲b̲l̲e̲
-//   ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲
-// | ̲s̲w̲_̲s̲e̲l̲ ̲|̲ ̲d̲i̲v̲e̲r̲g̲e̲d̲ ̲|̲ ̲f̲r̲0̲ ̲|̲ ̲f̲r̲1̲ ̲|
-// |      0 |        0 | sw0 | sw1 |
-// |      0 |        1 | sw1 | sw0 |
-// |      1 |        0 | sw0 | sw1 |
-// | ̲ ̲ ̲ ̲ ̲ ̲1̲ ̲|̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲1̲ ̲|̲ ̲s̲w̲0̲ ̲|̲ ̲s̲w̲1̲ ̲|
-assign fr0_s_val = (!sw_sel && diverged) ? sw1_fr_s_val : sw0_fr_s_val;
-assign fr1_s_val = (!sw_sel && diverged) ? sw0_fr_s_val : sw1_fr_s_val;
-assign sw0_fr_val = (!sw_sel && diverged) ? fr1_val : fr0_val;
-assign sw1_fr_val = (!sw_sel && diverged) ? fr0_val : fr1_val;
-
 // look-up tables
 NABPMapperLUT mapper_lut
 (
     // inputs
     .clk(clk),
-    .mp_angle(fr_angle),
+    .mp_angle(fr0_angle),
     // outputs
     .mp_accu_part(mp_accu_part),
     .mp_accu_base(mp_accu_base)
@@ -386,9 +262,13 @@ NABPShifterLUT shifter_lut
 (
     // inputs
     .clk(clk),
-    .sh_angle(fr_angle),
+    .sh_angle(fr0_angle),
     // output
     .sh_accu_base(sh_accu_base)
 );
+
+{% if c['debug'] %}
+assign db_angle = fr1_angle;
+{% end %}
 
 endmodule
