@@ -54,7 +54,7 @@ wire [`kSLength-1:0] fr_sa_s_val;
 NABPSinogramAddresser sinogram_addresser
 (
     // global signals
-    .clk(clk_fast),
+    .clk(clk),
     .reset_n(reset_n),
     // inputs from host
     .hs_kick(sg_kick),

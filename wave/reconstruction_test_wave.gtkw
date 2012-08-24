@@ -1,15 +1,15 @@
 [*]
 [*] GTKWave Analyzer v3.3.31 (w)1999-2012 BSI
-[*] Wed Aug 22 14:35:29 2012
+[*] Fri Aug 24 14:36:09 2012
 [*]
 [dumpfile] "/Users/admko/Documents/Sorcery/NABP/build/reconstruction_test.v.lxt"
-[dumpfile_mtime] "Wed Aug 22 14:34:29 2012"
-[dumpfile_size] 627799
+[dumpfile_mtime] "Fri Aug 24 14:35:39 2012"
+[dumpfile_size] 102099
 [savefile] "/Users/admko/Documents/Sorcery/NABP/wave/reconstruction_test_wave.gtkw"
 [timestart] 0
-[size] 1440 852
+[size] 1440 791
 [pos] 0 44
-*-23.000000 8690000 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+*-21.000000 1462500 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
 [treeopen] NABPReconstructionTest.
 [treeopen] NABPReconstructionTest.nabp_uut.
 [treeopen] NABPReconstructionTest.nabp_uut.processing_element_1.
@@ -20,12 +20,15 @@
 [signals_width] 305
 [sst_expanded] 1
 [sst_vpaned_height] 275
-@c00200
+@800200
 -host
 @28
 NABPReconstructionTest.nabp_uut.clk[0]
+@29
+NABPReconstructionTest.clk_fast[0]
+@28
 NABPReconstructionTest.nabp_uut.reset_n[0]
-@1401200
+@1000200
 -host
 @800200
 -sinogram end
@@ -64,21 +67,21 @@ NABPReconstructionTest.nabp_uut.filtered_ram_swap_control.hs_next_angle[0]
 NABPReconstructionTest.nabp_uut.filtered_ram_swap_control.state[2:0]
 @1000200
 -filtered ram
-@800201
+@800200
 -processing
 -control
-@29
+@28
 [color] 2
 NABPReconstructionTest.nabp_uut.processing_swap_control.fr_next_angle[0]
 [color] 2
 NABPReconstructionTest.nabp_uut.processing_swap_control.fr_next_angle_ack[0]
-@1000201
+@1000200
 -control
-@2025
+@2024
 [color] 7
 ^3 /Users/admko/Documents/Sorcery/NABP/wave/../derived_src/processing_swap_control.vxtf
 NABPReconstructionTest.nabp_uut.processing_swap_control.state[3:0]
-@c00201
+@c00200
 -sw0
 @28
 [color] 5
@@ -89,9 +92,9 @@ NABPReconstructionTest.nabp_uut.processing_swap_control.sw0.state_control.sw_swa
 [color] 5
 ^4 /Users/admko/Documents/Sorcery/NABP/wave/../derived_src/processing_swappable_state_control.vxtf
 NABPReconstructionTest.nabp_uut.processing_swap_control.sw0.state_control.state[2:0]
-@1401201
+@1401200
 -sw0
-@c00201
+@c00200
 -sw1
 @28
 [color] 5
@@ -102,9 +105,9 @@ NABPReconstructionTest.nabp_uut.processing_swap_control.sw1.state_control.sw_swa
 [color] 5
 ^4 /Users/admko/Documents/Sorcery/NABP/wave/../derived_src/processing_swappable_state_control.vxtf
 NABPReconstructionTest.nabp_uut.processing_swap_control.sw1.state_control.state[2:0]
-@1401201
+@1401200
 -sw1
-@1000201
+@1000200
 -processing
 @800200
 -processing element 0
