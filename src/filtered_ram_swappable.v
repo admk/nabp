@@ -11,20 +11,19 @@
 module NABPFilteredRAMSwappable
 (
     // global signals
-    input wire clk,
+    input wire clk_in,
+    input wire clk_out,
     input wire reset_n,
     // input from host
     input wire hs_fill_kick,
     input wire [`kFilteredDataLength-1:0] hs_val,
     // inputs from processing swappables
-    input wire [`kSLength-1:0] pr0_s_val,
-    input wire [`kSLength-1:0] pr1_s_val,
+    input wire [`kSLength-1:0] pr_s_val,
     // output to host
     output wire hs_fill_done,
     output wire [`kSLength-1:0] hs_s_val,
     // outputs to processing swappables
-    output wire signed [`kFilteredDataLength-1:0] pr0_val,
-    output wire signed [`kFilteredDataLength-1:0] pr1_val
+    output wire signed [`kFilteredDataLength-1:0] pr_val
 );
 
 {#
@@ -33,7 +32,7 @@ module NABPFilteredRAMSwappable
 #}
 
 // mealy state transition
-always @(posedge clk)
+always @(posedge clk_in)
 begin:transition
     if (!reset_n)
         state <= ready_s;
@@ -43,7 +42,7 @@ end
 
 reg [`kSLength-1:0] write_itr, read_itr;
 
-always @(posedge clk)
+always @(posedge clk_in)
 begin:itr_update
     if (state == ready_s)
     begin
@@ -95,24 +94,19 @@ begin:mealy_next_state
     endcase
 end
 
-wire [`kSLength-1:0] pr0_s_val_m;
-assign pr0_s_val_m = (state == ready_s) ? pr0_s_val : write_itr;
-
-NABPDualPortRAM dual_port_ram
+NABPDualClockSimpleDualPortRAM ram
 (
     // globals
-    .clk(clk),
+    .clk_in(clk_in),
+    .clk_out(clk_out),
     // write enables
-    .we_0(write_enable),
-    .we_1(1'b0),
+    .we(write_enable),
     // addresses
-    .addr_0(pr0_s_val_m),
-    .addr_1(pr1_s_val),
+    .addr_in(write_itr),
+    .addr_out(pr_s_val),
     // data
-    .data_in_0(hs_val),
-    .data_in_1({# to_v(0) #}),
-    .data_out_0(pr0_val),
-    .data_out_1(pr1_val)
+    .data_in(hs_val),
+    .data_out(pr_val)
 );
 
 endmodule

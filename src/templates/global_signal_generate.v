@@ -9,7 +9,9 @@
 #}
 // clock & reset generate
 parameter clk_delay = {# config['clock_period'] #} / 2;
-reg clk, reset;
+parameter clk_fast_delay = {# config['clock_period'] #} / 8;
+
+reg clk, clk_fast, reset;
 wire reset_n;
 assign reset_n = !reset;
 
@@ -17,6 +19,12 @@ always
 begin:clk_generate
     clk = 1'b0; #clk_delay;
     clk = 1'b1; #clk_delay;
+end
+
+always
+begin:clk_fast_generate
+    clk_fast = 1'b0; #clk_fast_delay;
+    clk_fast = 1'b1; #clk_fast_delay;
 end
 
 initial
