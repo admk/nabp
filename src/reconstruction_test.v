@@ -57,6 +57,7 @@ NABP nabp_uut
 (
     // global signals
     .clk(clk),
+    .clk_fast(clk_fast),
     .reset_n(reset_n),
     // inputs from host
     .sg_kick(kick),
@@ -80,7 +81,7 @@ NABP nabp_uut
 NABPSinogramDataLUT sinogram_lut
 (
     // global signals
-    .clk(clk),
+    .clk(clk_fast),
     .reset_n(reset_n),
     // inputs from nabp
     .sg_addr(sg_addr),

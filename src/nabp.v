@@ -28,6 +28,7 @@ module NABP
 (
     // global signals
     input wire clk,
+    input wire clk_fast,
     input wire reset_n,
     // inputs from host
     input wire sg_kick,
@@ -73,7 +74,7 @@ NABPSinogramAddresser sinogram_addresser
 wire [`kFilteredDataLength-1:0] fl_fr_val;
 NABPFilter filter
 (
-    .clk(clk),
+    .clk(clk_fast),
     .reset_n(reset_n),
     .enable(1'd1),
     .val_in(sg_val),
@@ -87,7 +88,8 @@ wire [`kSLength-1:0] pr0_s_val, pr1_s_val;
 wire [`kFilteredDataLength-1:0] pr0_val, pr1_val;
 NABPFilteredRAMSwapControl filtered_ram_swap_control
 (
-    .clk(clk),
+    .clk_in(clk_fast),
+    .clk_out(clk),
     .reset_n(reset_n),
     // inputs from addresser
     .hs_angle(sa_fr_angle),

@@ -24,7 +24,8 @@
 module NABPFilteredRAMSwapControl
 (
     // global signals
-    input wire clk,
+    input wire clk_in,
+    input wire clk_out,
     input wire reset_n,
     // inputs from host
     input wire [`kAngleLength-1:0] hs_angle,
@@ -68,7 +69,7 @@ reg rotate;
 reg [`kRotateLength-1:0] rotate_sel;
 
 // mealy state transition
-always @(posedge clk)
+always @(posedge clk_out)
 begin:transition
     if (!reset_n)
     begin
@@ -88,7 +89,7 @@ end
 
 // angle update
 reg pr_angle_valid_d;
-always @(posedge clk)
+always @(posedge clk_out)
 begin
     if (!reset_n)
     begin
@@ -118,16 +119,16 @@ end
 // signal wirings for swappable {#i#}
 // inputs
 reg sw{#i#}_fill_kick;
-reg [`kSLength-1:0] sw{#i#}_pr0_s_val, sw{#i#}_pr1_s_val;
+reg [`kSLength-1:0] sw{#i#}_pr_s_val;
 reg signed [`kFilteredDataLength-1:0] sw{#i#}_hs_val;
 // outputs
 wire sw{#i#}_fill_done;
 wire [`kSLength-1:0] sw{#i#}_hs_s_val;
-wire signed [`kFilteredDataLength-1:0] sw{#i#}_pr0_val, sw{#i#}_pr1_val;
+wire signed [`kFilteredDataLength-1:0] sw{#i#}_pr_val;
 {% end %}
 
 reg fill_done, fill_kick;
-always @(posedge clk)
+always @(posedge clk_out)
 begin:fill_kick_update
     fill_kick <= rotate;
 end
@@ -147,8 +148,8 @@ begin:rotate_sel_mux
     pr1_val <= 'bx;
     fill_done <= `NO;
     {% for i in range(rotate) %}
-    sw{#i#}_pr0_s_val <= 'bx;
-    sw{#i#}_pr1_s_val <= 'bx;
+    sw{#i#}_pr_s_val <= 'bx;
+    sw{#i#}_pr_s_val <= 'bx;
     sw{#i#}_fill_kick <= `NO;
     {% end %}
     // multiplexers and demultiplexers
@@ -160,12 +161,12 @@ begin:rotate_sel_mux
             hs_s_val <= sw{#r[0]#}_hs_s_val;
             // inputs from processing swappables
             // processing filling, pr1 reserved
-            sw{#r[1]#}_pr0_s_val <= pr0_s_val;
+            sw{#r[1]#}_pr_s_val <= pr0_s_val;
             // processing shifting, pr1 reserved
-            sw{#r[2]#}_pr0_s_val <= pr1_s_val;
+            sw{#r[2]#}_pr_s_val <= pr1_s_val;
             // outputs to processing swappables
-            pr0_val <= sw{#r[1]#}_pr0_val;
-            pr1_val <= sw{#r[2]#}_pr0_val;
+            pr0_val <= sw{#r[1]#}_pr_val;
+            pr1_val <= sw{#r[2]#}_pr_val;
             // internal controls
             fill_done <= sw{#r[0]#}_fill_done && !fill_kick;
             sw{#r[0]#}_fill_kick <= fill_kick;
@@ -263,20 +264,19 @@ end
 NABPFilteredRAMSwappable sw{#i#}
 (
     // global signals
-    .clk(clk),
+    .clk_in(clk_in),
+    .clk_out(clk_out),
     .reset_n(reset_n),
     // inputs from host
     .hs_fill_kick(sw{#i#}_fill_kick),
     .hs_val(hs_val),
     // inputs from processing swappables
-    .pr0_s_val(sw{#i#}_pr0_s_val),
-    .pr1_s_val(sw{#i#}_pr1_s_val),
+    .pr_s_val(sw{#i#}_pr_s_val),
     // outputs to host
     .hs_fill_done(sw{#i#}_fill_done),
     .hs_s_val(sw{#i#}_hs_s_val),
     // outputs to processing swappables
-    .pr0_val(sw{#i#}_pr0_val),
-    .pr1_val(sw{#i#}_pr1_val)
+    .pr_val(sw{#i#}_pr_val)
 );
 {% end %}
 
