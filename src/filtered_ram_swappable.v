@@ -2,6 +2,7 @@
 // NABPFilteredRAMSwappable
 //     6 Feb 2012
 // Controls the filling of filtered RAM
+// TODO maybe add additional registers to address metastability
 
 {#
     from pynabp.enums import filtered_ram_control_states
