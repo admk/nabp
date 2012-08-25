@@ -37,27 +37,35 @@ def validate(image_size, scheme):
         raise ValueError('Some partitions are not necessary.')
 
 
-def partition(image_size, no_of_partitions):
+def algorithm(width, no):
     """
     Partitioning algorithm
     """
-
     # find optimal partition size
-    partition_size = int(math.ceil(image_size / float(no_of_partitions)))
-
+    partition_size = int(math.ceil(width / float(no)))
     partition_scheme = {
-            'no_of_partitions': int(no_of_partitions),
+            'no_of_partitions': int(no),
             'size': partition_size,
             'partitions':
                     [int(idx * partition_size)
-                        for idx in xrange(no_of_partitions)],
+                        for idx in xrange(no)],
             }
-
     # partition pruning or appending
     while partition_size * (partition_scheme['no_of_partitions'] - 1) \
-            > image_size - 1:
+            > width - 1:
         # has one more unnecessary partition
         partition_scheme['no_of_partitions'] -= 1
         partition_scheme['partitions'] = partition_scheme['partitions'][:-1]
-
     return partition_scheme
+
+
+def partition(image_size, no_of_partitions, subdivisions):
+    """
+    Partition generator
+    """
+    partitions = algorithm(image_size, no_of_partitions)
+    if subdivisions > 1:
+        partitions['subdivisions'] = algorithm(image_size, subdivisions)
+    else:
+        partitions['subdivisions'] = None
+    return partitions

@@ -57,6 +57,8 @@ class PreConstraintsValidator(ConstraintsValidator):
                     'fir_function':     (func,  True,   function_arg_count(1)),
                     'no_of_processing_elements':
                                         (int,   False,  positive),
+                    'concurrent_subdivisions':
+                                        (int,   True,   positive),
                     'angle_step_size':  ((float, int),
                                                 True,   positive),
                     'kDataLength':      (int,   False,  positive),
@@ -86,6 +88,10 @@ class PostRelationValidator(Validator):
             partition.validate(
                     config['image_size'],
                     config['partition_scheme'])
+            if config['concurrent_subdivisions']:
+                partition.validate(
+                        config['image_size'],
+                        config['partition_scheme']['subdivisions'])
         except ValueError as e:
             raise RelationValidateError(str(e))
 

@@ -79,14 +79,19 @@ config = \
         # No of processing elements.
         # Constraints:
         #   The hardware resources available (will only know after place &
-        #   route). Value should not be greater than the width of the image,
-        #   value should also be sensible enough to ensure no processing
-        #   elements are doing work for wasted pixels only (validator will
-        #   check for this).
+        #   route).
         #   FIXME In this new implementation, this value must equal to image
         #   size. Future implementations will incorporate concurrent
         #   subdivision to allow further increase of the value.
         'no_of_processing_elements': 127,
+
+        # Concurrent subdivision.
+        # This enables concurrent subdivision of image by the factor specified.
+        # This will multiply the no of PEs specified above with the factor
+        # below. If not specified, there will be no subdivisions.
+        # Constraints:
+        #   Positive numbers.
+        'concurrent_subdivisions': 4,
 
         # The angle step size.
         # This determines the difference of angle values between two projection

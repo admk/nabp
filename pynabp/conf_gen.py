@@ -35,6 +35,11 @@ def derive(config):
         projection_line_size = int(config['image_size'] * math.sqrt(2))
     else:
         projection_line_size = config['projection_line_size']
+    # concurrent subdivisions
+    if not config['concurrent_subdivisions']:
+        concurrent_subdivisions = 1
+    else:
+        concurrent_subdivisions = config['concurrent_subdivisions']
 
     derived = \
         {
@@ -50,8 +55,12 @@ def derive(config):
             'fir_coefs':
                     filter_coefs(config['fir_order'], config['fir_function']),
             # partitions
+            'concurrent_subdivisions': concurrent_subdivisions,
             'partition_scheme':
-                    partition(image_size, config['no_of_processing_elements']),
+                    partition(
+                        image_size,
+                        config['no_of_processing_elements'],
+                        concurrent_subdivisions),
             'kFilteredDataLength':
                     1 + config['kDataLength'] + \
                             config['kFilteredDataPrecision'],
