@@ -19,6 +19,12 @@
 // Possible TODO: refactor FIR to be a part of NABPFilteredRAMSwapControl.
 {#
     from pynabp.enums import filtered_ram_swap_control_states
+    
+    def divisions():
+        import itertools
+        return itertools.product(
+                range(c['concurrent_subdivisions']),
+                range(c['concurrent_subdivisions']))
 #}
 
 module NABPFilteredRAMSwapControl
@@ -34,8 +40,10 @@ module NABPFilteredRAMSwapControl
     // input from filter
     input wire [`kFilteredDataLength-1:0] hs_val,
     // inputs from processing swappables
-    input wire [`kSLength-1:0] pr0_s_val,
-    input wire [`kSLength-1:0] pr1_s_val,
+    {% for j, k in divisions() %}
+    input wire [`kSLength-1:0] pr0_line{#j#}_seg{#k#}_s_val,
+    input wire [`kSLength-1:0] pr1_line{#j#}_seg{#k#}_s_val,
+    {% end %}
     input wire pr_next_angle,
     input wire pr_done,
     // outputs to host RAM
@@ -46,9 +54,11 @@ module NABPFilteredRAMSwapControl
     output reg [`kAngleLength-1:0] pr1_angle,
     output reg pr0_angle_valid,
     output reg pr1_angle_valid,
-    output reg pr_next_angle_ack,
-    output reg signed [`kFilteredDataLength-1:0] pr0_val,
-    output reg signed [`kFilteredDataLength-1:0] pr1_val
+    output reg pr_next_angle_ack
+    {% for j, k in divisions() %},
+    output reg signed [`kFilteredDataLength-1:0] pr0_line{#j#}_seg{#k#}_val,
+    output reg signed [`kFilteredDataLength-1:0] pr1_line{#j#}_seg{#k#}_val
+    {% end %}
 );
 
 {#
@@ -116,15 +126,19 @@ end
 //               2   1   0   -> shift to processing
 // ============ === === === ========================
 {% for i in range(rotate) %}
-// signal wirings for swappable {#i#}
-// inputs
-reg sw{#i#}_fill_kick;
-reg [`kSLength-1:0] sw{#i#}_pr_s_val;
-reg signed [`kFilteredDataLength-1:0] sw{#i#}_hs_val;
-// outputs
-wire sw{#i#}_fill_done;
-wire [`kSLength-1:0] sw{#i#}_hs_s_val;
-wire signed [`kFilteredDataLength-1:0] sw{#i#}_pr_val;
+    // signal wirings for swappable {#i#}
+    // inputs
+    reg sw{#i#}_fill_kick;
+    reg signed [`kFilteredDataLength-1:0] sw{#i#}_hs_val;
+    // outputs
+    wire sw{#i#}_fill_done;
+    wire [`kSLength-1:0] sw{#i#}_hs_s_val;
+    // data paths
+    {% for j, k in divisions() %}
+        reg [`kSLength-1:0] sw{#i#}_pr_line{#j#}_seg{#k#}_s_val;
+        wire signed [`kFilteredDataLength-1:0]
+                sw{#i#}_pr_line{#j#}_seg{#k#}_val;
+    {% end %}
 {% end %}
 
 reg fill_done, fill_kick;
@@ -144,13 +158,17 @@ always @(*)
 begin:rotate_sel_mux
     // prevent latches
     hs_s_val <= 'bx;
-    pr0_val <= 'bx;
-    pr1_val <= 'bx;
+    {% for j, k in divisions() %}
+        pr0_line{#j#}_seg{#k#}_val <= 'bx;
+        pr1_line{#j#}_seg{#k#}_val <= 'bx;
+    {% end %}
     fill_done <= `NO;
     {% for i in range(rotate) %}
-    sw{#i#}_pr_s_val <= 'bx;
-    sw{#i#}_pr_s_val <= 'bx;
-    sw{#i#}_fill_kick <= `NO;
+        sw{#i#}_fill_kick <= `NO;
+        {% for j, k in divisions() %}
+            sw{#i#}_pr_line{#j#}_seg{#k#}_s_val <= 'bx;
+            sw{#i#}_pr_line{#j#}_seg{#k#}_s_val <= 'bx;
+        {% end %}
     {% end %}
     // multiplexers and demultiplexers
     case (rotate_sel)
@@ -159,14 +177,19 @@ begin:rotate_sel_mux
         begin
             // outputs to host
             hs_s_val <= sw{#r[0]#}_hs_s_val;
+            {% for j, k in divisions() %}
             // inputs from processing swappables
-            // processing filling, pr1 reserved
-            sw{#r[1]#}_pr_s_val <= pr0_s_val;
-            // processing shifting, pr1 reserved
-            sw{#r[2]#}_pr_s_val <= pr1_s_val;
+            // processing filling & shifting
+            sw{#r[1]#}_pr_line{#j#}_seg{#k#}_s_val <=
+                    pr0_line{#j#}_seg{#k#}_s_val;
+            sw{#r[2]#}_pr_line{#j#}_seg{#k#}_s_val <=
+                    pr1_line{#j#}_seg{#k#}_s_val;
             // outputs to processing swappables
-            pr0_val <= sw{#r[1]#}_pr_val;
-            pr1_val <= sw{#r[2]#}_pr_val;
+            pr0_line{#j#}_seg{#k#}_val <=
+                    sw{#r[1]#}_pr_line{#j#}_seg{#k#}_val;
+            pr1_line{#j#}_seg{#k#}_val <=
+                    sw{#r[2]#}_pr_line{#j#}_seg{#k#}_val;
+            {% end %}
             // internal controls
             fill_done <= sw{#r[0]#}_fill_done && !fill_kick;
             sw{#r[0]#}_fill_kick <= fill_kick;
@@ -271,12 +294,16 @@ NABPFilteredRAMSwappable sw{#i#}
     .hs_fill_kick(sw{#i#}_fill_kick),
     .hs_val(hs_val),
     // inputs from processing swappables
-    .pr_s_val(sw{#i#}_pr_s_val),
+    {% for j, k in divisions() %}
+    .pr_line{#j#}_seg{#k#}_s_val(sw{#i#}_pr_line{#j#}_seg{#k#}_s_val),
+    {% end %}
     // outputs to host
     .hs_fill_done(sw{#i#}_fill_done),
-    .hs_s_val(sw{#i#}_hs_s_val),
+    .hs_s_val(sw{#i#}_hs_s_val)
     // outputs to processing swappables
-    .pr_val(sw{#i#}_pr_val)
+    {% for j, k in divisions() %},
+    .pr_line{#j#}_seg{#k#}_val(sw{#i#}_pr_line{#j#}_seg{#k#}_val)
+    {% end %}
 );
 {% end %}
 

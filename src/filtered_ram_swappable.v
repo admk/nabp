@@ -6,6 +6,13 @@
 
 {#
     from pynabp.enums import filtered_ram_control_states
+
+    def divisions():
+        import itertools
+        return itertools.product(
+                range(c['concurrent_subdivisions']),
+                range(c['concurrent_subdivisions']))
+
     p_line_size = c['projection_line_size']
 #}
 
@@ -19,12 +26,16 @@ module NABPFilteredRAMSwappable
     input wire hs_fill_kick,
     input wire [`kFilteredDataLength-1:0] hs_val,
     // inputs from processing swappables
-    input wire [`kSLength-1:0] pr_s_val,
+    {% for j, k in divisions() %}
+    input wire [`kSLength-1:0] pr_line{#j#}_seg{#k#}_s_val,
+    {% end %}
     // output to host
     output wire hs_fill_done,
-    output wire [`kSLength-1:0] hs_s_val,
+    output wire [`kSLength-1:0] hs_s_val
     // outputs to processing swappables
-    output wire signed [`kFilteredDataLength-1:0] pr_val
+    {% for j, k in divisions() %},
+    output wire signed [`kFilteredDataLength-1:0] pr_line{#j#}_seg{#k#}_val
+    {% end %}
 );
 
 {#
@@ -95,7 +106,9 @@ begin:mealy_next_state
     endcase
 end
 
-NABPDualClockSimpleDualPortRAM ram
+
+{% for j, k in divisions() %}
+NABPDualClockSimpleDualPortRAM frpr_line{#j#}_seg{#k#}_ram
 (
     // globals
     .clk_in(clk_in),
@@ -104,10 +117,11 @@ NABPDualClockSimpleDualPortRAM ram
     .we(write_enable),
     // addresses
     .addr_in(write_itr),
-    .addr_out(pr_s_val),
+    .addr_out(pr_line{#j#}_seg{#k#}_s_val),
     // data
     .data_in(hs_val),
-    .data_out(pr_val)
+    .data_out(pr_line{#j#}_seg{#k#}_val)
 );
+{% end %}
 
 endmodule
