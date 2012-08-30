@@ -136,16 +136,7 @@ config = \
         # This is used to generate a LUT in which values are of this precision.
         # Constraints:
         #   Positive integers.
-        #   Greater than or equal to kMapAccuPartPrecision
         'kMapAccuPrecision': 30,
-
-        # The decimal places (in binary) of mapper's accumulator's initial
-        # value.
-        # This is used to generate a LUT in which values are of this precision.
-        # Constraints:
-        #   Positive integers.
-        #   Less than or equal to kMapAccuPrecision
-        'kMapAccuPartPrecision': 30,
 
         # Force assignment of values of parameters.
         # The forced parameters will be used to override the parameters after

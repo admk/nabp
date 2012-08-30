@@ -83,9 +83,6 @@ def _map_accu_part_defines(conf):
 
     defines = {
             'lutMapAccuPart': lut_map_accu_part,
-            'tLUTMapAccuPart': FixedPoint(
-                accu_part_int_len, conf['kMapAccuPartPrecision'],
-                accu_part_signed),
             'tMapAccuPart': FixedPoint(
                 accu_part_int_len, conf['kMapAccuPrecision'],
                 accu_part_signed)

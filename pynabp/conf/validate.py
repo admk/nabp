@@ -30,12 +30,6 @@ class PreRelationValidator(Validator):
             raise RelationValidateError(
                     'Unrecognised device %s.' % config['device'])
 
-    def validate_map_accu_relationship(self, config):
-        if config['kMapAccuPrecision'] < config['kMapAccuPartPrecision']:
-            raise RelationValidateError(
-                    'kMapAccuPrecision must be greater or equal to '
-                    'kMapAccuPartPrecision')
-
 
 class PreConstraintsValidator(ConstraintsValidator):
     """Validate config constraints"""
