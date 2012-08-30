@@ -7,12 +7,6 @@
 {#
     from pynabp.enums import filtered_ram_control_states
 
-    def divisions():
-        import itertools
-        return itertools.product(
-                range(c['concurrent_subdivisions']),
-                range(c['concurrent_subdivisions']))
-
     p_line_size = c['projection_line_size']
 #}
 

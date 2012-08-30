@@ -19,12 +19,6 @@
 // Possible TODO: refactor FIR to be a part of NABPFilteredRAMSwapControl.
 {#
     from pynabp.enums import filtered_ram_swap_control_states
-    
-    def divisions():
-        import itertools
-        return itertools.product(
-                range(c['concurrent_subdivisions']),
-                range(c['concurrent_subdivisions']))
 #}
 
 module NABPFilteredRAMSwapControl
@@ -156,13 +150,13 @@ end
 #}
 always @(*)
 begin:rotate_sel_mux
-    // prevent latches
+    // initialisations, prevent latches
     hs_s_val <= 'bx;
-    {% for j, k in divisions() %}
-        pr0_line{#j#}_seg{#k#}_val <= 'bx;
-        pr1_line{#j#}_seg{#k#}_val <= 'bx;
-    {% end %}
     fill_done <= `NO;
+    {% for j, k in divisions() %}
+    pr0_line{#j#}_seg{#k#}_val <= 'bx;
+    pr1_line{#j#}_seg{#k#}_val <= 'bx;
+    {% end %}
     {% for i in range(rotate) %}
         sw{#i#}_fill_kick <= `NO;
         {% for j, k in divisions() %}

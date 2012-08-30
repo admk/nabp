@@ -20,6 +20,12 @@
     def to_b(val):
         return '`YES' if val else '`NO'
 
+    def divisions():
+        import itertools
+        return itertools.product(
+                range(c['concurrent_subdivisions']),
+                range(c['concurrent_subdivisions']))
+
     __angle_defines = { k: v for k, v in c.iteritems() if 'kAngle' in k }
 #}
 `timescale 1ns/{# c['time_precision'] #}
