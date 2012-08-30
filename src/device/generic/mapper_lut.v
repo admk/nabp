@@ -22,13 +22,32 @@ module NABPMapperLUT
     input wire [`kAngleLength-1:0] mp_angle,
     // outputs to mapper
     // mp_accu_part {# str(accu_part_fixed) #}
-    output reg {# accu_part_fixed.verilog_decl() #} mp_accu_part,
+    {% for j, k in divisions() %}
+    output reg {# accu_part_fixed.verilog_decl() #}
+            mp_line{#j#}_seg{#k#}_accu_part,
+    {% end %}
     // mp_accu_base {# str(accu_base_fixed) #}
     output reg {# accu_base_fixed.verilog_decl() #} mp_accu_base
 );
 
-reg {# c['tMapLineSegDiff'].verilog_decl() #} wsin, wcos;
-reg {# accu_part_fixed.verilog_decl() #} accu_part;
+reg {# line_seg_fixed.verilog_decl() #} wsin, wcos;
+reg {# accu_part_fixed.verilog_decl() #} mp_accu_part;
+
+always @(mp_angle or wsin or wcos or mp_accu_part)
+begin:mp_accu_part_lattice_update
+    reg {# accu_part_fixed.verilog_decl() #} diff;
+    {% for j, k in divisions() %}
+    if (mp_angle < `kAngle45)
+        diff = - wsin * {#j#} - wcos * {#k#};
+    else if (mp_angle < `kAngle90)
+        diff = + wcos * {#j#} + wsin * {#k#};
+    else if (mp_angle < `kAngle135)
+        diff = - wcos * {#j#} + wsin * {#k#};
+    else
+        diff = + wsin * {#j#} - wcos * {#k#};
+    mp_line{#j#}_seg{#k#}_accu_part <= mp_accu_part + diff;
+    {% end %}
+end
 
 always @(posedge clk)
 begin
