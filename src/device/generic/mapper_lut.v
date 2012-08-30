@@ -9,11 +9,8 @@
     from pynabp.enums import mapper_states
     from pynabp.utils import xfrange
 
-    accu_part_fixed = c['tLUTMapAccuPart']
+    accu_part_fixed = c['tMapAccuPart']
     accu_base_fixed = c['tMapAccuBase']
-    mp_accu_part_fixed = c['tMapAccuPart']
-    mp_accu_part_shift = mp_accu_part_fixed.fractional_width - \
-            accu_part_fixed.fractional_width
 #}
 
 module NABPMapperLUT
@@ -23,19 +20,13 @@ module NABPMapperLUT
     // inputs from mapper
     input wire [`kAngleLength-1:0] mp_angle,
     // outputs to mapper
-    // mp_accu_part {# str(mp_accu_part_fixed) #}
-    output wire {# mp_accu_part_fixed.verilog_decl() #} mp_accu_part,
+    // mp_accu_part {# str(accu_part_fixed) #}
+    output reg {# accu_part_fixed.verilog_decl() #} mp_accu_part,
     // mp_accu_base {# str(accu_base_fixed) #}
     output reg {# accu_base_fixed.verilog_decl() #} mp_accu_base
 );
 
 reg {# accu_part_fixed.verilog_decl() #} accu_part;
-assign mp_accu_part =
-    {% if mp_accu_part_shift > 0 %}
-    {accu_part, {# dec_repr(0, mp_accu_part_shift) #}}
-    {% else %}
-    accu_part
-    {% end %};
 
 always @(posedge clk)
 begin
@@ -49,7 +40,7 @@ begin
                 accu_base_val = c['lutMapAccuBase'][idx]
             #}
             // {# accu_part_val #}
-            accu_part <= {# accu_part_fixed.verilog_repr(accu_part_val) #};
+            mp_accu_part <= {# accu_part_fixed.verilog_repr(accu_part_val) #};
             // {# accu_base_val #}
             mp_accu_base <= {# accu_base_fixed.verilog_repr(accu_base_val) #};
         end
