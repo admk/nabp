@@ -6,11 +6,12 @@
 // TODO reduce look-up table size by using symmetry
 
 {#
+    from math import sin, cos, radians
     from pynabp.enums import mapper_states
-    from pynabp.utils import xfrange
 
     accu_part_fixed = c['tLUTMapAccuPart']
     accu_base_fixed = c['tMapAccuBase']
+    line_seg_fixed = c['tMapLineSegDiff']
     mp_accu_part_fixed = c['tMapAccuPart']
     mp_accu_part_shift = mp_accu_part_fixed.fractional_width - \
             accu_part_fixed.fractional_width
@@ -29,6 +30,7 @@ module NABPMapperLUT
     output reg {# accu_base_fixed.verilog_decl() #} mp_accu_base
 );
 
+reg {# c['tMapLineSegDiff'].verilog_decl() #} wsin, wcos;
 reg {# accu_part_fixed.verilog_decl() #} accu_part;
 assign mp_accu_part =
     {% if mp_accu_part_shift > 0 %}
@@ -47,11 +49,14 @@ begin
             {#
                 accu_part_val = c['lutMapAccuPart'][idx]
                 accu_base_val = c['lutMapAccuBase'][idx]
+                angle_rad = radians(angle)
             #}
             // {# accu_part_val #}
             accu_part <= {# accu_part_fixed.verilog_repr(accu_part_val) #};
             // {# accu_base_val #}
             mp_accu_base <= {# accu_base_fixed.verilog_repr(accu_base_val) #};
+            wsin <= {# line_seg_fixed.verilog_repr(sin(angle_rad)) #};
+            wcos <= {# line_seg_fixed.verilog_repr(cos(angle_rad)) #};
         end
         {% end %}
     endcase

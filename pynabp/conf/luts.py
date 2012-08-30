@@ -98,6 +98,10 @@ def _map_accu_base_defines(conf):
     """
     defines = {
             'tMapAccuBase': FixedPoint(1, conf['kMapAccuPrecision'], True),
+            'tMapLineSegDiff':
+                    FixedPoint(
+                        int(math.sqrt(2) * conf['image_size'] + 0.5),
+                        conf['kMapAccuPrecision'], True),
             'lutMapAccuBase': map(_map_accu_base_lookup, xrange(0, 180))
             }
     return defines
