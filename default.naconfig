@@ -91,7 +91,7 @@ config = \
         # below. If not specified, there will be no subdivisions.
         # Constraints:
         #   Positive numbers.
-        'concurrent_subdivisions': 4,
+        'concurrent_subdivisions': 2,
 
         # The angle step size.
         # This determines the difference of angle values between two projection

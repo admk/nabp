@@ -23,13 +23,13 @@ class processing_element_states(enum):
         super(processing_element_states, self).__init__()
 
 
-class processing_state_control_states(enum):
+class processing_swappable_states(enum):
     def __init__(self):
         self.ready = None
         self.fill = None
         self.fill_done = None
         self.shift = None
-        super(processing_state_control_states, self).__init__()
+        super(processing_swappable_states, self).__init__()
 
 
 class shifter_states(enum):

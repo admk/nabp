@@ -17,7 +17,6 @@ ingredients = {
             shifter.v
             shifter_lut.v
             line_buffer.v
-            processing_swappable_state_control.v
             processing_swappable.v
             """),
         'nabp': Split("""
