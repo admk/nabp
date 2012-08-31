@@ -21,18 +21,25 @@ module NABPProcessingSwapControl
     input wire fr0_angle_valid,
     input wire fr1_angle_valid,
     input wire fr_next_angle_ack,
-    input wire signed [`kFilteredDataLength-1:0] fr0_val,
-    input wire signed [`kFilteredDataLength-1:0] fr1_val,
+    {% for j, k in divisions() %}
+    input wire signed [`kFilteredDataLength-1:0] fr0_line{#j#}_seg{#k#}_val,
+    input wire signed [`kFilteredDataLength-1:0] fr1_line{#j#}_seg{#k#}_val,
+    {% end %}
     // output to processing elements
     output reg pe_kick,
     output reg pe_scan_mode,
     output reg pe_scan_direction,
-    output reg [`kFilteredDataLength*`kNoOfPartitions-1:0] pe_taps,
+    {% for j, k in divisions() %}
+    output reg [`kFilteredDataLength*`kNoOfPartitions-1:0]
+            pe_line{#j#}_seg{#k#}_taps,
+    {% end %}
     // output to RAM
     output reg fr_next_angle,
-    output wire fr_done,
-    output wire signed [`kSLength-1:0] fr0_s_val,
-    output wire signed [`kSLength-1:0] fr1_s_val
+    output wire fr_done
+    {% for j, k in divisions() %},
+    output wire signed [`kSLength-1:0] fr0_line{#j#}_seg{#k#}_s_val,
+    output wire signed [`kSLength-1:0] fr1_line{#j#}_seg{#k#}_s_val
+    {% end %}
     {% if c['debug'] %},
     // debug signals
     output wire [`kAngleLength-1:0] db_angle
@@ -66,9 +73,12 @@ end
 reg sw{#i#}_fill_kick, sw{#i#}_shift_kick;
 wire sw{#i#}_pe_kick;
 wire sw{#i#}_shift_done, sw{#i#}_fill_done;
-wire [`kSLength-1:0] sw{#i#}_fr_s_val;
-wire [`kFilteredDataLength-1:0] sw{#i#}_fr_val;
-wire [`kFilteredDataLength*`kNoOfPartitions-1:0] sw{#i#}_pe_taps;
+{% for j, k in divisions() %}
+wire [`kSLength-1:0] sw{#i#}_fr_line{#j#}_seg{#k#}_s_val;
+wire [`kFilteredDataLength-1:0] sw{#i#}_fr_line{#j#}_seg{#k#}_val;
+wire [`kFilteredDataLength*`kNoOfPartitions-1:0]
+        sw{#i#}_pe_line{#j#}_seg{#k#}_taps;
+{% end %}
 {% end %}
 
 reg fill_done, fill_kick, shift_done, shift_kick;
@@ -87,7 +97,9 @@ begin:mux_and_demux
     sw{#i#}_fill_kick <= `NO;
     sw{#i#}_shift_kick <= `NO;
     {% end %}
-    pe_taps <= 'bx;
+    {% for j, k in divisions() %}
+    pe_line{#j#}_seg{#k#}_taps <= 'bx;
+    {% end %}
     pe_kick <= `NO;
     fill_done <= `NO;
     shift_done <= `NO;
@@ -99,7 +111,10 @@ begin:mux_and_demux
             sw{#r[1]#}_fill_kick <= fill_kick;
             sw{#r[0]#}_shift_kick <= shift_kick;
             // to PEs
-            pe_taps <= sw{#r[1]#}_pe_taps;
+            {% for j, k in divisions() %}
+            pe_line{#j#}_seg{#k#}_taps <=
+                    sw{#r[1]#}_pe_line{#j#}_seg{#k#}_taps;
+            {% end %}
             pe_kick <= sw{#r[1]#}_pe_kick;
             // from swappables
             fill_done <= sw{#r[0]#}_fill_done;
@@ -114,10 +129,17 @@ begin:mux_and_demux
 end
 
 // datapath muxing & demuxing
-assign fr0_s_val = (sel == {# to_b(0) #}) ? sw0_fr_s_val : sw1_fr_s_val;
-assign fr1_s_val = (sel == {# to_b(0) #}) ? sw1_fr_s_val : sw0_fr_s_val;
-assign sw0_fr_val = (sel == {# to_b(0) #}) ? fr0_val : fr1_val;
-assign sw1_fr_val = (sel == {# to_b(0) #}) ? fr1_val : fr0_val;
+
+{% for j, k in divisions() %}
+assign fr0_line{#j#}_seg{#k#}_s_val = (sel == {# to_b(0) #}) ?
+        sw0_fr_line{#j#}_seg{#k#}_s_val : sw1_fr_line{#j#}_seg{#k#}_s_val;
+assign fr1_line{#j#}_seg{#k#}_s_val = (sel == {# to_b(0) #}) ?
+        sw1_fr_line{#j#}_seg{#k#}_s_val : sw0_fr_line{#j#}_seg{#k#}_s_val;
+assign sw0_fr_line{#j#}_seg{#k#}_val = (sel == {# to_b(0) #}) ?
+        fr0_line{#j#}_seg{#k#}_val : fr1_line{#j#}_seg{#k#}_val;
+assign sw1_fr_line{#j#}_seg{#k#}_val = (sel == {# to_b(0) #}) ?
+        fr1_line{#j#}_seg{#k#}_val : fr0_line{#j#}_seg{#k#}_val;
+{% end %}
 
 always @(fr1_angle)
 begin:scan_modes_update
@@ -211,40 +233,42 @@ begin:mealy_next_state
 end
 
 wire {# c['tShiftAccuBase'].verilog_decl() #} sh_accu_base;
-wire {# c['tMapAccuPart'].verilog_decl() #} mp_accu_part;
+{% for j, k in divisions() %}
+wire {# c['tMapAccuPart'].verilog_decl() #} mp_line{#j#}_seg{#k#}_accu_part;
+{% end %}
 wire {# c['tMapAccuBase'].verilog_decl() #} mp_accu_base;
 
 {% for i in range(swap) %}
-// swappable {#i#}
-wire {# c['tShiftAccuBase'].verilog_decl() #} sw{#i#}_sh_accu_base;
-wire {# c['tMapAccuInit'].verilog_decl() #} sw{#i#}_mp_accu_init;
-wire {# c['tMapAccuBase'].verilog_decl() #} sw{#i#}_mp_accu_base;
-// wirings
-assign sw{#i#}_sh_accu_base = sh_accu_base;
-assign sw{#i#}_mp_accu_init = mp_accu_part;
-assign sw{#i#}_mp_accu_base = mp_accu_base;
-// module instantiation
+// swappable {#i#} module instantiation
 NABPProcessingSwappable sw{#i#}
 (
     // global signals
     .clk(clk),
     .reset_n(reset_n),
     // inputs from swap control
-    .sw_sh_accu_base(sw{#i#}_sh_accu_base),
-    .sw_mp_accu_init(sw{#i#}_mp_accu_init),
-    .sw_mp_accu_base(sw{#i#}_mp_accu_base),
+    .sw_sh_accu_base(sh_accu_base),
+    {% for j, k in divisions() %}
+    .sw_mp_line{#j#}_seg{#k#}_accu_init(mp_line{#j#}_seg{#k#}_accu_part),
+    {% end %}
+    .sw_mp_accu_base(mp_accu_base),
     .sw_swap_ack(sw{#i#}_shift_kick),
     .sw_next_itr_ack(sw{#i#}_fill_kick),
     // inputs from Filtered RAM
-    .fr_val(sw{#i#}_fr_val),
+    {% for j, k in divisions() %}
+    .fr_line{#j#}_seg{#k#}_val(sw{#i#}_fr_line{#j#}_seg{#k#}_val),
+    {% end %}
     // outputs to swap control
     .sw_swap(sw{#i#}_fill_done),
     .sw_next_itr(sw{#i#}_shift_done),
-    .sw_pe_kick(sw{#i#}_pe_kick),
+    .sw_pe_kick(sw{#i#}_pe_kick)
     // outputs to Filtered RAM
-    .fr_s_val(sw{#i#}_fr_s_val),
+    {% for j, k in divisions() %},
+    .fr_line{#j#}_seg{#k#}_s_val(sw{#i#}_fr_line{#j#}_seg{#k#}_s_val)
+    {% end %}
     // outputs to PEs
-    .pe_taps(sw{#i#}_pe_taps)
+    {% for j, k in divisions() %},
+    .pe_line{#j#}_seg{#k#}_taps(sw{#i#}_pe_line{#j#}_seg{#k#}_taps)
+    {% end %}
 );
 {% end %}
 
@@ -255,7 +279,9 @@ NABPMapperLUT mapper_lut
     .clk(clk),
     .mp_angle(fr0_angle),
     // outputs
-    .mp_accu_part(mp_accu_part),
+    {% for j, k in divisions() %}
+    .mp_line{#j#}_seg{#k#}_accu_part(mp_line{#j#}_seg{#k#}_accu_part),
+    {% end %}
     .mp_accu_base(mp_accu_base)
 );
 NABPShifterLUT shifter_lut
